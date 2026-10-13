@@ -16,7 +16,16 @@ let package = Package(
     targets: [
         .target(
             name: "ARKeyboardCore",
-            path: "ARKeyboard/Core"
+            path: "ARKeyboard/Core",
+            // Core の型は public にしていない(アプリのコードを読みやすくするため)。
+            // 再生コマンド(別モジュール)から使えるよう、リリースビルドでも @testable import を許可する
+            swiftSettings: [.unsafeFlags(["-enable-testing"])]
+        ),
+        // 記録ファイルの再生・合成データ作り(tools/eval/ の Python から呼び出す)
+        .executableTarget(
+            name: "arkeyboard-replay",
+            dependencies: ["ARKeyboardCore"],
+            path: "tools/replay"
         ),
         .testTarget(
             name: "ARKeyboardCoreTests",

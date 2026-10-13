@@ -49,6 +49,9 @@ final class SensorFusion<Payload> {
     var useAudio = true
     /// 振動のオンセットも「当たった証拠」として使うか(音か振動のどちらかがあれば採用)
     var useMotion = false
+    /// 音・振動が無いとき却下するか。false にすると、窓の終わりまで待ってオンセットを対応づけるだけで、
+    /// 採否は後の段(レベルB の学習モデル)に任せる
+    var requireEvidence = true
 
     private var pending: [(time: Double, payload: Payload)] = []
     private var onsets: [OnsetEvent] = []
@@ -143,7 +146,10 @@ final class SensorFusion<Payload> {
             // 窓の終わりまでデータが届いたのに、何も無い → 却下
             let windowEnd = t + config.windowAfter
             let allCovered = activeSources.allSatisfy { (coveredUntil[$0] ?? -Double.infinity) >= windowEnd }
-            if allCovered {
+            if allCovered && !requireEvidence {
+                decisions.append(Decision(payload: candidate.payload, time: t, audio: nil, motion: nil,
+                                          accepted: true, note: nil))
+            } else if allCovered {
                 let names = activeSources.map { $0 == .audio ? "音" : "振動" }.joined(separator: "・")
                 decisions.append(Decision(payload: candidate.payload, time: t, audio: nil, motion: nil,
                                           accepted: false, note: "\(names)なし"))

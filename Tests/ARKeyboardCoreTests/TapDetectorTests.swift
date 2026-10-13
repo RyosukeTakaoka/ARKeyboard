@@ -86,7 +86,9 @@ final class TapDetectorTests: XCTestCase {
             if t < 0.40 { return Vec2(0, -0.15 + 0.15 * (t - 0.36) / 0.04) }  // 戻す
             return Self.tapScript(start: 0.40)(t)
         }
-        XCTAssertEqual(run(script: script).count, 1)
+        let results = run(script: script)
+        // 2回目は(候補になったとしても)クールダウンで入力されない
+        XCTAssertEqual(results.filter { $0.note != "クールダウン中" }.count, 1)
     }
 
     func testTwoSeparateTaps() {
@@ -179,5 +181,25 @@ final class TapDetectorTests: XCTestCase {
         XCTAssertGreaterThan(samples.count, 30)
         XCTAssertGreaterThan(samples.map(\.speed).max() ?? 0, samples.first!.threshold)
         XCTAssertEqual(samples.filter(\.didTap).count, 1)
+    }
+}
+
+final class TapDetectorRegressionTests: XCTestCase {
+    /// 奥の段へ素早く指を伸ばしてから下ろしたタップも検出する(合成データの評価で見つかった不具合の再発防止)
+    func testReachForwardThenTap() {
+        let engine = KeyboardEngine()
+        let (left, right) = standardHands()
+        var taps: [TapResult] = []
+        var t = 0.0
+        while t <= 1.0 {
+            // 0.1〜0.25秒で奥へ 0.27 伸ばし(速い)、0.3秒から 0.12 下ろす
+            let reach = min(max((t - 0.1) / 0.15, 0), 1) * 0.27
+            let press = min(max((t - 0.3) / 0.06, 0), 1) * 0.12
+            taps += engine.process(makeFrame(time: t, hands: [left.moving(.middle, by: Vec2(0, reach - press)), right]))
+                .taps
+            t += 1.0 / 30
+        }
+        XCTAssertEqual(taps.count, 1)
+        XCTAssertEqual(taps.first?.event.finger.finger, .middle)
     }
 }

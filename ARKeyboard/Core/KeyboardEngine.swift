@@ -18,6 +18,10 @@ struct TapResult: Equatable {
     var motionOffset: Double? = nil
     /// デコーダーの結果(キーごとの確率)。デコーダーを使わないときは nil
     var decode: DecodeResult? = nil
+    /// レベルB の特徴量(学習データ作り・デバッグ用)
+    var levelBFeatures: [Double]? = nil
+    /// レベルB の「タップである確率」(使ったときだけ)
+    var levelBProbability: Double? = nil
 }
 
 /// 融合の結果を待っている候補に付けておく情報
@@ -25,6 +29,8 @@ struct TapCandidate {
     var event: TapEvent
     var touch: TouchEvent?
     var heightAboveSurface: Double?
+    /// レベルB の特徴量のうち、カメラの部分
+    var baseFeatures: [Double]
 }
 
 /// 1フレーム処理した結果(ViewModel が画面に反映する)
@@ -79,6 +85,12 @@ final class KeyboardEngine {
     private var languageModels: [DecoderLanguage: CharNGramModel] = [:]
     /// 最後にキーが入力された時刻(入力の速さを測るため)
     private var lastKeyTime: Double?
+    /// レベルB の学習モデル(読み込んだときだけ)
+    var tapClassifier: TapClassifier?
+    /// 指ごとの、最後に入力が採用された時刻(クールダウン用)
+    private var lastAcceptedTime: [FingerID: Double] = [:]
+    /// 指ごとの「手のひらに対する指先の位置」(手の座標)の直近の履歴(レベルB の特徴量用)
+    private var tipHistory: [FingerID: [Vec2]] = [:]
     /// 机の平面(机モードで四隅を登録したとき)
     var deskPlane: DeskPlane? {
         didSet {
@@ -246,6 +258,7 @@ final class KeyboardEngine {
             // 「下向き」と「手の大きさ」は、今の手の座標系(平滑化済み)から求める
             if let hand = hands[chirality], let handFrame = smoothedFrames[chirality] {
                 tapInput[chirality] = (hand, handFrame)
+                updateTipHistory(chirality: chirality, hand: hand, frame: handFrame)
             }
         }
         let detection = tapDetector.process(hands: tapInput, timestamp: frame.timestamp,
@@ -279,6 +292,31 @@ final class KeyboardEngine {
         fusion.config = settings.fusion
         fusion.useAudio = settings.features.audioOnset
         fusion.useMotion = settings.features.motionAssist
+        // レベルB を使うときは、音が無くても却下せず、採否を学習モデルに任せる
+        fusion.requireEvidence = !isLevelBActive
+    }
+
+    /// レベルB の学習モデルを使っているか
+    var isLevelBActive: Bool {
+        settings.features.levelBModel && tapClassifier != nil
+    }
+
+    /// 指先の位置の履歴を更新する(手のひらに対する位置を、手の座標で)
+    private func updateTipHistory(chirality: Chirality, hand: HandObservation, frame: HandFrame) {
+        guard let palm = TapDetector.palmCenter(of: hand, minConfidence: settings.minConfidence) else { return }
+        for finger in Finger.allCases {
+            let id = FingerID(chirality: chirality, finger: finger)
+            guard let tip = hand.position(Joint.tip(of: finger), minConfidence: settings.minConfidence) else {
+                tipHistory[id] = nil
+                continue
+            }
+            let rel = tip - palm
+            let local = Vec2(rel.dot(frame.thumbward), rel.dot(frame.forward)) / frame.scale
+            var history = tipHistory[id, default: []]
+            history.append(local)
+            if history.count > TapFeatures.historyLength { history.removeFirst(history.count - TapFeatures.historyLength) }
+            tipHistory[id] = history
+        }
     }
 
     /// カメラのタップ候補から TouchEvent を作り、融合の保留に加える。
@@ -293,8 +331,12 @@ final class KeyboardEngine {
         }
         var touch = makeTouch(from: event)
         if settings.useLiDAR, height != nil { touch?.evidence.insert(.depth) }
+        let baseFeatures = TapFeatures.base(history: tipHistory[event.finger] ?? [],
+                                            peakRatio: event.peakSpeed / max(tapDetector.effectiveDownSpeed, 1e-6),
+                                            travel: event.travel, finger: event.finger.finger)
         fusion.addCandidate(time: event.timestamp,
-                            payload: TapCandidate(event: event, touch: touch, heightAboveSurface: height))
+                            payload: TapCandidate(event: event, touch: touch, heightAboveSurface: height,
+                                                  baseFeatures: baseFeatures))
         return nil
     }
 
@@ -331,8 +373,29 @@ final class KeyboardEngine {
                                    heightAboveSurface: decision.payload.heightAboveSurface,
                                    audioOffset: decision.audio.map { $0.time - decision.time },
                                    motionOffset: decision.motion.map { $0.time - decision.time })
+            let features = TapFeatures.withAudio(decision.payload.baseFeatures, onset: decision.audio,
+                                                 tapTime: decision.time)
+            result.levelBFeatures = features
             guard decision.accepted else { return result }
+            // レベルB: 学習モデルで「タップかどうか」と「位置の補正」を判定する
+            var levelBOffset = Vec2.zero
+            if isLevelBActive, let classifier = tapClassifier {
+                let output = classifier.evaluate(features)
+                result.levelBProbability = output.tapProbability
+                if output.tapProbability < settings.levelBThreshold {
+                    result.note = String(format: "レベルB: タップでない(%.0f%%)", output.tapProbability * 100)
+                    return result
+                }
+                if settings.levelBUseOffset { levelBOffset = output.offset }
+            }
+            // 同じ指の連続誤検出を防ぐクールダウン(採用された入力の後だけ)
+            if let last = lastAcceptedTime[decision.payload.event.finger],
+               decision.time - last < settings.tap.cooldown {
+                result.note = "クールダウン中"
+                return result
+            }
             guard var touch = result.touch else {
+                lastAcceptedTime[decision.payload.event.finger] = decision.time
                 result.note = "未キャリブレーション"
                 return result
             }
@@ -342,6 +405,7 @@ final class KeyboardEngine {
                 let c = min(max(0.5 + (onset.strength - 1) * 0.25, 0.3), 0.95)
                 touch.confidence = 1 - (1 - touch.confidence) * (1 - c)
             }
+            touch.surfaceLocation += levelBOffset
             result.touch = touch
             let chosen = chooseKey(for: touch, context: runningContext)
             result.key = chosen.key
@@ -349,6 +413,7 @@ final class KeyboardEngine {
             if let key = chosen.key {
                 runningContext += key.output
                 lastKeyTime = touch.time
+                lastAcceptedTime[decision.payload.event.finger] = decision.time
             } else if result.note == nil {
                 result.note = "キーの範囲外"
             }

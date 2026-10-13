@@ -116,6 +116,10 @@ struct KeyboardSettings: Codable, Equatable {
     var fusion = FusionConfig()
     /// デコーダー(空間タッチモデル × 言語モデル)の設定
     var decoder = DecoderConfig()
+    /// レベルB: この確率より低い候補はタップにしない
+    var levelBThreshold: Double = 0.5
+    /// レベルB: 位置の補正を使う
+    var levelBUseOffset: Bool = true
     /// キー配置の上に重ねて表示するもの
     var overlayMode: OverlayMode = .keys
     /// 机モードで登録する範囲の実際の大きさ(cm)。メジャーで測って入れると、キーの大きさが cm で分かる

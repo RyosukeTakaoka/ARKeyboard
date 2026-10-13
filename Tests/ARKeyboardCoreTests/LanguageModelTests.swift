@@ -48,3 +48,28 @@ final class LanguageModelTests: XCTestCase {
         }
     }
 }
+
+/// オンセット検出の Python 版(tools/eval/onset.py)と同じ結果になること(ゴールデンテスト)
+final class OnsetGoldenTests: XCTestCase {
+    func testMatchesPythonGolden() throws {
+        struct Golden: Decodable {
+            struct Onset: Decodable { let time: Double; let strength: Double }
+            let inputs: [[Double]]
+            let onsets: [Onset]
+            let thresholds: [Double]
+        }
+        let golden = try JSONDecoder().decode(Golden.self, from: try RepoFiles.fixture("onset_golden.json"))
+        let detector = OnsetDetector(source: .audio)
+        var onsets: [OnsetEvent] = []
+        for (i, pair) in golden.inputs.enumerated() {
+            if let e = detector.process(value: pair[1], time: pair[0]) { onsets.append(e) }
+            XCTAssertEqual(detector.lastThreshold, golden.thresholds[i], accuracy: 1e-12)
+        }
+        XCTAssertEqual(onsets.count, golden.onsets.count)
+        XCTAssertGreaterThan(onsets.count, 3)
+        for (a, b) in zip(onsets, golden.onsets) {
+            XCTAssertEqual(a.time, b.time, accuracy: 1e-12)
+            XCTAssertEqual(a.strength, b.strength, accuracy: 1e-12)
+        }
+    }
+}

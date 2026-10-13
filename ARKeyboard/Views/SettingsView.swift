@@ -106,7 +106,7 @@ struct SettingsView: View {
                             help: "これより長くかかる動きはタップではない。")
             ParameterSlider(title: "クールダウン", value: $viewModel.settings.tap.cooldown, range: 0.05...0.5,
                             format: { "\(Int($0 * 1000)) ms" },
-                            help: "同じ指の連続誤検出を防ぐ待ち時間。")
+                            help: "同じ指の連続誤検出を防ぐ待ち時間(入力が採用された後に掛かる)。")
             ParameterSlider(title: "同じ手の別の指のロック", value: $viewModel.settings.tap.sameHandLockout, range: 0...0.2,
                             format: { "\(Int($0 * 1000)) ms" },
                             help: "隣の指がつられて動いたのを誤検出しないための時間。")

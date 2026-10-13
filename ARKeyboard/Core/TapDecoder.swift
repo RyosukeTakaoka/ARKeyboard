@@ -25,7 +25,9 @@ struct DecoderConfig: Codable, Equatable {
     var lmOrder: Int = 5
     /// 言語モデルの重み w(事後確率 ∝ 位置の尤度 × 言語の確率^w)。
     /// 0 なら言語モデルを使わないのと同じ。大きいほど文脈を重視する。
-    var lmWeight: Double = 0.7
+    /// 初期値 0.4 は、合成データ(学習データに無い英文)で w = 0〜1.5 を比べた結果から仮に決めた値
+    /// (docs/results.md)。実際の記録データで調整し直すこと。
+    var lmWeight: Double = 0.4
     /// キーごとの分布の、初期のばらつき(キーの大きさに対する割合)
     var keySigma: Double = 0.3
     /// 測定(カメラ)の不確かさ(キー間隔に対する割合)

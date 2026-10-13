@@ -55,6 +55,9 @@ final class Calibrator {
         var requiredDuration: Double = 2.0
         /// 「静止」とみなす指先の移動量の上限(手の大きさ単位。0.08 ≒ 手首〜中指付け根の 8%)
         var stillnessTolerance: Double = 0.08
+        /// 静止の判定に使う平均のフレーム数。1フレームずつ比べると、関節点の細かい震えだけで
+        /// 「動いた」と判定され、いつまでも完了しないことがあるため(合成データの評価で発見)
+        var stillnessAveraging: Int = 6
         /// この信頼度より低い点は使わない
         var minConfidence: Double = 0.3
         /// 人の手の「手のひらの幅 ÷ 手首〜中指付け根の長さ」のおおよその値
@@ -112,8 +115,12 @@ final class Calibrator {
         }
         let current = (time: timestamp, hands: [Chirality.left: left, .right: right])
 
-        // 2. 最初のサンプルから動いていないか(動いたら計測をやり直す)
-        if let anchor = samples.first, moved(from: anchor.hands, to: current.hands) {
+        // 2. 最初の数フレームの平均から、直近の数フレームの平均が動いていないか(動いたら計測をやり直す)
+        //    平均を使うのは、関節点の細かい震えを打ち消すため
+        if samples.count >= 1,
+           let anchor = Self.averagedHands(Array(samples.prefix(config.stillnessAveraging)), minConfidence: config.minConfidence),
+           let recent = Self.averagedHands(Array((samples + [current]).suffix(config.stillnessAveraging)), minConfidence: config.minConfidence),
+           moved(from: anchor, to: recent) {
             samples = [current]
             phase = .holding(progress: 0)
             message = "動きました。そのまま静止してください"
@@ -141,6 +148,18 @@ final class Calibrator {
     }
 
     // MARK: - 内部の計算
+
+    /// 何フレーム分かの両手を、関節ごとに平均する
+    private static func averagedHands(_ samples: [(time: Double, hands: [Chirality: HandObservation])],
+                                      minConfidence: Double) -> [Chirality: HandObservation]? {
+        var result: [Chirality: HandObservation] = [:]
+        for chirality in Chirality.allCases {
+            let observations = samples.compactMap { $0.hands[chirality] }
+            guard let averaged = average(observations, minConfidence: minConfidence) else { return nil }
+            result[chirality] = averaged
+        }
+        return result
+    }
 
     private func hasRequiredJoints(_ hand: HandObservation) -> Bool {
         Self.requiredJoints.allSatisfy { hand.position($0, minConfidence: config.minConfidence) != nil }

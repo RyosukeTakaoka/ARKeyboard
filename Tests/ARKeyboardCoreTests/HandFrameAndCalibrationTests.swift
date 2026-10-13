@@ -83,10 +83,15 @@ final class CalibrationTests: XCTestCase {
             _ = engine.process(makeFrame(time: t, hands: [left, right]))
             t += 1.0 / 30
         }
-        // 大きく動かす(手の大きさの 30%)
+        // 大きく動かす(手の大きさの 30%)。直近の数フレームの平均で判定するので、数フレーム以内にやり直しになる
         let moved = left.moving(.middle, by: Vec2(0, 0.3))
-        _ = engine.process(makeFrame(time: t, hands: [moved, right]))
-        XCTAssertEqual(engine.calibrator.phase, .holding(progress: 0))
+        var restarted = false
+        for _ in 0..<3 {
+            _ = engine.process(makeFrame(time: t, hands: [moved, right]))
+            t += 1.0 / 30
+            if engine.calibrator.phase == .holding(progress: 0) { restarted = true; break }
+        }
+        XCTAssertTrue(restarted)
         // 片手しか映っていなければ待機に戻る
         _ = engine.process(makeFrame(time: t + 0.1, hands: [right]))
         XCTAssertEqual(engine.calibrator.phase, .waitingForHands)
@@ -123,5 +128,23 @@ final class HandAssignmentTests: XCTestCase {
         let engine = KeyboardEngine(settings: settings)
         let hands = engine.assignHands([left.observation(), right.observation()])
         XCTAssertEqual(hands[.right]?.joints[.wrist]?.position, left.observation().joints[.wrist]?.position)
+    }
+}
+
+final class CalibrationRobustnessTests: XCTestCase {
+    /// 関節点が震えていても(手の大きさの 2%)、キャリブレーションは完了する
+    func testCompletesWithJointJitter() {
+        let (left, right) = standardHands()
+        let engine = KeyboardEngine()
+        engine.startCalibration()
+        var rng = SplitMix64(seed: 7)
+        var t = 0.0
+        while engine.calibration == nil, t < 6 {
+            let frame = Replayer.addNoise(to: makeFrame(time: t, hands: [left, right]), sigma: 0.02, rng: &rng)
+            _ = engine.process(frame)
+            t += 1.0 / 30
+        }
+        XCTAssertNotNil(engine.calibration)
+        XCTAssertLessThan(t, 3)
     }
 }

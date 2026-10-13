@@ -1,7 +1,6 @@
 import Foundation
-@testable import ARKeyboardCore
 
-/// テスト用の「人工的な手」。
+/// 人工的な手(単体テストと、評価ツールの合成データ作りで使う)。
 /// 手の座標(x: 親指側+, y: 前+、単位は手首〜中指付け根の長さ)で関節の位置を決めておき、
 /// 好きな位置・回転・大きさで画像上に置いた HandObservation を作ります。
 struct SyntheticHand {
@@ -70,13 +69,3 @@ struct SyntheticHand {
     }
 }
 
-/// 左右そろった VisionFrame を作る
-func makeFrame(time: Double, hands: [SyntheticHand], imageSize: Vec2 = Vec2(720, 1280)) -> VisionFrame {
-    VisionFrame(timestamp: time, imageSize: imageSize, hands: hands.map { $0.observation() })
-}
-
-/// 左手と右手を横に並べた、標準のテスト用の両手
-func standardHands() -> (left: SyntheticHand, right: SyntheticHand) {
-    (SyntheticHand(chirality: .left, origin: Vec2(200, 1000)),
-     SyntheticHand(chirality: .right, origin: Vec2(520, 1000)))
-}

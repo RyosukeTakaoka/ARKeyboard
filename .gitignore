@@ -10,3 +10,8 @@ build/
 
 # macOS
 .DS_Store
+
+# 評価ツールが作る一時的な合成データ・記録データ
+tools/eval/synth-*/
+recordings/
+__pycache__/

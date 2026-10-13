@@ -33,8 +33,12 @@ struct TapParameters: Codable, Equatable {
     var minTravel: Double = 0.06
     /// 下ろし始めてからこれ以上たっても止まらなければ、タップではない(ゆっくりした動き)(秒)
     var maxDownDuration: Double = 0.25
-    /// 同じ指の連続誤検出を防ぐ待ち時間(秒)
+    /// 同じ指の連続誤検出を防ぐ待ち時間(秒)。「採用された入力」の後に掛ける(KeyboardEngine)。
+    /// ※ カメラの候補の段階で掛けると、却下される誤った候補(指をキーへ動かしただけ等)の直後の
+    ///   本物のタップまでブロックしてしまうため(合成データの評価で分かった)。
     var cooldown: Double = 0.15
+    /// 候補の段階の不応期(秒)。1回の打鍵の跳ね返りで、候補が二重に出ないようにする
+    var candidateRefractory: Double = 0.06
     /// 手全体がこれより速く動いているときは、タップ判定しない(手/秒)。手を移動させている最中の誤検出対策。
     var maxPalmSpeed: Double = 1.5
     /// 位置の平滑化(0 = しない 〜 0.9 = 強く)。大きいほど震えに強いが、止まりの検出が遅れる。
@@ -243,8 +247,12 @@ final class TapDetector {
                         // 下ろし始めた。始点は「最後に止まっていたとき」の値にしておく
                         state.phase = .descending(startTime: timestamp - dt, startSignal: state.restSignal,
                                                   startRel: state.restRel, peak: speed)
-                    } else if abs(speed) < threshold * 0.3 {
-                        // ほぼ止まっている → ここを次の動きの始点の候補にする
+                    } else if speed < threshold * 0.3 {
+                        // ほぼ止まっている、または手首から離れる向き(指を上げる・奥へ伸ばす)に動いている
+                        // → ここを次の「下ろす動き」の始点にする。
+                        // ※ 以前は「止まっているとき」だけ更新していたため、奥の段へ素早く指を伸ばしてから
+                        //   下ろすと、始点が伸ばす前の位置のままになり、移動量がマイナスになって
+                        //   タップを取りこぼしていた(合成データの評価で発見)。
                         state.restSignal = state.signal
                         state.restRel = state.rel
                     }
@@ -292,7 +300,7 @@ final class TapDetector {
                 continue
             }
             taps.append(best)
-            cooldownUntil[best.finger] = timestamp + parameters.cooldown
+            cooldownUntil[best.finger] = timestamp + parameters.candidateRefractory
             lastTapTime[chirality] = timestamp
             if best.finger == observedFinger {
                 sample?.didTap = true
