@@ -34,4 +34,11 @@ struct KeyboardSettings: Codable, Equatable {
     var restrictKeysToFinger: Bool = true
     /// 指先からこれ以上離れたキーは押していないとみなす(キーの大きさ単位)
     var maxKeyDistance: Double = 1.3
+
+    /// タップの感度(0〜1)。画面下のスライダーで実行中に変えられる。
+    var sensitivity: Double = 0.5
+    /// タップ判定のしきい値
+    var tap = TapParameters()
+    /// デバッグ表示で速度グラフを出す指
+    var debugFinger = FingerID(chirality: .right, finger: .index)
 }

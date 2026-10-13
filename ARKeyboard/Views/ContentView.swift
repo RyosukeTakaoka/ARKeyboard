@@ -44,6 +44,7 @@ struct ContentView: View {
                     KeyboardOverlayView(keys: viewModel.keys,
                                         frames: viewModel.layoutFrames,
                                         hoveredKeyIDs: viewModel.hoveredKeyIDs,
+                                        pressedKeys: viewModel.pressedKeys,
                                         converter: converter)
                     HandSkeletonView(hands: viewModel.hands,
                                      frames: viewModel.layoutFrames,

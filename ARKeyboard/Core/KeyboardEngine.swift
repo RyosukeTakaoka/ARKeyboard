@@ -1,5 +1,14 @@
 import Foundation
 
+/// タップと、それで押されたキー
+struct TapResult: Equatable {
+    var event: TapEvent
+    /// 押されたキー(キャリブレーション前や、キーから遠すぎるときは nil)
+    var key: Key?
+    /// キーが決まらなかった理由など(デバッグログ用)
+    var note: String?
+}
+
 /// 1フレーム処理した結果(ViewModel が画面に反映する)
 struct EngineOutput {
     /// 左右を割り当てた手
@@ -8,6 +17,10 @@ struct EngineOutput {
     var layoutFrames: [Chirality: HandFrame] = [:]
     /// 指先の下にあるキーの ID(光らせる)
     var hoveredKeyIDs: Set<String> = []
+    /// このフレームで起きたタップ
+    var taps: [TapResult] = []
+    /// デバッググラフ用の、1本の指の速度
+    var signalSample: FingerSignalSample?
     /// このフレームでキャリブレーションが完了したら、その結果
     var calibrationFinished: CalibrationResult?
 }
@@ -15,7 +28,7 @@ struct EngineOutput {
 /// キーボードの「頭脳」。カメラにも画面にも依存しない純粋なロジックだけを持ちます。
 ///
 /// VisionFrame(手の認識結果)を1つ受け取るたびに、
-///   左右の割り当て → 手の座標系 → キャリブレーション → 指先とキーの対応
+///   左右の割り当て → 手の座標系 → キャリブレーション → 指先とキーの対応 → タップ判定
 /// の順に処理して、EngineOutput を返します。
 /// UI に依存しないので、単体テストで動作を確かめられます。
 final class KeyboardEngine {
@@ -32,6 +45,8 @@ final class KeyboardEngine {
     private(set) var calibration: CalibrationResult?
     /// 手ごとのキー(手の座標で表したもの)
     private(set) var keys: [Chirality: [Key]] = [:]
+    /// タップ判定
+    let tapDetector = TapDetector()
 
     /// 手ごとの「平滑化した」手の座標系(手ぶれでキー配置が震えないようにするため)
     private var smoothedFrames: [Chirality: HandFrame] = [:]
@@ -42,6 +57,7 @@ final class KeyboardEngine {
 
     func startCalibration() {
         calibrator.start()
+        tapDetector.reset()
     }
 
     func setCalibration(_ result: CalibrationResult?) {
@@ -112,8 +128,8 @@ final class KeyboardEngine {
 
         // 指先の下にあるキーを探す(画面で光らせる)
         for chirality in Chirality.allCases {
-            guard let hand = hands[chirality], let frame = layoutFrame(for: chirality) else { continue }
-            output.layoutFrames[chirality] = frame
+            guard let hand = hands[chirality], let layout = layoutFrame(for: chirality) else { continue }
+            output.layoutFrames[chirality] = layout
             for finger in Finger.allCases {
                 guard let tip = hand.position(Joint.tip(of: finger), minConfidence: settings.minConfidence),
                       let key = key(atImagePoint: tip, finger: FingerID(chirality: chirality, finger: finger)) else {
@@ -122,7 +138,36 @@ final class KeyboardEngine {
                 output.hoveredKeyIDs.insert(key.id)
             }
         }
+
+        // タップ判定(設定は毎フレーム反映するので、スライダーを動かすとすぐ効く)
+        tapDetector.parameters = settings.tap
+        tapDetector.sensitivity = settings.sensitivity
+        tapDetector.minConfidence = settings.minConfidence
+        var tapInput: [Chirality: (observation: HandObservation, frame: HandFrame)] = [:]
+        for chirality in Chirality.allCases {
+            // 「下向き」と「手の大きさ」は、今の手の座標系(平滑化済み)から求める
+            if let hand = hands[chirality], let handFrame = smoothedFrames[chirality] {
+                tapInput[chirality] = (hand, handFrame)
+            }
+        }
+        let detection = tapDetector.process(hands: tapInput, timestamp: frame.timestamp,
+                                            observedFinger: settings.debugFinger)
+        output.signalSample = detection.sample
+        for event in detection.taps {
+            output.taps.append(resolve(event))
+        }
         return output
+    }
+
+    /// タップした瞬間の指先の位置から、押されたキーを決める
+    private func resolve(_ event: TapEvent) -> TapResult {
+        guard calibration != nil else {
+            return TapResult(event: event, key: nil, note: "未キャリブレーション")
+        }
+        guard let key = key(atImagePoint: event.tipPosition, finger: event.finger) else {
+            return TapResult(event: event, key: nil, note: "キーの範囲外")
+        }
+        return TapResult(event: event, key: key, note: nil)
     }
 
     /// Vision の検出結果(最大2つ)を「左手」「右手」に割り当てます。

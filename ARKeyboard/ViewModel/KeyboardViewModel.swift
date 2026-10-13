@@ -33,6 +33,8 @@ final class KeyboardViewModel {
     var keys: [Chirality: [Key]] = [:]
     /// 指先の下にあるキー
     var hoveredKeyIDs: Set<String> = []
+    /// 押されたキーと押された時刻(押した瞬間にキーを光らせる)
+    var pressedKeys: [String: Date] = [:]
 
     // MARK: 内部で使うもの(View から監視する必要がないので @ObservationIgnored)
 
@@ -98,6 +100,15 @@ final class KeyboardViewModel {
             calibration = result
             keys = engine.keys
         }
+        for tap in output.taps {
+            handleTap(tap)
+        }
+    }
+
+    /// タップ1回分の処理
+    private func handleTap(_ tap: TapResult) {
+        guard let key = tap.key else { return }
+        pressedKeys[key.id] = Date()
     }
 
     private func syncCalibrationState() {
