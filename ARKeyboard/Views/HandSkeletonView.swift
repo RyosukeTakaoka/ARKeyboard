@@ -2,8 +2,11 @@ import SwiftUI
 
 /// 検出した手の関節点と骨格を、カメラ映像の上に描く View。
 /// 「Vision がちゃんと手を見つけているか」を目で確認するためのものです。
+/// あわせて、手の座標系(前=緑、親指側=赤の矢印)も描きます。
 struct HandSkeletonView: View {
-    let hands: [HandObservation]
+    let hands: [Chirality: HandObservation]
+    /// キー配置の基準にしている手の座標系(キャリブレーション後のみ)
+    let frames: [Chirality: HandFrame]
     /// 画像のピクセル座標 → 画面座標 の変換
     let converter: CoordinateConverter
     /// この信頼度より低い点は描かない(=計算にも使わない点)
@@ -12,8 +15,8 @@ struct HandSkeletonView: View {
     var body: some View {
         // Canvas は、たくさんの線や点を高速に描くのに向いた View です。
         Canvas { context, _ in
-            for hand in hands {
-                let color = Self.color(for: hand.chirality)
+            for (chirality, hand) in hands {
+                let color = Self.color(for: chirality)
 
                 // 骨格(手首 → 各指の付け根 → 指先)を線で結ぶ
                 for finger in Finger.allCases {
@@ -27,7 +30,7 @@ struct HandSkeletonView: View {
                         let v = converter.viewPoint(fromImage: p).cgPoint
                         if started { path.addLine(to: v) } else { path.move(to: v); started = true }
                     }
-                    context.stroke(path, with: .color(color.opacity(0.7)), lineWidth: 2)
+                    context.stroke(path, with: .color(color.opacity(0.6)), lineWidth: 2)
                 }
 
                 // 関節点(信頼度が高いほど不透明に)
@@ -39,17 +42,31 @@ struct HandSkeletonView: View {
                     context.fill(Path(ellipseIn: rect), with: .color(color.opacity(0.4 + 0.6 * point.confidence)))
                 }
             }
+
+            // 手の座標系の軸(前 = 緑、親指側 = 赤)。長さは手の大きさの 0.5 倍。
+            for (_, frame) in frames {
+                let origin = converter.viewPoint(fromImage: frame.origin).cgPoint
+                let forwardEnd = converter.viewPoint(fromImage: frame.toImage(Vec2(0, 0.5))).cgPoint
+                let thumbEnd = converter.viewPoint(fromImage: frame.toImage(Vec2(0.5, 0))).cgPoint
+                var forwardPath = Path()
+                forwardPath.move(to: origin)
+                forwardPath.addLine(to: forwardEnd)
+                context.stroke(forwardPath, with: .color(.green), lineWidth: 3)
+                var thumbPath = Path()
+                thumbPath.move(to: origin)
+                thumbPath.addLine(to: thumbEnd)
+                context.stroke(thumbPath, with: .color(.red), lineWidth: 3)
+            }
         }
         // 下にあるボタンなどのタッチを邪魔しないように、この View はタッチを受け取らない
         .allowsHitTesting(false)
     }
 
-    /// 左手は水色、右手はオレンジ、不明は灰色
-    static func color(for chirality: Chirality?) -> Color {
+    /// 左手は水色、右手はオレンジ
+    static func color(for chirality: Chirality) -> Color {
         switch chirality {
-        case .left?: return .cyan
-        case .right?: return .orange
-        case nil: return .gray
+        case .left: return .cyan
+        case .right: return .orange
         }
     }
 }

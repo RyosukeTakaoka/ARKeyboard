@@ -8,6 +8,10 @@ import Observation
 ///
 /// このクラスのメソッドとプロパティは、すべて**メインスレッド**から使います。
 /// (カメラ側が結果をメインスレッドに渡してくれるので、ここでスレッドを気にする必要はありません)
+///
+/// 役割分担:
+/// - 計算(左右の割り当て・座標系・キャリブレーション・タップ判定)は KeyboardEngine(Core)
+/// - このクラスは「カメラ → エンジン → 画面」の受け渡しと、触覚・音などの iPhone 固有の処理
 @Observable
 final class KeyboardViewModel {
     // MARK: 画面に表示する状態
@@ -16,13 +20,22 @@ final class KeyboardViewModel {
     var cameraStatus: CameraStatus = .idle
     /// 向き補正後の画像サイズ(ピクセル)。画面座標への変換に使う。
     var imageSize = Vec2(720, 1280)
-    /// 最新フレームで検出された手
-    var hands: [HandObservation] = []
+    /// 最新フレームで検出された手(左右を割り当て済み)
+    var hands: [Chirality: HandObservation] = [:]
+    /// キー配置の基準にしている手の座標系
+    var layoutFrames: [Chirality: HandFrame] = [:]
+    /// キャリブレーションの進み具合と案内
+    var calibrationPhase: Calibrator.Phase = .idle
+    var calibrationMessage = ""
+    /// キャリブレーション結果
+    var calibration: CalibrationResult?
 
     // MARK: 内部で使うもの(View から監視する必要がないので @ObservationIgnored)
 
     /// カメラ
     @ObservationIgnored let camera = CameraManager()
+    /// 計算を担当するエンジン
+    @ObservationIgnored private let engine = KeyboardEngine()
 
     init() {
         // カメラから1コマ届くたびに handle(_:) を呼んでもらう。
@@ -45,9 +58,44 @@ final class KeyboardViewModel {
         camera.stop()
     }
 
+    // MARK: キャリブレーション
+
+    /// キャリブレーション中か。
+    /// (engine は監視対象外なので、監視対象の calibrationPhase から求める。
+    ///  こうしないと、値が変わっても画面が更新されません)
+    var isCalibrating: Bool {
+        switch calibrationPhase {
+        case .waitingForHands, .holding: return true
+        case .idle, .finished: return false
+        }
+    }
+
+    func startCalibration() {
+        engine.startCalibration()
+        syncCalibrationState()
+    }
+
+    func cancelCalibration() {
+        engine.calibrator.cancel()
+        syncCalibrationState()
+    }
+
+    // MARK: フレーム処理
+
     /// 1コマ分の認識結果を受け取る(メインスレッド)
     private func handle(_ frame: VisionFrame) {
         imageSize = frame.imageSize
-        hands = frame.hands
+        let output = engine.process(frame)
+        hands = output.hands
+        layoutFrames = output.layoutFrames
+        syncCalibrationState()
+        if let result = output.calibrationFinished {
+            calibration = result
+        }
+    }
+
+    private func syncCalibrationState() {
+        calibrationPhase = engine.calibrator.phase
+        calibrationMessage = engine.calibrator.message
     }
 }
