@@ -57,6 +57,7 @@ final class Replayer {
         /// 言語モデルの学習用テキスト
         var englishCorpus: String?
         var romajiCorpus: String?
+        var kanaCorpus: String?
         /// 記録にキャリブレーションが無ければ、最初の静止部分で自動キャリブレーションする
         var autoCalibrate = true
         /// レベルB の学習用に、タップ候補の特徴量も出力する
@@ -89,6 +90,7 @@ final class Replayer {
         let settings = Self.applyPatch(options.settingsPatch, to: recording.settings)
         let engine = KeyboardEngine(settings: settings)
         engine.setLanguageCorpora(english: options.englishCorpus, romaji: options.romajiCorpus)
+        if let kana = options.kanaCorpus { engine.setKanaCorpus(kana) }
         engine.deskPlane = recording.deskPlane
         engine.tapClassifier = options.classifier
         if let calibration = recording.calibration {
@@ -138,6 +140,16 @@ final class Replayer {
             for r in results {
                 if let rewrite = r.wordRewrite {
                     typed = String(typed.dropLast(min(r.wordReplaceCount, typed.count))) + rewrite
+                } else if let action = r.functionAction {
+                    // フリックモードの機能パッド(アプリの KeyboardViewModel.handleFunction と同じ扱い)
+                    switch action {
+                    case .space: typed += " "
+                    case .newline: typed += "\n"
+                    case .backspace:
+                        if !typed.isEmpty { typed.removeLast() }
+                        engine.noteBackspace()
+                    case .modifier, .nextCandidate, .none: break
+                    }
                 } else if let key = r.key {
                     typed += key.output
                 }

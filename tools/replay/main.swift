@@ -13,6 +13,10 @@
 //   swift run -c release arkeyboard-replay synth --out 出力.json [オプション]   → 合成の記録を作る
 //     --text "the quick brown fox"   打つ文章(既定: 練習モードのお題をつなげたもの)
 //     --seed 1 --mode knee|desk --aim-noise 0.25 --interval 0.6 --false-onsets 0.3 --finger-bias 0.3
+//
+//   swift run -c release arkeyboard-replay synth --flick --out 出力.json [オプション]   → 合成のフリックの記録
+//     --text "きょうはいいてんきですね。" --seed 1 --fps 30 --aim-noise 0.2
+//     --angle-noise 12(度) --rotation-bias 0(度) --contact-audio(方式B用にフリックの始まりにも音を出す)
 import Foundation
 @testable import ARKeyboardCore
 
@@ -54,6 +58,7 @@ case "replay":
     let corpusDir = option("--corpus-dir") ?? "ARKeyboard/Resources/Corpus"
     options.englishCorpus = try? String(contentsOfFile: corpusDir + "/corpus_english.txt", encoding: .utf8)
     options.romajiCorpus = try? String(contentsOfFile: corpusDir + "/corpus_romaji.txt", encoding: .utf8)
+    options.kanaCorpus = try? String(contentsOfFile: corpusDir + "/corpus_kana.txt", encoding: .utf8)
     options.dumpFeatures = flag("--dump-features")
     if let modelPath = option("--model") {
         guard let modelData = FileManager.default.contents(atPath: modelPath),
@@ -66,6 +71,25 @@ case "replay":
     let output = try RecordingIO.encoder().encode(result)
     FileHandle.standardOutput.write(output)
     FileHandle.standardOutput.write("\n".data(using: .utf8)!)
+
+case "synth" where flag("--flick"):
+    guard let out = option("--out") else { fail("--out を指定してください") }
+    let text = option("--text") ?? "きょうはいいてんきですね。"
+    var config = SyntheticFlickConfig(targets: SyntheticFlickGenerator.targets(from: text))
+    config.seed = UInt64(option("--seed") ?? "1") ?? 1
+    if let v = option("--fps").flatMap(Double.init) { config.fps = v }
+    if let v = option("--aim-noise").flatMap(Double.init) { config.aimNoise = v }
+    if let v = option("--angle-noise").flatMap(Double.init) { config.angleNoiseDegrees = v }
+    if let v = option("--rotation-bias").flatMap(Double.init) { config.rotationBiasDegrees = v }
+    if let v = option("--false-onsets").flatMap(Double.init) { config.falseOnsetRate = v }
+    config.contactAudio = flag("--contact-audio")
+    let recording = SyntheticFlickGenerator.generate(config)
+    do {
+        try RecordingIO.encoder().encode(recording).write(to: URL(fileURLWithPath: out))
+    } catch {
+        fail("書き込めません: \(error)")
+    }
+    FileHandle.standardError.write("合成のフリックの記録を作りました: \(out)(\(config.targets.count) 文字, \(recording.frames.count) フレーム)\n".data(using: .utf8)!)
 
 case "synth":
     guard let out = option("--out") else { fail("--out を指定してください") }

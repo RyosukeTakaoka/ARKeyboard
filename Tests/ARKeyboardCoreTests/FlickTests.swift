@@ -129,6 +129,26 @@ final class FlickSegmenterTests: XCTestCase {
         XCTAssertTrue(run { t in Vec2(0.4 * self.ease((t - 0.1) / 0.8), 0) }.isEmpty)
     }
 
+    /// 30fps・関節点の震えあり: 空中タップは「タップ」のまま(折り返しで切れて「下フリック」にならない)。
+    /// 速さの平滑化を時間で決める修正と、止まりの継続時間(endHold)の回帰テスト
+    func testAirTapAt30fpsWithJitter() throws {
+        var rng = SplitMix64(seed: 7)
+        let segmenter = FlickSegmenter()
+        var gestures: [FlickGesture] = []
+        var t = 0.0
+        while t <= 1.0 {
+            let x = (t - 0.4) / 0.14
+            var rel = Vec2(0, x > 0 && x < 1 ? -0.15 * sin(Double.pi * x) : 0)
+            rel += Vec2(rng.nextGaussian(), rng.nextGaussian()) * 0.006
+            if let g = segmenter.process(finger: finger, position: rel, rel: rel, time: t) { gestures.append(g) }
+            t += 1.0 / 30
+        }
+        XCTAssertEqual(gestures.count, 1)
+        let probabilities = FlickModel.directionProbabilities(displacement: try XCTUnwrap(gestures.first).displacement,
+                                                              hand: .right, config: FlickConfig())
+        XCTAssertEqual(probabilities.max { $0.value < $1.value }?.key, .tap)
+    }
+
     func testAirTapHasSmallDisplacement() throws {
         // 0.12 秒で下ろして戻す(空中のタップ)
         let gestures = run { t in
@@ -193,5 +213,51 @@ final class FlickEngineTests: XCTestCase {
         // 確定したので、次のフリックは新しい並び(消す文字数 0)
         let next = engine.handle(gesture, context: pick.rewrite)
         XCTAssertEqual(next.replaceCount, 0)
+    }
+
+    /// 合成のフリックの記録を、アプリと同じエンジンで再生すると、ほぼ目標どおりに入力される
+    func testSyntheticFlickRecordingReplays() throws {
+        let text = "きょうはいいてんきですね。"
+        var config = SyntheticFlickConfig(targets: SyntheticFlickGenerator.targets(from: text))
+        config.audioMissRate = 0
+        let recording = SyntheticFlickGenerator.generate(config)
+        var options = Replayer.Options()
+        options.settingsPatch = ["flick": ["useLanguageModel": false]]
+        let result = Replayer(recording: recording, options: options).run()
+        XCTAssertTrue(result.calibrated)
+        let flicks = result.taps.filter { $0.flickDirection != nil }
+        XCTAssertEqual(flicks.count, config.targets.count)
+        // 文字誤り(置換)が 2 文字以下
+        XCTAssertEqual(result.finalText.count, text.count)
+        let errors = zip(result.finalText, text).filter { $0 != $1 }.count
+        XCTAssertLessThanOrEqual(errors, 2, result.finalText)
+    }
+}
+
+final class OneEuroFilterTests: XCTestCase {
+    /// 止まっているときの震えは小さくなり、速く動いたら遅れずに付いていく
+    func testReducesJitterAndFollowsFastMotion() {
+        var rng = SplitMix64(seed: 3)
+        var filter = OneEuroFilter2(minCutoff: 1.5, beta: 3)
+        var rawVariance = 0.0, filteredVariance = 0.0
+        var t = 0.0
+        for i in 0..<60 {
+            let raw = Vec2(rng.nextGaussian(), rng.nextGaussian()) * 0.01
+            let out = filter.filter(raw, time: t)
+            if i >= 10 {
+                rawVariance += raw.dot(raw)
+                filteredVariance += out.dot(out)
+            }
+            t += 1.0 / 30
+        }
+        XCTAssertLessThan(filteredVariance, rawVariance * 0.5)
+        // 0.3 手を 0.1 秒で動かす: 動き終わって 0.1 秒後には、8 割以上付いてきている
+        var out = Vec2.zero
+        for i in 1...6 {
+            let x = min(Double(i) / 3, 1) * 0.3
+            out = filter.filter(Vec2(x, 0), time: t)
+            t += 1.0 / 30
+        }
+        XCTAssertGreaterThan(out.x, 0.24)
     }
 }

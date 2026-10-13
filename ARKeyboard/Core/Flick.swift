@@ -62,7 +62,20 @@ struct FlickConfig: Codable, Equatable {
     /// 動き出しとみなす速さ(手/秒)。キーの上へ指を「ゆっくり」移動する動きと区別するため、高めにしている
     var startSpeed: Double = 2.0
     /// 止まったとみなす速さ(手/秒)
-    var endSpeed: Double = 0.5
+    var endSpeed: Double = 0.8
+    /// 止まりの速さをこの時間(秒)下回り続けたら、フリックの終わり。
+    /// 空中タップは「下ろして戻す」途中の折り返しで一瞬遅くなるので、そこで切ると「下フリック」と間違える
+    var endHold: Double = 0.03
+    /// 指先の位置のぶれ除去(One Euro フィルター)を使う。
+    /// 既定はオフ: 合成データでは、ぶれが大きいとき(手の大きさの 1〜2%)は少し良くなるが、ぶれが小さいときに
+    /// 動き出しの速さがなまって大きく悪くなった(docs/results-flick.md)。オンにするときは
+    /// 動き出しの速さ 1.2・止まりの速さ 0.5 程度に下げる(フィルターで速さの山が低くなるため)
+    var useJitterFilter: Bool = false
+    /// One Euro フィルターの、止まっているときの遮断周波数(Hz)と、速さに応じた上げ幅
+    var filterMinCutoff: Double = 1.5
+    var filterBeta: Double = 3.0
+    /// 速さの平滑化の時定数(秒)。小さいほど速さの変化にすぐ追従する(ぶれにも敏感になる)
+    var speedTimeConstant: Double = 0.02
     /// 動き出す前に止まっていなければならない時間(秒)
     var dwellTime: Double = 0.08
     /// フリックの長さの範囲(秒)。短すぎる止まり(空中タップの折り返しの瞬間)では切らない。長すぎる動きは移動とみなす
@@ -267,13 +280,17 @@ final class FlickSegmenter {
     private enum Phase {
         /// since: 止まり始めた時刻、bandSince: 「止まりと動き出しの間の速さ」になった時刻
         case still(since: Double?, bandSince: Double?)
-        case moving(startTime: Double, start: Vec2, startRel: Vec2, peak: Double)
+        /// slowSince: 止まりの速さを下回り始めた時刻(空中タップの折り返しの一瞬で切らないため)
+        case moving(startTime: Double, start: Vec2, startRel: Vec2, peak: Double, slowSince: Double?)
     }
 
     /// 中間の速さが、これより長く続いたら「ゆっくりした移動」とみなし、止まっていた記録を捨てる(秒)
     private let maxBandDuration = 0.12
 
     private struct State {
+        /// 指先の位置(キー配置の座標)と、手のひらに対する位置(手の座標)のぶれ除去
+        var positionFilter: OneEuroFilter2
+        var relFilter: OneEuroFilter2
         var lastTime: Double
         var rel: Vec2
         var speed: Double
@@ -297,19 +314,38 @@ final class FlickSegmenter {
     ///   - position: 指先の位置(キー配置の座標)
     ///   - rel: 手のひらに対する指先の位置(手の座標)
     func process(finger: FingerID, position: Vec2?, rel: Vec2?, time: Double) -> FlickGesture? {
-        guard let position, let rel else {
+        guard let rawPosition = position, let rawRel = rel else {
             states[finger] = nil
             active[finger] = nil
             return nil
         }
         guard var state = states[finger], time > state.lastTime, time - state.lastTime < 0.2 else {
-            states[finger] = State(lastTime: time, rel: rel, speed: 0, anchor: position, anchorRel: rel,
+            var positionFilter = OneEuroFilter2(minCutoff: config.filterMinCutoff, beta: config.filterBeta)
+            var relFilter = positionFilter
+            _ = positionFilter.filter(rawPosition, time: time)
+            _ = relFilter.filter(rawRel, time: time)
+            states[finger] = State(positionFilter: positionFilter, relFilter: relFilter, lastTime: time, rel: rawRel,
+                                   speed: 0, anchor: rawPosition, anchorRel: rawRel,
                                    phase: .still(since: time, bandSince: nil))
             return nil
         }
+        // ぶれ除去(オフなら、そのままの値)
+        var position = rawPosition
+        var rel = rawRel
+        if config.useJitterFilter {
+            state.positionFilter.minCutoff = config.filterMinCutoff
+            state.positionFilter.beta = config.filterBeta
+            state.relFilter.minCutoff = config.filterMinCutoff
+            state.relFilter.beta = config.filterBeta
+            position = state.positionFilter.filter(rawPosition, time: time)
+            rel = state.relFilter.filter(rawRel, time: time)
+        }
         let dt = time - state.lastTime
         let raw = (rel - state.rel).length / dt
-        state.speed = state.speed + (raw - state.speed) * 0.6
+        // 速さの平滑化は「時間」で決める(1フレームごとの係数で決めると、30fps では 60fps の倍ほど遅れて、
+        // 短いフリックの山がつぶれて見逃す)。時定数 speedTimeConstant 秒の指数移動平均
+        let alpha = 1 - exp(-dt / max(config.speedTimeConstant, 1e-3))
+        state.speed = state.speed + (raw - state.speed) * alpha
         state.rel = rel
         state.lastTime = time
 
@@ -326,7 +362,7 @@ final class FlickSegmenter {
                 let moveStart = bandSince ?? (time - dt)
                 if let since, moveStart - since >= config.dwellTime {
                     state.phase = .moving(startTime: moveStart, start: state.anchor, startRel: state.anchorRel,
-                                          peak: state.speed)
+                                          peak: state.speed, slowSince: nil)
                 } else {
                     state.phase = .still(since: nil, bandSince: nil)
                 }
@@ -337,9 +373,10 @@ final class FlickSegmenter {
                 state.phase = time - band > maxBandDuration ? .still(since: nil, bandSince: nil)
                                                             : .still(since: since, bandSince: band)
             }
-        case .moving(let startTime, let start, let startRel, let peak):
+        case .moving(let startTime, let start, let startRel, let peak, let slowSince):
             active[finger] = (start, rel - startRel)
-            if state.speed < config.endSpeed && time - startTime >= config.minDuration {
+            let slow = state.speed < config.endSpeed ? (slowSince ?? time) : nil
+            if let slow, time - slow >= config.endHold - 1e-9, time - startTime >= config.minDuration {
                 let displacement = rel - startRel
                 // 大きすぎる移動は「キーの上への移動」なので、フリックにしない
                 if displacement.length <= config.maxDistance {
@@ -355,7 +392,7 @@ final class FlickSegmenter {
                 active[finger] = nil
             } else {
                 state.phase = .moving(startTime: startTime, start: start, startRel: startRel,
-                                      peak: max(peak, state.speed))
+                                      peak: max(peak, state.speed), slowSince: slow)
             }
         }
         states[finger] = state

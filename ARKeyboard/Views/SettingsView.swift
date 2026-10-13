@@ -114,6 +114,14 @@ struct SettingsView: View {
             ParameterSlider(title: "方向の鋭さ κ", value: $viewModel.settings.flick.kappa, range: 0.5...10,
                             format: { String(format: "%.1f", $0) },
                             help: "大きいほど、測った向きをそのまま信じる。小さいほど文脈(言語モデル)に頼る")
+            Toggle("ぶれ除去フィルター(One Euro)", isOn: $viewModel.settings.flick.useJitterFilter)
+            if viewModel.settings.flick.useJitterFilter {
+                ParameterSlider(title: "止まっているときの遮断周波数", value: $viewModel.settings.flick.filterMinCutoff,
+                                range: 0.3...5, format: { String(format: "%.1f Hz", $0) },
+                                help: "小さいほど震えが消えるが、動き出しに遅れる。オンにしたら「動き出しの速さ」を 1.2 程度に下げる")
+                ParameterSlider(title: "速さに応じた追従", value: $viewModel.settings.flick.filterBeta, range: 0...10,
+                                format: { String(format: "%.1f", $0) })
+            }
             Toggle("仮名の言語モデル", isOn: $viewModel.settings.flick.useLanguageModel)
             if viewModel.settings.flick.useLanguageModel {
                 ParameterSlider(title: "言語モデルの重み", value: $viewModel.settings.flick.lmWeight, range: 0...2)
