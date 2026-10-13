@@ -51,6 +51,8 @@ final class KeyboardViewModel {
     var heatmapPoints: [Chirality: [(key: Key, points: [Vec2])]] = [:]
     /// 個人適応で学習したタップの数
     var adaptationSampleCount = 0
+    /// レベルB の学習モデルの状態(表示用)
+    var levelBModelStatus = "モデル未導入"
 
     /// 入力された文字列
     var typedText = ""
@@ -137,6 +139,11 @@ final class KeyboardViewModel {
         settings = loaded
         engine = KeyboardEngine(settings: loaded)
         loadLanguageModels()
+        // レベルB の学習モデル(アプリに入れたときだけ)
+        if let model = LevelBModelLoader.load() {
+            engine.tapClassifier = model.classifier
+            levelBModelStatus = "読み込み済み: \(model.description)"
+        }
 
         // 個人適応の学習データ(端末内に保存)を読み込む
         if let data = try? Data(contentsOf: Self.adaptationURL), let saved = PersonalAdaptation.load(from: data) {

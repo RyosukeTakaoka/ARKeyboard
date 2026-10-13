@@ -108,8 +108,9 @@ def main() -> None:
 
     variants = list(VARIANTS)
     if args.model:
-        variants.append(("+音+デコーダー+言語モデル+レベルB", {"features": {"audioOnset": True, "decoder": True,
-                                                                   "languageModel": True, "levelBModel": True}}))
+        variants.append(("+音+デコーダー+言語モデル+個人適応+レベルB", {"features": {"audioOnset": True, "decoder": True,
+                                                                        "languageModel": True, "personalAdaptation": True,
+                                                                        "levelBModel": True, "wordDecoder": False}}))
 
     rows = []
     for rec in recordings:
@@ -166,6 +167,7 @@ def write_report(path: str, rows, noise_rows, synthetic: bool, recordings: list[
             "> この表を置き換えてください。",
             "",
             "合成データの作り方: `ARKeyboard/Core/SyntheticRecordingGenerator.swift`(狙いのずれ σ=0.25 キー、",
+            "(レベルB のモデルは、評価用とは別の乱数の種 11〜14 の合成データで学習したもの)",
             "関節の震え、フレーム落ち 1%、音の取りこぼし 5%、雑音のオンセット 0.3 回/秒、キーへの移動で手首方向に動く)。",
             "",
         ]

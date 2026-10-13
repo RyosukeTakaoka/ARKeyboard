@@ -14,6 +14,7 @@ struct SettingsView: View {
                 }
                 tapSection
                 sensorSection
+                levelBSection
                 decoderSection
                 adaptationSection
                 layoutSection
@@ -163,6 +164,22 @@ struct SettingsView: View {
             Text("センサーと二重条件(レベルA)")
         } footer: {
             Text("カメラの「指が下りて急に止まった」と、マイクの「叩いた音の立ち上がり」が同じ頃に起きたときだけ入力します(Acustico の二重条件の考え方)。マイクが使えないときはカメラだけで判定します。")
+        }
+    }
+
+    // MARK: - タップ推定レベルB(学習モデル)
+
+    private var levelBSection: some View {
+        Section {
+            Toggle("学習モデルで判定する", isOn: $viewModel.settings.features.levelBModel)
+            LabeledContent("モデル", value: viewModel.levelBModelStatus)
+            ParameterSlider(title: "タップとみなす確率", value: $viewModel.settings.levelBThreshold, range: 0.1...0.95,
+                            format: { "\(Int($0 * 100))%" })
+            Toggle("位置の補正を使う", isOn: $viewModel.settings.levelBUseOffset)
+        } header: {
+            Text("タップ推定レベルB(学習モデル)")
+        } footer: {
+            Text("記録データから学習した小さなニューラルネットワーク(Core ML)で、カメラの候補が本当のタップかを判定し、位置も補正します。オンにすると、音が無い候補も一度モデルに渡します(採否はモデルが決める)。モデルは tools/eval/train_levelb.py で作り、ARKeyboard/Resources/Model/ に置いてください。")
         }
     }
 

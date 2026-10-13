@@ -16,6 +16,12 @@ struct ReplayedTap: Codable, Equatable {
     var location: Vec2?
     /// タップ推定レベルB の学習用の特徴量(--dump-features のとき)
     var features: [Double]?
+    /// そのとき表示されていた目標の番号
+    var promptIndex: Int?
+    /// 目標のキーの中心 − タップ位置(キー配置の座標)。レベルB の「位置の補正」の学習の正解
+    var targetOffset: Vec2?
+    /// 本当に触れた時刻(合成データのみ)までのいちばん近い時間差(秒)
+    var truthDistance: Double?
 }
 
 struct ReplayedCandidate: Codable, Equatable {
@@ -117,6 +123,14 @@ final class Replayer {
         let audioOnsets = recording.audioOnsets.sorted { $0.time < $1.time }
         let motionOnsets = recording.motionOnsets.sorted { $0.time < $1.time }
 
+        // 目標の時間窓を探すための表示時刻の並び
+        let promptTimes = recording.prompts.map(\.shownAt)
+        func promptIndex(at time: Double) -> Int? {
+            guard let i = promptTimes.lastIndex(where: { $0 <= time }) else { return nil }
+            return recording.prompts[i].index
+        }
+        let truths = recording.groundTruthTaps
+
         func collect(_ results: [TapResult]) {
             for r in results {
                 if let rewrite = r.wordRewrite {
@@ -130,6 +144,19 @@ final class Replayer {
                                           ReplayedCandidate(output: $0.key.output, probability: $0.probability) } },
                                       audioOffset: r.audioOffset, location: r.touch?.surfaceLocation)
                 if options.dumpFeatures { tap.features = r.levelBFeatures }
+                tap.promptIndex = promptIndex(at: r.event.timestamp)
+                // 目標のキー(同じ手・その指で打てるもの)の中心までのずれ
+                if let index = tap.promptIndex, index < recording.task.targets.count,
+                   let location = r.touch?.surfaceLocation {
+                    let target = recording.task.targets[index]
+                    let handKeys = engine.keys[r.event.finger.chirality] ?? []
+                    if let key = handKeys.first(where: { $0.output == target }) {
+                        tap.targetOffset = key.center - location
+                    }
+                }
+                if let truths {
+                    tap.truthDistance = truths.map { abs($0 - r.event.timestamp) }.min()
+                }
                 taps.append(tap)
             }
         }

@@ -85,6 +85,7 @@ enum SyntheticRecordingGenerator {
                                   aim: key.center + aimNoise, contact: contact))
         }
         let end = typingStart + Double(config.targets.count) * config.interval + 1.0
+        recording.groundTruthTaps = strokes.map(\.contact)
 
         /// なめらかな 0→1(動き始めと終わりがゆっくり)
         func ease(_ x: Double) -> Double {

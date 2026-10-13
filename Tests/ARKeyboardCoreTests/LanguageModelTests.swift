@@ -73,3 +73,23 @@ final class OnsetGoldenTests: XCTestCase {
         }
     }
 }
+
+/// レベルB の学習モデル: Python(numpy)で計算した出力と、Swift の DenseNetwork の出力が一致すること
+final class LevelBGoldenTests: XCTestCase {
+    func testDenseNetworkMatchesPython() throws {
+        struct Golden: Decodable {
+            let model: DenseNetwork
+            let inputs: [[Double]]
+            let outputs: [[Double]]
+        }
+        let golden = try JSONDecoder().decode(Golden.self, from: try RepoFiles.fixture("levelb_golden.json"))
+        XCTAssertEqual(golden.inputs.first?.count, TapFeatures.count)
+        for (input, expected) in zip(golden.inputs, golden.outputs) {
+            let output = golden.model.forward(input)
+            XCTAssertEqual(output.count, 3)
+            for (a, b) in zip(output, expected) {
+                XCTAssertEqual(a, b, accuracy: 1e-9)
+            }
+        }
+    }
+}

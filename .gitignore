@@ -15,3 +15,6 @@ build/
 tools/eval/synth-*/
 recordings/
 __pycache__/
+
+# レベルB の学習用に作る合成データ
+tools/eval/synth-train/

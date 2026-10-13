@@ -30,6 +30,8 @@ struct Recording: Codable {
     var motionOnsets: [OnsetEvent] = []
     var prompts: [RecordedPrompt] = []
     var events: [RecordedEvent] = []
+    /// 本当に面に触れた時刻(合成データのときだけ分かる。実際の記録では nil)
+    var groundTruthTaps: [Double]? = nil
 }
 
 /// 記録の課題
