@@ -50,8 +50,16 @@ final class KeyboardViewModel {
 
     /// 入力された文字列
     var typedText = ""
-    /// 記録モード中か(記録モードは RecordingSession で実装)
+    /// 記録モード中か
     var isRecording = false
+    /// 記録の目標の並びと、今の位置(画面表示用)
+    var recordingTargets: [String] = []
+    var recordingIndex = 0
+    var recordingKind: RecordingTask.Kind = .keys
+    /// 保存した記録ファイル
+    var savedRecordings: [URL] = []
+    /// 最後に保存した記録ファイル
+    var lastSavedRecording: URL?
     /// 練習モード(nil なら練習していない)
     var practice: PracticeSession?
 
@@ -106,6 +114,9 @@ final class KeyboardViewModel {
     static let signalHistoryDuration = 2.0
     /// タップログに残す件数
     static let tapLogLimit = 12
+
+    /// 記録中のセッション
+    @ObservationIgnored private var recordingSession: RecordingSession?
 
     /// 当たり判定の地図を最後に計算したときの条件(同じなら計算し直さない)
     @ObservationIgnored private var hitMapSignature = ""
@@ -291,30 +302,8 @@ final class KeyboardViewModel {
         let defaults = KeyboardSettings.defaults(for: .knee)
         // 初回起動なら、膝モードの初期値から始める
         guard let data = UserDefaults.standard.data(forKey: settingsKey) else { return defaults }
-        // アプリを更新して設定の項目が増えると、古い保存データには新しい項目が無いので
-        // そのままでは読み込みに失敗する。そこで「初期値の JSON」に「保存データの JSON」を重ねてから読む。
-        // (保存データにある項目は保存データの値、無い項目は初期値になる)
-        guard let defaultData = try? JSONEncoder().encode(defaults),
-              let base = try? JSONSerialization.jsonObject(with: defaultData) as? [String: Any],
-              let saved = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let mergedData = try? JSONSerialization.data(withJSONObject: Self.merge(base, saved)),
-              let settings = try? JSONDecoder().decode(KeyboardSettings.self, from: mergedData) else {
-            return defaults
-        }
-        return settings
-    }
-
-    /// 辞書を重ねる(入れ子の辞書は中まで重ねる)
-    private static func merge(_ base: [String: Any], _ overlay: [String: Any]) -> [String: Any] {
-        var result = base
-        for (key, value) in overlay {
-            if let baseChild = base[key] as? [String: Any], let overlayChild = value as? [String: Any] {
-                result[key] = merge(baseChild, overlayChild)
-            } else {
-                result[key] = value
-            }
-        }
-        return result
+        // アプリを更新して設定の項目が増えても読めるよう、初期値に重ねて読む(TolerantDecoding 参照)
+        return TolerantDecoding.decode(KeyboardSettings.self, from: data, defaults: defaults) ?? defaults
     }
 
     // MARK: キャリブレーション
@@ -405,6 +394,99 @@ final class KeyboardViewModel {
         deleteCalibration()
     }
 
+    // MARK: 記録モード(データ収集)
+
+    /// 記録ファイルを置くフォルダ(アプリの「書類」フォルダの中。「ファイル」アプリから見える)
+    static var recordingsDirectory: URL {
+        let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        return documents.appendingPathComponent("Recordings", isDirectory: true)
+    }
+
+    /// 記録を始める
+    /// - Parameters:
+    ///   - kind: 1文字ずつ / フレーズ
+    ///   - count: 文字数(1文字ずつ)またはフレーズの数
+    func startRecording(kind: RecordingTask.Kind, count: Int) {
+        let task = RecordingSession.makeTask(kind: kind, count: count, seed: UInt64(Date().timeIntervalSince1970))
+        let session = RecordingSession(task: task, settings: settings, calibration: calibration,
+                                       deskPlane: deskPlane, device: Self.deviceModel, startTime: now)
+        recordingSession = session
+        recordingKind = kind
+        recordingTargets = task.targets
+        recordingIndex = 0
+        isRecording = true
+        // 記録中は加速度センサーも動かす(評価用のデータとして残すため)
+        applySensorSettings()
+    }
+
+    /// 目標を飛ばす
+    func skipRecordingTarget() {
+        recordingSession?.skip(at: now)
+        syncRecordingState()
+    }
+
+    /// 記録を終える(save = true なら保存する)
+    func stopRecording(save: Bool) {
+        guard let session = recordingSession else { return }
+        recordingSession = nil
+        isRecording = false
+        applySensorSettings()
+        guard save else { return }
+        let recording = session.recording
+        let name = "rec-\(Self.fileDateFormatter.string(from: recording.createdAt))-\(recording.task.kind.rawValue).json"
+        let url = Self.recordingsDirectory.appendingPathComponent(name)
+        // JSON への変換と書き込みは時間がかかることがあるので、バックグラウンドで行う
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            do {
+                try FileManager.default.createDirectory(at: Self.recordingsDirectory, withIntermediateDirectories: true)
+                let data = try RecordingIO.encoder().encode(recording)
+                try data.write(to: url, options: .atomic)
+                DispatchQueue.main.async { [weak self] in
+                    self?.lastSavedRecording = url
+                    self?.refreshRecordings()
+                }
+            } catch {
+                print("[KeyboardViewModel] 記録を保存できませんでした: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    func refreshRecordings() {
+        let urls = (try? FileManager.default.contentsOfDirectory(at: Self.recordingsDirectory,
+                                                                  includingPropertiesForKeys: nil)) ?? []
+        savedRecordings = urls.filter { $0.pathExtension == "json" }.sorted { $0.lastPathComponent > $1.lastPathComponent }
+    }
+
+    func deleteRecording(_ url: URL) {
+        try? FileManager.default.removeItem(at: url)
+        refreshRecordings()
+    }
+
+    private func syncRecordingState() {
+        guard let session = recordingSession else { return }
+        recordingIndex = session.promptIndex
+        if session.isFinished {
+            stopRecording(save: true)
+            notificationHaptics.notificationOccurred(.success)
+        }
+    }
+
+    private static let fileDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyyMMdd-HHmmss"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter
+    }()
+
+    /// 機種名(例: "iPhone15,2")。どの機種で記録したかを残すため
+    static var deviceModel: String {
+        var info = utsname()
+        uname(&info)
+        return withUnsafeBytes(of: &info.machine) { buffer in
+            String(decoding: buffer.prefix { $0 != 0 }, as: UTF8.self)
+        }
+    }
+
     // MARK: 練習モード
 
     /// 経過時間の計算に使う「今の時刻」(端末起動からの秒数。時計の変更に影響されない)
@@ -430,12 +512,14 @@ final class KeyboardViewModel {
     }
 
     func backspace() {
+        recordingSession?.addEdit(.backspace, at: now)
         practice?.backspace()
         guard !typedText.isEmpty else { return }
         typedText.removeLast()
     }
 
     func newline() {
+        recordingSession?.addEdit(.newline, at: now)
         insert("\n")
     }
 
@@ -459,6 +543,7 @@ final class KeyboardViewModel {
         }
 
         imageSize = frame.imageSize
+        recordingSession?.addFrame(frame)
         fps = fpsCounter.tick(at: frame.timestamp)
         detectedHandCount = frame.hands.count
         let output = engine.process(frame, now: now)
@@ -482,6 +567,7 @@ final class KeyboardViewModel {
     private func handleAudio(_ update: AudioUpdate) {
         engine.settings = settings
         engine.context = languageContext
+        recordingSession?.addAudio(features: update.features, onsets: update.onsets)
         let results = engine.ingestOnsets(update.onsets, source: .audio, coveredUntil: update.coveredUntil, now: now)
         handleTapResults(results)
         guard settings.showDebug else {
@@ -500,6 +586,7 @@ final class KeyboardViewModel {
     private func handleMotion(_ update: MotionUpdate) {
         engine.settings = settings
         engine.context = languageContext
+        recordingSession?.addMotion(samples: update.samples, onsets: update.onsets)
         let results = engine.ingestOnsets(update.onsets, source: .motion, coveredUntil: update.coveredUntil, now: now)
         handleTapResults(results)
         if settings.showDebug {
@@ -510,6 +597,7 @@ final class KeyboardViewModel {
     /// 確定したタップをまとめて処理する
     private func handleTapResults(_ results: [TapResult]) {
         for tap in results {
+            recordingSession?.addTap(tap, at: now)
             handleTap(tap)
             tapLogCounter += 1
             tapLog.insert(TapLogEntry(id: tapLogCounter, result: tap), at: 0)
@@ -520,6 +608,7 @@ final class KeyboardViewModel {
         if tapLog.count > Self.tapLogLimit {
             tapLog.removeLast(tapLog.count - Self.tapLogLimit)
         }
+        if !results.isEmpty { syncRecordingState() }
     }
 
     /// デバッグ表示用の記録(表示していないときは、グラフの記録を省いて少しでも軽くする)

@@ -8,6 +8,9 @@
   NSCameraUsageDescription / NSMicrophoneUsageDescription / NSMotionUsageDescription:
     カメラ・マイクを使うアプリは、この説明文が無いと、アクセスした瞬間にアプリが強制終了します。
     初回の「〜へのアクセスを許可しますか?」ダイアログに、この文章が表示されます。
+
+  UIFileSharingEnabled / LSSupportsOpeningDocumentsInPlace:
+    記録モードで保存したファイル(書類フォルダ)を、「ファイル」アプリや Mac の Finder から見られるようにする。
 -->
 <plist version="1.0">
 <dict>
@@ -15,6 +18,10 @@
 	<string>両手の指先の位置をカメラで認識し、キーボード入力に変換するためにカメラを使用します。映像は端末の中だけで処理され、保存や送信はされません。</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>指で面を叩いた瞬間の音を検出して、タップの判定を正確にするためにマイクを使用します。音は端末の中だけで解析され、録音の保存や送信はされません。</string>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
 	<key>NSMotionUsageDescription</key>
 	<string>iPhone を机に置いて使うとき、机を叩いた振動を検出してタップの判定を補助するためにモーションセンサーを使用します。データは端末の外に送信されません。</string>
 </dict>

@@ -22,6 +22,7 @@ struct SettingsView: View {
                     lidarSection
                 }
                 calibrationSection
+                recordingsSection
                 debugSection
             }
             .navigationTitle("設定")
@@ -282,6 +283,38 @@ struct SettingsView: View {
         } footer: {
             Text("キャリブレーションの結果は保存され、次回の起動時にも使われます。カメラの位置や姿勢を変えたら、やり直してください。")
         }
+    }
+
+    // MARK: - 記録データ
+
+    private var recordingsSection: some View {
+        Section {
+            if viewModel.savedRecordings.isEmpty {
+                Text("まだ記録はありません。画面下の赤い丸のボタンで記録できます。")
+                    .foregroundStyle(.secondary)
+            }
+            ForEach(viewModel.savedRecordings, id: \.self) { url in
+                HStack {
+                    Text(url.lastPathComponent)
+                        .font(.caption.monospaced())
+                        .lineLimit(1)
+                    Spacer()
+                    // 共有シート(AirDrop で Mac に送る、「ファイル」に保存する など)
+                    ShareLink(item: url) {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                    .buttonStyle(.borderless)
+                }
+                .swipeActions {
+                    Button("削除", role: .destructive) { viewModel.deleteRecording(url) }
+                }
+            }
+        } header: {
+            Text("記録データ")
+        } footer: {
+            Text("記録は端末の中(「ファイル」アプリ → このiPhone内 → ARKeyboard → Recordings)に保存されます。外部には送信しません。Mac の tools/eval/ で評価します(README 参照)。")
+        }
+        .onAppear { viewModel.refreshRecordings() }
     }
 
     // MARK: - デバッグ

@@ -6,6 +6,8 @@ struct ControlBarView: View {
     /// `$viewModel.settings.sensitivity` のように Binding(双方向の結びつき)として渡せます。
     @Bindable var viewModel: KeyboardViewModel
     let onOpenSettings: () -> Void
+    /// 記録の課題を選ぶダイアログを出しているか
+    @State private var isChoosingRecording = false
 
     var body: some View {
         VStack(spacing: 10) {
@@ -38,6 +40,28 @@ struct ControlBarView: View {
                 .disabled(viewModel.isCalibrating)
 
                 Spacer()
+
+                // 記録モード(データ収集)
+                Button {
+                    if viewModel.isRecording {
+                        viewModel.stopRecording(save: true)
+                    } else {
+                        isChoosingRecording = true
+                    }
+                } label: {
+                    Image(systemName: viewModel.isRecording ? "stop.circle.fill" : "record.circle")
+                        .foregroundStyle(.red)
+                }
+                .buttonStyle(.bordered)
+                .accessibilityLabel("記録モード")
+                .confirmationDialog("記録する課題", isPresented: $isChoosingRecording, titleVisibility: .visible) {
+                    Button("1文字ずつ(50文字)") { viewModel.startRecording(kind: .keys, count: 50) }
+                    Button("1文字ずつ(150文字)") { viewModel.startRecording(kind: .keys, count: 150) }
+                    Button("フレーズ(3文)") { viewModel.startRecording(kind: .phrases, count: 3) }
+                    Button("やめる", role: .cancel) {}
+                } message: {
+                    Text("表示された文字を、このキーボードで打ってください。手の関節の座標・音・加速度と、目標の文字が保存されます(映像は保存しません)。")
+                }
 
                 // 練習モードの開始/終了
                 Button {
