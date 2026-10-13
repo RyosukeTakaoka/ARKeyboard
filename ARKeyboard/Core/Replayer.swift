@@ -22,6 +22,9 @@ struct ReplayedTap: Codable, Equatable {
     var targetOffset: Vec2?
     /// 本当に触れた時刻(合成データのみ)までのいちばん近い時間差(秒)
     var truthDistance: Double?
+    /// フリック: 方向(FlickDirection の番号)とキーの表示名
+    var flickDirection: Int? = nil
+    var flickKey: String? = nil
 }
 
 struct ReplayedCandidate: Codable, Equatable {
@@ -167,7 +170,23 @@ final class Replayer {
             case .frame(let recorded):
                 var frame = recorded.visionFrame
                 if options.jointNoise > 0 { frame = Self.addNoise(to: frame, sigma: options.jointNoise, rng: &rng) }
-                collect(engine.process(frame, now: recorded.t).taps)
+                let output = engine.process(frame, now: recorded.t)
+                collect(output.taps)
+                for flick in output.flicks {
+                    if let rewrite = flick.rewrite {
+                        typed = String(typed.dropLast(min(flick.replaceCount, typed.count))) + rewrite
+                    }
+                    var tap = ReplayedTap(t: flick.gesture.endTime, finger: flick.gesture.finger, output: flick.output,
+                                          accepted: flick.output != nil, note: nil,
+                                          candidates: flick.decode.candidates.prefix(3).map {
+                                              ReplayedCandidate(output: $0.output, probability: $0.probability) },
+                                          audioOffset: nil, location: flick.gesture.start)
+                    tap.promptIndex = promptIndex(at: flick.gesture.startTime)
+                    tap.flickDirection = flick.decode.best?.direction.rawValue
+                    tap.flickKey = flick.decode.best?.key.definition.label
+                    if let truths { tap.truthDistance = truths.map { abs($0 - flick.gesture.startTime) }.min() }
+                    taps.append(tap)
+                }
             case .audio(let time):
                 var newOnsets: [OnsetEvent] = []
                 while deliveredAudio < audioOnsets.count, audioOnsets[deliveredAudio].time <= time {

@@ -120,6 +120,10 @@ struct KeyboardSettings: Codable, Equatable {
     var adaptation = AdaptationConfig()
     /// 単語単位のデコードの設定
     var wordDecoder = WordBeamDecoder.Config()
+    /// 入力の方式(QWERTY / フリック)
+    var inputMode: InputMode = .qwerty
+    /// フリック入力の設定
+    var flick = FlickConfig()
     /// レベルB: この確率より低い候補はタップにしない
     var levelBThreshold: Double = 0.5
     /// レベルB: 位置の補正を使う

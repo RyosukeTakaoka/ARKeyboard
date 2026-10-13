@@ -47,6 +47,16 @@ final class KeyboardViewModel {
     var pressedKeys: [String: Date] = [:]
     /// 当たり判定の地図(当たり判定ビューを表示しているときだけ計算する)
     var hitMaps: [Chirality: HitMap] = [:]
+    /// フリックパッドのキー
+    var flickKeys: [FlickKey] = []
+    /// 今まさに動いているフリック(始点と移動)
+    var activeFlicks: [FingerID: (start: Vec2, displacement: Vec2)] = [:]
+    /// 今の仮名の並びの候補(上位3つ)
+    var flickCandidates: [String] = []
+    /// 最後のフリックの解読結果(デバッグ表示用)
+    var lastFlickDecode: FlickDecodeResult?
+    /// 指先の下のフリックキーの、方向ごとの事前確率(扇形の表示用)
+    var hoveredFlickPriors: [String: [FlickDirection: Double]] = [:]
     /// ヒートマップ(実際に押した場所)。ヒートマップ表示のときだけ更新する
     var heatmapPoints: [Chirality: [(key: Key, points: [Vec2])]] = [:]
     /// 個人適応で学習したタップの数
@@ -199,6 +209,7 @@ final class KeyboardViewModel {
         }
         engine.settings = settings
         engine.setLanguageCorpora(english: corpus("english"), romaji: corpus("romaji"))
+        engine.setKanaCorpus(corpus("kana"))
         languageModelOrder = settings.decoder.lmOrder
     }
 
@@ -614,6 +625,9 @@ final class KeyboardViewModel {
         if engine.keys != keys {
             keys = engine.keys
         }
+        if engine.flickEngine.keys != flickKeys {
+            flickKeys = engine.flickEngine.keys
+        }
 
         imageSize = frame.imageSize
         recordingSession?.addFrame(frame)
@@ -637,8 +651,13 @@ final class KeyboardViewModel {
             notificationHaptics.notificationOccurred(.success)
         }
         handleTapResults(output.taps)
+        handleFlicks(output.flicks)
+        if settings.inputMode == .flick || !activeFlicks.isEmpty {
+            activeFlicks = output.activeFlicks
+        }
         recordDebugInfo(output)
         updateHitMapsIfNeeded()
+        updateFlickPriors()
     }
 
     /// マイクの解析結果を受け取る(メインスレッド)
@@ -670,6 +689,61 @@ final class KeyboardViewModel {
         if settings.showDebug {
             recentOnsets += update.onsets
         }
+    }
+
+    /// フリックの結果を処理する(フリックモード)
+    private func handleFlicks(_ flicks: [FlickResult]) {
+        for flick in flicks {
+            lastFlickDecode = flick.decode
+            flickCandidates = flick.nBest
+            recordingSession?.addFlick(flick, at: now)
+            if let rewrite = flick.rewrite {
+                typedText = String(typedText.dropLast(min(flick.replaceCount, typedText.count))) + rewrite
+            }
+            if let output = flick.output { practice?.input(output, at: now) }
+            if let key = flick.decode.best?.key { pressedKeys[key.id] = Date() }
+            playFeedback()
+        }
+        if !flicks.isEmpty { syncRecordingState() }
+    }
+
+    /// 画面の候補をタップして選ぶ
+    func selectFlickCandidate(_ index: Int) {
+        guard let rewrite = engine.flickEngine.selectCandidate(index) else { return }
+        typedText = String(typedText.dropLast(min(rewrite.replaceCount, typedText.count))) + rewrite.rewrite
+        flickCandidates = []
+    }
+
+    /// 扇形の表示用に、指先の下のフリックキーの事前確率を計算する
+    private func updateFlickPriors() {
+        guard settings.inputMode == .flick else {
+            if !hoveredFlickPriors.isEmpty { hoveredFlickPriors = [:] }
+            return
+        }
+        var priors: [String: [FlickDirection: Double]] = [:]
+        let context = languageContext
+        for key in flickKeys where hoveredKeyIDs.contains(key.id) {
+            priors[key.id] = FlickModel.directionPriors(for: key, context: context, config: settings.flick,
+                                                        languageModel: engine.flickEngine.languageModel)
+        }
+        if priors != hoveredFlickPriors { hoveredFlickPriors = priors }
+    }
+
+    /// 機能パッド(フリックモードのもう一方の手)の動作
+    private func handleFunction(_ action: FunctionAction, tap: TapResult) {
+        switch action {
+        case .space: insert(" ")
+        case .backspace: backspace()
+        case .newline: newline()
+        case .modifier, .nextCandidate:
+            if let rewrite = tap.wordRewrite {
+                typedText = String(typedText.dropLast(min(tap.wordReplaceCount, typedText.count))) + rewrite
+            }
+            if action == .nextCandidate { flickCandidates = engine.flickEngine.runNBest }
+        case .none: return
+        }
+        if action == .space || action == .newline { flickCandidates = [] }
+        playFeedback()
     }
 
     /// 確定したタップをまとめて処理する
@@ -714,6 +788,10 @@ final class KeyboardViewModel {
 
     /// タップ1回分の処理
     private func handleTap(_ tap: TapResult) {
+        if let action = tap.functionAction {
+            handleFunction(action, tap: tap)
+            return
+        }
         guard let key = tap.key else { return }
         pressedKeys[key.id] = Date()
         if let rewrite = tap.wordRewrite {
@@ -724,6 +802,11 @@ final class KeyboardViewModel {
             insert(key.output)
         }
 
+        playFeedback()
+    }
+
+    /// 触覚と効果音
+    private func playFeedback() {
         if settings.hapticsEnabled {
             haptics.impactOccurred()
             haptics.prepare()

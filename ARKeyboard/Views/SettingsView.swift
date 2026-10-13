@@ -13,6 +13,10 @@ struct SettingsView: View {
                 if viewModel.settings.mode == .desk {
                     deskSection
                 }
+                inputModeSection
+                if viewModel.settings.inputMode == .flick {
+                    flickSection
+                }
                 tapSection
                 sensorSection
                 levelBSection
@@ -60,6 +64,76 @@ struct SettingsView: View {
             Text("モード")
         } footer: {
             Text("膝モード: キー大きめ・判定ゆるめ・キーが手に追従。\n机モード: 判定厳しめ・キーは面に固定。\nモードを切り替えると、下のしきい値はそのモードの初期値に戻ります。")
+        }
+    }
+
+    // MARK: - 入力方式(QWERTY / フリック)
+
+    private var inputModeSection: some View {
+        Section {
+            Picker("入力方式", selection: $viewModel.settings.inputMode) {
+                ForEach(InputMode.allCases) { mode in
+                    Text(mode.japaneseName).tag(mode)
+                }
+            }
+            .pickerStyle(.segmented)
+        } header: {
+            Text("入力方式")
+        } footer: {
+            Text("フリック(比較実験用): 片手に 12 キーの仮名パッド、もう一方の手に機能パッド(空白・削除など)を置きます。")
+        }
+    }
+
+    private var flickSection: some View {
+        Section {
+            Picker("フリックパッドの手", selection: $viewModel.settings.flick.hand) {
+                Text("右手").tag(Chirality.right)
+                Text("左手").tag(Chirality.left)
+            }
+            Toggle("両手ともフリックパッド", isOn: $viewModel.settings.flick.bothHands)
+            Picker("切り出し方", selection: $viewModel.settings.flick.segmentation) {
+                ForEach(FlickSegmentation.allCases) { s in
+                    Text(s.japaneseName).tag(s)
+                }
+            }
+            ParameterSlider(title: "キーの大きさ", value: $viewModel.settings.flick.keyScale, range: 0.8...3,
+                            format: { String(format: "×%.2f", $0) })
+            ParameterSlider(title: "動き出しの速さ", value: $viewModel.settings.flick.startSpeed, range: 0.5...5,
+                            format: { String(format: "%.2f 手/秒", $0) },
+                            help: "これより速く動いたらフリックの始まり。キーの上への移動を誤ってフリックにするなら上げる")
+            ParameterSlider(title: "止まりの速さ", value: $viewModel.settings.flick.endSpeed, range: 0.1...2,
+                            format: { String(format: "%.2f 手/秒", $0) })
+            ParameterSlider(title: "動き出す前の静止", value: $viewModel.settings.flick.dwellTime, range: 0...0.3,
+                            format: { String(format: "%.0f ms", $0 * 1000) })
+            ParameterSlider(title: "フリックの最長時間", value: $viewModel.settings.flick.maxDuration, range: 0.15...1,
+                            format: { String(format: "%.0f ms", $0 * 1000) })
+            ParameterSlider(title: "フリックの最大距離", value: $viewModel.settings.flick.maxDistance, range: 0.2...1.5,
+                            format: { String(format: "%.2f 手", $0) })
+            ParameterSlider(title: "タップとみなす距離", value: $viewModel.settings.flick.tapDistance, range: 0.02...0.3,
+                            format: { String(format: "%.2f 手", $0) })
+            ParameterSlider(title: "方向の鋭さ κ", value: $viewModel.settings.flick.kappa, range: 0.5...10,
+                            format: { String(format: "%.1f", $0) },
+                            help: "大きいほど、測った向きをそのまま信じる。小さいほど文脈(言語モデル)に頼る")
+            Toggle("仮名の言語モデル", isOn: $viewModel.settings.flick.useLanguageModel)
+            if viewModel.settings.flick.useLanguageModel {
+                ParameterSlider(title: "言語モデルの重み", value: $viewModel.settings.flick.lmWeight, range: 0...2)
+            }
+            if !viewModel.settings.flick.bothHands {
+                ForEach(Finger.allCases, id: \.self) { finger in
+                    Picker("機能パッド: \(finger.japaneseName)", selection: Binding(
+                        get: { viewModel.settings.flick.action(for: finger) },
+                        set: { viewModel.settings.flick.functionMapping[finger.rawValue] = $0 }
+                    )) {
+                        ForEach(FunctionAction.allCases) { action in
+                            Text(action.japaneseName).tag(action)
+                        }
+                    }
+                }
+            }
+        } header: {
+            Text("フリック")
+        } footer: {
+            Text("数値はすべて仮説です(実機の記録で調整してください)。黄色の扇形は、文脈から見た各方向の出やすさ = 実効的な判定範囲の広さです。")
         }
     }
 

@@ -26,6 +26,8 @@ struct TapResult: Equatable {
     var wordRewrite: String? = nil
     /// 書き換えの前に、末尾から消す文字数(=これまでに表示していた、今の単語の文字数)
     var wordReplaceCount: Int = 0
+    /// フリックモードの機能パッドの動作(機能パッドの指のタップのとき)
+    var functionAction: FunctionAction? = nil
 }
 
 /// 融合の結果を待っている候補に付けておく情報
@@ -49,6 +51,10 @@ struct EngineOutput {
     var hoveredKeyIDs: Set<String> = []
     /// このフレームで起きたタップ
     var taps: [TapResult] = []
+    /// このフレームで終わったフリック(フリックモード)
+    var flicks: [FlickResult] = []
+    /// 今まさに動いているフリック(始点と移動。画面表示用)
+    var activeFlicks: [FingerID: (start: Vec2, displacement: Vec2)] = [:]
     /// デバッググラフ用の、1本の指の速度
     var signalSample: FingerSignalSample?
     /// このフレームでキャリブレーションが完了したら、その結果
@@ -66,8 +72,8 @@ struct EngineOutput {
 final class KeyboardEngine {
     var settings: KeyboardSettings {
         didSet {
-            // キーの大きさが変わったらキーを作り直す
-            if settings.keyScale != oldValue.keyScale { rebuildKeys() }
+            // キーの大きさ・フリックの配置が変わったらキーを作り直す
+            if settings.keyScale != oldValue.keyScale || settings.flick != oldValue.flick { rebuildKeys() }
         }
     }
 
@@ -95,6 +101,11 @@ final class KeyboardEngine {
     private var wordSteps: [[KeyCandidate]] = []
     /// 今の単語が始まる直前までの文脈
     private var wordStartContext = ""
+    /// フリック入力
+    let flickEngine = FlickEngine()
+
+    /// フリックモードか(キャリブレーション済みのときだけ)
+    var isFlickMode: Bool { settings.inputMode == .flick }
     /// 最後にキーが入力された時刻(入力の速さを測るため)
     private var lastKeyTime: Double?
     /// レベルB の学習モデル(読み込んだときだけ)
@@ -149,6 +160,13 @@ final class KeyboardEngine {
     }
 
     /// 個人適応の学習データを入れ替える(保存データの読み込み)
+    /// 仮名の言語モデル(フリック用)を作る
+    func setKanaCorpus(_ text: String?) {
+        flickEngine.kanaModel = text.map {
+            CharNGramModel(text: $0, order: settings.decoder.lmOrder, vocabulary: FlickLayout.kanaVocabulary)
+        }
+    }
+
     func setAdaptation(_ value: PersonalAdaptation) {
         adaptation = value
         appliedAdaptationVersion = -1
@@ -157,6 +175,7 @@ final class KeyboardEngine {
     /// 削除ボタンが押された(個人適応で「間違いだった」と記録する)
     func noteBackspace() {
         adaptation.noteBackspace()
+        flickEngine.noteBackspace()
         if !wordSteps.isEmpty { wordSteps.removeLast() }
     }
 
@@ -223,6 +242,8 @@ final class KeyboardEngine {
 
     private func rebuildKeys() {
         keys = [:]
+        flickEngine.config = settings.flick
+        flickEngine.rebuildKeys(calibration: calibration)
         guard let calibration else { return }
         for chirality in Chirality.allCases {
             keys[chirality] = KeyLayout.makeKeys(for: calibration.hand(chirality), keyScale: settings.keyScale)
@@ -300,6 +321,20 @@ final class KeyboardEngine {
         for chirality in Chirality.allCases {
             guard let hand = hands[chirality], let layout = layoutFrame(for: chirality) else { continue }
             output.layoutFrames[chirality] = layout
+            // フリックモード: フリックパッドの手は、フリックの切り出しと解読をする
+            if isFlickMode && settings.flick.isFlickHand(chirality) {
+                if let live = smoothedFrames[chirality] {
+                    flickEngine.config = settings.flick
+                    flickEngine.adaptRotation = settings.features.personalAdaptation
+                    let (result, hovered) = flickEngine.process(hand: hand, chirality: chirality, layoutFrame: layout,
+                                                                liveFrame: live, time: frame.timestamp,
+                                                                minConfidence: settings.minConfidence, context: context)
+                    if let hovered { output.hoveredKeyIDs.insert(hovered) }
+                    if let result { output.flicks.append(result) }
+                }
+                continue
+            }
+            if isFlickMode { continue }  // 機能パッドの手は、キーを光らせない
             for finger in Finger.allCases {
                 guard let tip = hand.position(Joint.tip(of: finger), minConfidence: settings.minConfidence),
                       let key = key(atImagePoint: tip, finger: FingerID(chirality: chirality, finger: finger)) else {
@@ -325,8 +360,11 @@ final class KeyboardEngine {
                                             observedFinger: settings.debugFinger)
         output.signalSample = detection.sample
 
+        output.activeFlicks = flickEngine.segmenter.active
         syncFusionSettings()
-        for event in detection.taps {
+        // フリックモードでは、フリックパッドの手の動きはタップにしない(フリックとして扱う)
+        let tapEvents = detection.taps.filter { !(isFlickMode && settings.flick.isFlickHand($0.finger.chirality)) }
+        for event in tapEvents {
             if let rejected = addCandidate(event, hands: rawHands, frame: frame) {
                 output.taps.append(rejected)
             }
@@ -452,6 +490,17 @@ final class KeyboardEngine {
             if let last = lastAcceptedTime[decision.payload.event.finger],
                decision.time - last < settings.tap.cooldown {
                 result.note = "クールダウン中"
+                return result
+            }
+            // フリックモード: 機能パッドの手のタップは、指ごとの動作(削除・改行など)
+            if isFlickMode {
+                lastAcceptedTime[decision.payload.event.finger] = decision.time
+                let action = settings.flick.action(for: decision.payload.event.finger.finger)
+                result.functionAction = action
+                if let rewrite = flickEngine.applyFunction(action) {
+                    result.wordRewrite = rewrite.rewrite
+                    result.wordReplaceCount = rewrite.replaceCount
+                }
                 return result
             }
             guard var touch = result.touch else {

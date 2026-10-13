@@ -85,11 +85,23 @@ struct ContentView: View {
                                            frames: viewModel.layoutFrames,
                                            projection: projection)
                     }
+                    if viewModel.settings.inputMode == .flick {
+                        FlickPadOverlayView(keys: viewModel.flickKeys,
+                                            frames: viewModel.layoutFrames,
+                                            hoveredKeyIDs: viewModel.hoveredKeyIDs,
+                                            pressedKeys: viewModel.pressedKeys,
+                                            activeFlicks: viewModel.activeFlicks,
+                                            hoveredPriors: viewModel.hoveredFlickPriors,
+                                            hands: viewModel.hands,
+                                            config: viewModel.settings.flick,
+                                            projection: projection)
+                    } else {
                     KeyboardOverlayView(keys: viewModel.keys,
                                         frames: viewModel.layoutFrames,
                                         hoveredKeyIDs: viewModel.hoveredKeyIDs,
                                         pressedKeys: viewModel.pressedKeys,
                                         projection: projection)
+                    }
                     HandSkeletonView(hands: viewModel.hands,
                                      frames: viewModel.layoutFrames,
                                      converter: converter,
@@ -107,6 +119,11 @@ struct ContentView: View {
                                 onBackspace: { viewModel.backspace() },
                                 onNewline: { viewModel.newline() },
                                 onClear: { viewModel.clearText() })
+
+                if viewModel.settings.inputMode == .flick && !viewModel.flickCandidates.isEmpty {
+                    FlickCandidateBar(candidates: viewModel.flickCandidates,
+                                      onSelect: { viewModel.selectFlickCandidate($0) })
+                }
 
                 if viewModel.calibration == nil && !viewModel.isCalibrating {
                     hintBanner("まず下の「キャリブレーション」を押して、両手をホームポジションに置いてください")

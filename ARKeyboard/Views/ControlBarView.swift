@@ -58,6 +58,7 @@ struct ControlBarView: View {
                     Button("1文字ずつ(50文字)") { viewModel.startRecording(kind: .keys, count: 50) }
                     Button("1文字ずつ(150文字)") { viewModel.startRecording(kind: .keys, count: 150) }
                     Button("フレーズ(3文)") { viewModel.startRecording(kind: .phrases, count: 3) }
+                    Button("仮名(フリック・20語)") { viewModel.startRecording(kind: .kana, count: 20) }
                     Button("やめる", role: .cancel) {}
                 } message: {
                     Text("表示された文字を、このキーボードで打ってください。手の関節の座標・音・加速度と、目標の文字が保存されます(映像は保存しません)。")

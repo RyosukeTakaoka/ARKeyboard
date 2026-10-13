@@ -19,20 +19,26 @@ import Foundation
 ///
 /// Python 版(tools/lm/ngram.py)も同じ式で、両者の出力が一致することをテストで確認しています。
 struct CharNGramModel {
-    /// このキーボードで打てる文字(30種類)。これ以外の文字は学習時に取り除く。
+    /// このキーボード(QWERTY)で打てる文字(30種類)。これ以外の文字は学習時に取り除く。
     static let vocabulary: [Character] = Array("abcdefghijklmnopqrstuvwxyz ,.;")
 
     /// n-gram の n(文脈は n−1 文字)
     let order: Int
+    /// このモデルが扱う文字(英字用・仮名用で違う)
+    let symbols: [Character]
+    private let allowed: Set<Character>
     /// 文脈 → (次の文字 → 回数)
     private var counts: [String: [Character: Int]] = [:]
     /// 文脈 → 合計回数
     private var totals: [String: Int] = [:]
 
     /// 学習用のテキストから作る
-    init(text: String, order: Int = 5) {
+    /// - Parameter vocabulary: 扱う文字(既定は英字)。仮名のモデルなら FlickLayout.kanaVocabulary
+    init(text: String, order: Int = 5, vocabulary: [Character] = CharNGramModel.vocabulary) {
         self.order = max(1, order)
-        let normalized = Self.normalize(text)
+        self.symbols = vocabulary
+        self.allowed = Set(vocabulary)
+        let normalized = Self.normalize(text, allowed: allowed)
         let chars = Array(normalized)
         for i in 0..<chars.count {
             let c = chars[i]
@@ -48,8 +54,7 @@ struct CharNGramModel {
 
     /// 学習・推定の前に文字をそろえる: 小文字にし、改行やタブはスペースに、打てない文字は消し、
     /// スペースの連続は1つにまとめる。
-    static func normalize(_ text: String) -> String {
-        let allowed = Set(vocabulary)
+    static func normalize(_ text: String, allowed: Set<Character> = Set(vocabulary)) -> String {
         var result = ""
         var lastWasSpace = false
         for ch in text.lowercased() {
@@ -68,7 +73,7 @@ struct CharNGramModel {
 
     /// P(c | context)。context は直前の文字列(長くてもよい。最後の order−1 文字だけ使う)。
     func probability(of c: Character, after context: String) -> Double {
-        let normalizedContext = Array(Self.normalize(context))
+        let normalizedContext = Array(Self.normalize(context, allowed: allowed))
         let historyLength = min(order - 1, normalizedContext.count)
         let history = String(normalizedContext.suffix(historyLength))
         return interpolated(c, history: history)
@@ -84,7 +89,7 @@ struct CharNGramModel {
             // 文脈なし: 加算スムージング(すべての文字に1回ずつ足す)
             let count = Double(counts[""]?[c] ?? 0)
             let total = Double(totals[""] ?? 0)
-            return (count + 1) / (total + Double(Self.vocabulary.count))
+            return (count + 1) / (total + Double(symbols.count))
         }
         let shorter = interpolated(c, history: String(history.dropFirst()))
         guard let total = totals[history], total > 0, let next = counts[history] else {

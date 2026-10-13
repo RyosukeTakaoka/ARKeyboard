@@ -41,6 +41,8 @@ struct RecordingTask: Codable, Equatable {
         case keys
         /// 短いフレーズ
         case phrases
+        /// 仮名(フリック入力用)
+        case kana
 
         var id: String { rawValue }
 
@@ -48,6 +50,7 @@ struct RecordingTask: Codable, Equatable {
             switch self {
             case .keys: return "1文字ずつ"
             case .phrases: return "フレーズ"
+            case .kana: return "仮名(フリック)"
             }
         }
     }
@@ -136,6 +139,8 @@ struct RecordedEvent: Codable, Equatable {
         case backspace
         /// 画面の改行ボタン
         case newline
+        /// フリック(フリックモード)
+        case flick
     }
 
     var kind: Kind
@@ -150,6 +155,10 @@ struct RecordedEvent: Codable, Equatable {
     var location: Vec2?
     /// その時点で表示していた目標の番号
     var promptIndex: Int?
+    /// フリックの始点(キー配置の座標)と移動(手の座標)、方向(FlickDirection の番号)
+    var flickStart: Vec2? = nil
+    var flickDisplacement: Vec2? = nil
+    var flickDirection: Int? = nil
 }
 
 /// 記録の進行(目標の表示と、入力に合わせた次の目標への進行)
@@ -202,6 +211,18 @@ final class RecordingSession {
         }
     }
 
+    /// フリックの結果を記録する。仮名が入力されたら次の目標へ進む
+    func addFlick(_ result: FlickResult, at time: Double) {
+        var event = RecordedEvent(kind: .flick, t: result.gesture.endTime, output: result.output,
+                                  finger: result.gesture.finger, accepted: result.output != nil, note: nil,
+                                  audioOffset: nil, location: result.gesture.start, promptIndex: promptIndex)
+        event.flickStart = result.gesture.start
+        event.flickDisplacement = result.gesture.displacement
+        event.flickDirection = result.decode.best?.direction.rawValue
+        recording.events.append(event)
+        if result.output != nil { advance(at: time) }
+    }
+
     func addEdit(_ kind: RecordedEvent.Kind, at time: Double) {
         recording.events.append(RecordedEvent(kind: kind, t: time, output: nil, finger: nil, accepted: true,
                                               note: nil, audioOffset: nil, location: nil, promptIndex: promptIndex))
@@ -242,6 +263,21 @@ final class RecordingSession {
                 if i < count - 1 { targets.append(" ") }
             }
             return RecordingTask(kind: .phrases, targets: targets)
+        case .kana:
+            // フリック用: 短い仮名の語(言語モデルの学習データには入っていない語を中心に)
+            let words = ["あさ", "いぬ", "うみ", "えき", "おかし", "かさ", "きつね", "くも", "けいと", "こえ",
+                         "さる", "しま", "すいか", "せかい", "そら", "たこ", "ちず", "つき", "てがみ", "とり",
+                         "なつ", "にわ", "ぬの", "ねこ", "のり", "はな", "ひかり", "ふね", "へや", "ほし",
+                         "まど", "みかん", "むし", "めがね", "もり", "やま", "ゆき", "よる", "らいおん", "りんご",
+                         "るす", "れもん", "ろうそく", "わたし", "がっこう", "でんしゃ", "ぱん", "きょう"]
+            var state = seed &+ 0x9E3779B97F4A7C15
+            var targets: [String] = []
+            for _ in 0..<max(1, count) {
+                state = state &* 6364136223846793005 &+ 1442695040888963407
+                let word = words[Int((state >> 33) % UInt64(words.count))]
+                targets += word.map(String.init)
+            }
+            return RecordingTask(kind: .kana, targets: targets)
         }
     }
 }
