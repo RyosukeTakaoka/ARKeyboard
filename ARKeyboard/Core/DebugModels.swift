@@ -40,6 +40,8 @@ struct TapLogEntry: Identifiable, Equatable {
     var audioOffset: Double?
     /// タップの確からしさ
     var confidence: Double?
+    /// デコーダーの上位の候補(例: "F 82% G 12%")
+    var candidatesText: String?
 
     init(id: Int, result: TapResult) {
         self.id = id
@@ -52,6 +54,10 @@ struct TapLogEntry: Identifiable, Equatable {
         heightAboveSurface = result.heightAboveSurface
         audioOffset = result.audioOffset
         confidence = result.touch?.confidence
+        if let decode = result.decode {
+            let top = decode.candidates.prefix(2).map { "\($0.key.label)\(Int(($0.probability * 100).rounded()))%" }
+            candidatesText = top.joined(separator: " ") + (decode.anchored ? " ⚓︎" : "")
+        }
     }
 
     /// 1行の説明(例: "右手の人差し指 → J  速さ2.31 移動0.112")
@@ -59,6 +65,7 @@ struct TapLogEntry: Identifiable, Equatable {
         let key = keyLabel.map { "→ \($0)" } ?? "→ (\(note ?? "なし"))"
         let height = heightAboveSurface.map { String(format: " 高さ%.1fcm", $0 * 100) } ?? ""
         let audio = audioOffset.map { String(format: " 音%+.0fms", $0 * 1000) } ?? ""
-        return "\(finger.japaneseName) \(key)  速さ\(String(format: "%.2f", peakSpeed)) 移動\(String(format: "%.3f", travel))\(audio)\(height)"
+        let candidates = candidatesText.map { " [\($0)]" } ?? ""
+        return "\(finger.japaneseName) \(key)\(candidates)  速さ\(String(format: "%.2f", peakSpeed)) 移動\(String(format: "%.3f", travel))\(audio)\(height)"
     }
 }

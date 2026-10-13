@@ -21,7 +21,9 @@ let package = Package(
         .testTarget(
             name: "ARKeyboardCoreTests",
             dependencies: ["ARKeyboardCore"],
-            path: "Tests/ARKeyboardCoreTests"
+            path: "Tests/ARKeyboardCoreTests",
+            // 固定データ(Python が作ったゴールデンデータ)は、テストの中でファイルとして直接読む
+            exclude: ["Fixtures"]
         ),
     ]
 )

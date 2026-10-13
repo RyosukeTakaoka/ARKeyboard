@@ -66,6 +66,12 @@ struct ContentView: View {
                 let converter = CoordinateConverter(imageSize: viewModel.imageSize,
                                                     viewSize: Vec2(geometry.size))
                 ZStack {
+                    if viewModel.settings.overlayMode == .hitMap {
+                        HitMapOverlayView(hitMaps: viewModel.hitMaps,
+                                          keys: viewModel.keys,
+                                          frames: viewModel.layoutFrames,
+                                          converter: converter)
+                    }
                     KeyboardOverlayView(keys: viewModel.keys,
                                         frames: viewModel.layoutFrames,
                                         hoveredKeyIDs: viewModel.hoveredKeyIDs,

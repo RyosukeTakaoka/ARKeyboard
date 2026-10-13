@@ -34,6 +34,26 @@ enum LayoutAnchor: String, Codable, CaseIterable, Identifiable {
     }
 }
 
+/// キー配置の上に重ねて表示するもの
+enum OverlayMode: String, Codable, CaseIterable, Identifiable {
+    /// キーの枠と文字
+    case keys
+    /// 当たり判定ビュー: 各場所で「押したらどのキーになるか」(事後確率が最大のキー)で色分け
+    case hitMap
+    /// タッチヒートマップ: 実際に押した場所の分布(個人適応のデータ)
+    case heatmap
+
+    var id: String { rawValue }
+
+    var japaneseName: String {
+        switch self {
+        case .keys: return "キー"
+        case .hitMap: return "当たり判定"
+        case .heatmap: return "ヒートマップ"
+        }
+    }
+}
+
 /// 機能の ON/OFF(あとで効果を比べるため、すべて設定画面で切り替えられるようにしている)
 struct FeatureFlags: Codable, Equatable {
     /// タップ推定レベルA: カメラの急停止に加えて、マイクの音の立ち上がりを条件にする
@@ -94,6 +114,10 @@ struct KeyboardSettings: Codable, Equatable {
     var handTracker: HandTrackerKind = .vision
     /// センサー融合の時間窓など
     var fusion = FusionConfig()
+    /// デコーダー(空間タッチモデル × 言語モデル)の設定
+    var decoder = DecoderConfig()
+    /// キー配置の上に重ねて表示するもの
+    var overlayMode: OverlayMode = .keys
     /// 音のオンセット検出の設定
     var audioOnset = OnsetDetectorConfig()
     /// 振動のオンセット検出の設定

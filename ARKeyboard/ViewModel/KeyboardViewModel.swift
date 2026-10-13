@@ -37,6 +37,8 @@ final class KeyboardViewModel {
     var hoveredKeyIDs: Set<String> = []
     /// 押されたキーと押された時刻(押した瞬間にキーを光らせる)
     var pressedKeys: [String: Date] = [:]
+    /// 当たり判定の地図(当たり判定ビューを表示しているときだけ計算する)
+    var hitMaps: [Chirality: HitMap] = [:]
 
     /// 入力された文字列
     var typedText = ""
@@ -97,6 +99,11 @@ final class KeyboardViewModel {
     /// タップログに残す件数
     static let tapLogLimit = 12
 
+    /// 当たり判定の地図を最後に計算したときの条件(同じなら計算し直さない)
+    @ObservationIgnored private var hitMapSignature = ""
+    /// 言語モデルを作ったときの n
+    @ObservationIgnored private var languageModelOrder = 0
+
     /// UserDefaults に保存するときのキー(名前)
     private static let settingsKey = "KeyboardSettings.v1"
     private static let calibrationKey = "CalibrationResult.v1"
@@ -105,6 +112,7 @@ final class KeyboardViewModel {
         let loaded = Self.loadSettings()
         settings = loaded
         engine = KeyboardEngine(settings: loaded)
+        loadLanguageModels()
 
         // 前回のキャリブレーションがあれば再利用する(毎回やり直さなくてよいように)
         if let saved = Self.loadCalibration() {
@@ -128,6 +136,44 @@ final class KeyboardViewModel {
         motionSensor.onUpdate = { [weak self] update in
             self?.handleMotion(update)
         }
+    }
+
+    /// アプリに同梱した学習用テキスト(自作のコーパス)から言語モデルを作る
+    private func loadLanguageModels() {
+        func corpus(_ name: String) -> String? {
+            guard let url = Bundle.main.url(forResource: "corpus_\(name)", withExtension: "txt") else {
+                print("[KeyboardViewModel] corpus_\(name).txt が見つかりません")
+                return nil
+            }
+            return try? String(contentsOf: url, encoding: .utf8)
+        }
+        engine.settings = settings
+        engine.setLanguageCorpora(english: corpus("english"), romaji: corpus("romaji"))
+        languageModelOrder = settings.decoder.lmOrder
+    }
+
+    /// 言語モデルの文脈(直前の入力)。改行はスペースとして扱う
+    private var languageContext: String {
+        String(typedText.suffix(12)).replacingOccurrences(of: "\n", with: " ")
+    }
+
+    /// 当たり判定の地図を、必要なときだけ計算し直す
+    private func updateHitMapsIfNeeded() {
+        guard settings.overlayMode == .hitMap, calibration != nil else {
+            if !hitMaps.isEmpty { hitMaps = [:] }
+            hitMapSignature = ""
+            return
+        }
+        // 文脈・キー・デコーダーの設定が同じなら、地図も同じなので計算しない
+        let signature = "\(languageContext)|\(settings.decoder)|\(settings.features.languageModel)|\(settings.keyScale)|\(calibration?.createdAt.timeIntervalSince1970 ?? 0)"
+        guard signature != hitMapSignature else { return }
+        hitMapSignature = signature
+        engine.context = languageContext
+        var maps: [Chirality: HitMap] = [:]
+        for chirality in Chirality.allCases {
+            maps[chirality] = engine.hitMap(for: chirality)
+        }
+        hitMaps = maps
     }
 
     /// 今使うべきカメラ(設定で LiDAR がオンで、対応機なら ARKit 版)
@@ -340,6 +386,10 @@ final class KeyboardViewModel {
     private func handle(_ frame: VisionFrame) {
         // 画面で変えた設定を、毎フレームエンジンに反映する(struct のコピーなので軽い)
         engine.settings = settings
+        engine.context = languageContext
+        if settings.decoder.lmOrder != languageModelOrder {
+            loadLanguageModels()
+        }
         // キーの大きさが変わったときなど、キーが作り直されていたら画面にも反映
         if engine.keys != keys {
             keys = engine.keys
@@ -361,11 +411,13 @@ final class KeyboardViewModel {
         }
         handleTapResults(output.taps)
         recordDebugInfo(output)
+        updateHitMapsIfNeeded()
     }
 
     /// マイクの解析結果を受け取る(メインスレッド)
     private func handleAudio(_ update: AudioUpdate) {
         engine.settings = settings
+        engine.context = languageContext
         let results = engine.ingestOnsets(update.onsets, source: .audio, coveredUntil: update.coveredUntil, now: now)
         handleTapResults(results)
         guard settings.showDebug else {
@@ -383,6 +435,7 @@ final class KeyboardViewModel {
     /// 加速度センサーの解析結果を受け取る(メインスレッド)
     private func handleMotion(_ update: MotionUpdate) {
         engine.settings = settings
+        engine.context = languageContext
         let results = engine.ingestOnsets(update.onsets, source: .motion, coveredUntil: update.coveredUntil, now: now)
         handleTapResults(results)
         if settings.showDebug {

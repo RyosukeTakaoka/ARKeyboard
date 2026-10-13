@@ -1,0 +1,8066 @@
+[
+{
+"corpus": "english",
+"order": 1,
+"context": "",
+"char": "a",
+"p": 0.0597667638483965
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "",
+"char": "e",
+"p": 0.10903790087463557
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "",
+"char": "h",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "",
+"char": "n",
+"p": 0.04795918367346939
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "",
+"char": "o",
+"p": 0.05641399416909621
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "",
+"char": "q",
+"p": 0.0010204081632653062
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "",
+"char": "r",
+"p": 0.043731778425655975
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "",
+"char": "s",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "",
+"char": "t",
+"p": 0.08323615160349854
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "",
+"char": "u",
+"p": 0.018950437317784258
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "",
+"char": "y",
+"p": 0.01967930029154519
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "",
+"char": "z",
+"p": 0.0005830903790087463
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "",
+"char": " ",
+"p": 0.19941690962099126
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "",
+"char": ",",
+"p": 0.004081632653061225
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "",
+"char": ".",
+"p": 0.023760932944606412
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "",
+"char": ";",
+"p": 0.00043731778425655976
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "t",
+"char": "a",
+"p": 0.0597667638483965
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "t",
+"char": "e",
+"p": 0.10903790087463557
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "t",
+"char": "h",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "t",
+"char": "n",
+"p": 0.04795918367346939
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "t",
+"char": "o",
+"p": 0.05641399416909621
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "t",
+"char": "q",
+"p": 0.0010204081632653062
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "t",
+"char": "r",
+"p": 0.043731778425655975
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "t",
+"char": "s",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "t",
+"char": "t",
+"p": 0.08323615160349854
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "t",
+"char": "u",
+"p": 0.018950437317784258
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "t",
+"char": "y",
+"p": 0.01967930029154519
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "t",
+"char": "z",
+"p": 0.0005830903790087463
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "t",
+"char": " ",
+"p": 0.19941690962099126
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "t",
+"char": ",",
+"p": 0.004081632653061225
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "t",
+"char": ".",
+"p": 0.023760932944606412
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "t",
+"char": ";",
+"p": 0.00043731778425655976
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "th",
+"char": "a",
+"p": 0.0597667638483965
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "th",
+"char": "e",
+"p": 0.10903790087463557
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "th",
+"char": "h",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "th",
+"char": "n",
+"p": 0.04795918367346939
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "th",
+"char": "o",
+"p": 0.05641399416909621
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "th",
+"char": "q",
+"p": 0.0010204081632653062
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "th",
+"char": "r",
+"p": 0.043731778425655975
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "th",
+"char": "s",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "th",
+"char": "t",
+"p": 0.08323615160349854
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "th",
+"char": "u",
+"p": 0.018950437317784258
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "th",
+"char": "y",
+"p": 0.01967930029154519
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "th",
+"char": "z",
+"p": 0.0005830903790087463
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "th",
+"char": " ",
+"p": 0.19941690962099126
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "th",
+"char": ",",
+"p": 0.004081632653061225
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "th",
+"char": ".",
+"p": 0.023760932944606412
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "th",
+"char": ";",
+"p": 0.00043731778425655976
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the",
+"char": "a",
+"p": 0.0597667638483965
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the",
+"char": "e",
+"p": 0.10903790087463557
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the",
+"char": "h",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the",
+"char": "n",
+"p": 0.04795918367346939
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the",
+"char": "o",
+"p": 0.05641399416909621
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the",
+"char": "q",
+"p": 0.0010204081632653062
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the",
+"char": "r",
+"p": 0.043731778425655975
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the",
+"char": "s",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the",
+"char": "t",
+"p": 0.08323615160349854
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the",
+"char": "u",
+"p": 0.018950437317784258
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the",
+"char": "y",
+"p": 0.01967930029154519
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the",
+"char": "z",
+"p": 0.0005830903790087463
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the",
+"char": " ",
+"p": 0.19941690962099126
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the",
+"char": ",",
+"p": 0.004081632653061225
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the",
+"char": ".",
+"p": 0.023760932944606412
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the",
+"char": ";",
+"p": 0.00043731778425655976
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the q",
+"char": "a",
+"p": 0.0597667638483965
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the q",
+"char": "e",
+"p": 0.10903790087463557
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the q",
+"char": "h",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the q",
+"char": "n",
+"p": 0.04795918367346939
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the q",
+"char": "o",
+"p": 0.05641399416909621
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the q",
+"char": "q",
+"p": 0.0010204081632653062
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the q",
+"char": "r",
+"p": 0.043731778425655975
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the q",
+"char": "s",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the q",
+"char": "t",
+"p": 0.08323615160349854
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the q",
+"char": "u",
+"p": 0.018950437317784258
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the q",
+"char": "y",
+"p": 0.01967930029154519
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the q",
+"char": "z",
+"p": 0.0005830903790087463
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the q",
+"char": " ",
+"p": 0.19941690962099126
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the q",
+"char": ",",
+"p": 0.004081632653061225
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the q",
+"char": ".",
+"p": 0.023760932944606412
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "the q",
+"char": ";",
+"p": 0.00043731778425655976
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "hello wor",
+"char": "a",
+"p": 0.0597667638483965
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "hello wor",
+"char": "e",
+"p": 0.10903790087463557
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "hello wor",
+"char": "h",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "hello wor",
+"char": "n",
+"p": 0.04795918367346939
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "hello wor",
+"char": "o",
+"p": 0.05641399416909621
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "hello wor",
+"char": "q",
+"p": 0.0010204081632653062
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "hello wor",
+"char": "r",
+"p": 0.043731778425655975
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "hello wor",
+"char": "s",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "hello wor",
+"char": "t",
+"p": 0.08323615160349854
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "hello wor",
+"char": "u",
+"p": 0.018950437317784258
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "hello wor",
+"char": "y",
+"p": 0.01967930029154519
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "hello wor",
+"char": "z",
+"p": 0.0005830903790087463
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "hello wor",
+"char": " ",
+"p": 0.19941690962099126
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "hello wor",
+"char": ",",
+"p": 0.004081632653061225
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "hello wor",
+"char": ".",
+"p": 0.023760932944606412
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "hello wor",
+"char": ";",
+"p": 0.00043731778425655976
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "i am typ",
+"char": "a",
+"p": 0.0597667638483965
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "i am typ",
+"char": "e",
+"p": 0.10903790087463557
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "i am typ",
+"char": "h",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "i am typ",
+"char": "n",
+"p": 0.04795918367346939
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "i am typ",
+"char": "o",
+"p": 0.05641399416909621
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "i am typ",
+"char": "q",
+"p": 0.0010204081632653062
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "i am typ",
+"char": "r",
+"p": 0.043731778425655975
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "i am typ",
+"char": "s",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "i am typ",
+"char": "t",
+"p": 0.08323615160349854
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "i am typ",
+"char": "u",
+"p": 0.018950437317784258
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "i am typ",
+"char": "y",
+"p": 0.01967930029154519
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "i am typ",
+"char": "z",
+"p": 0.0005830903790087463
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "i am typ",
+"char": " ",
+"p": 0.19941690962099126
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "i am typ",
+"char": ",",
+"p": 0.004081632653061225
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "i am typ",
+"char": ".",
+"p": 0.023760932944606412
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "i am typ",
+"char": ";",
+"p": 0.00043731778425655976
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "konnichi",
+"char": "a",
+"p": 0.0597667638483965
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "konnichi",
+"char": "e",
+"p": 0.10903790087463557
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "konnichi",
+"char": "h",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "konnichi",
+"char": "n",
+"p": 0.04795918367346939
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "konnichi",
+"char": "o",
+"p": 0.05641399416909621
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "konnichi",
+"char": "q",
+"p": 0.0010204081632653062
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "konnichi",
+"char": "r",
+"p": 0.043731778425655975
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "konnichi",
+"char": "s",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "konnichi",
+"char": "t",
+"p": 0.08323615160349854
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "konnichi",
+"char": "u",
+"p": 0.018950437317784258
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "konnichi",
+"char": "y",
+"p": 0.01967930029154519
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "konnichi",
+"char": "z",
+"p": 0.0005830903790087463
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "konnichi",
+"char": " ",
+"p": 0.19941690962099126
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "konnichi",
+"char": ",",
+"p": 0.004081632653061225
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "konnichi",
+"char": ".",
+"p": 0.023760932944606412
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "konnichi",
+"char": ";",
+"p": 0.00043731778425655976
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "arigatou ",
+"char": "a",
+"p": 0.0597667638483965
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "arigatou ",
+"char": "e",
+"p": 0.10903790087463557
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "arigatou ",
+"char": "h",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "arigatou ",
+"char": "n",
+"p": 0.04795918367346939
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "arigatou ",
+"char": "o",
+"p": 0.05641399416909621
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "arigatou ",
+"char": "q",
+"p": 0.0010204081632653062
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "arigatou ",
+"char": "r",
+"p": 0.043731778425655975
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "arigatou ",
+"char": "s",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "arigatou ",
+"char": "t",
+"p": 0.08323615160349854
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "arigatou ",
+"char": "u",
+"p": 0.018950437317784258
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "arigatou ",
+"char": "y",
+"p": 0.01967930029154519
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "arigatou ",
+"char": "z",
+"p": 0.0005830903790087463
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "arigatou ",
+"char": " ",
+"p": 0.19941690962099126
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "arigatou ",
+"char": ",",
+"p": 0.004081632653061225
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "arigatou ",
+"char": ".",
+"p": 0.023760932944606412
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "arigatou ",
+"char": ";",
+"p": 0.00043731778425655976
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "xyz",
+"char": "a",
+"p": 0.0597667638483965
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "xyz",
+"char": "e",
+"p": 0.10903790087463557
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "xyz",
+"char": "h",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "xyz",
+"char": "n",
+"p": 0.04795918367346939
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "xyz",
+"char": "o",
+"p": 0.05641399416909621
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "xyz",
+"char": "q",
+"p": 0.0010204081632653062
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "xyz",
+"char": "r",
+"p": 0.043731778425655975
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "xyz",
+"char": "s",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "xyz",
+"char": "t",
+"p": 0.08323615160349854
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "xyz",
+"char": "u",
+"p": 0.018950437317784258
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "xyz",
+"char": "y",
+"p": 0.01967930029154519
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "xyz",
+"char": "z",
+"p": 0.0005830903790087463
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "xyz",
+"char": " ",
+"p": 0.19941690962099126
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "xyz",
+"char": ",",
+"p": 0.004081632653061225
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "xyz",
+"char": ".",
+"p": 0.023760932944606412
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "xyz",
+"char": ";",
+"p": 0.00043731778425655976
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "zzzz zzzz",
+"char": "a",
+"p": 0.0597667638483965
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "zzzz zzzz",
+"char": "e",
+"p": 0.10903790087463557
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "zzzz zzzz",
+"char": "h",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "zzzz zzzz",
+"char": "n",
+"p": 0.04795918367346939
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "zzzz zzzz",
+"char": "o",
+"p": 0.05641399416909621
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "zzzz zzzz",
+"char": "q",
+"p": 0.0010204081632653062
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "zzzz zzzz",
+"char": "r",
+"p": 0.043731778425655975
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "zzzz zzzz",
+"char": "s",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "zzzz zzzz",
+"char": "t",
+"p": 0.08323615160349854
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "zzzz zzzz",
+"char": "u",
+"p": 0.018950437317784258
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "zzzz zzzz",
+"char": "y",
+"p": 0.01967930029154519
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "zzzz zzzz",
+"char": "z",
+"p": 0.0005830903790087463
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "zzzz zzzz",
+"char": " ",
+"p": 0.19941690962099126
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "zzzz zzzz",
+"char": ",",
+"p": 0.004081632653061225
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "zzzz zzzz",
+"char": ".",
+"p": 0.023760932944606412
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "zzzz zzzz",
+"char": ";",
+"p": 0.00043731778425655976
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "kyou ha ",
+"char": "a",
+"p": 0.0597667638483965
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "kyou ha ",
+"char": "e",
+"p": 0.10903790087463557
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "kyou ha ",
+"char": "h",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "kyou ha ",
+"char": "n",
+"p": 0.04795918367346939
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "kyou ha ",
+"char": "o",
+"p": 0.05641399416909621
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "kyou ha ",
+"char": "q",
+"p": 0.0010204081632653062
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "kyou ha ",
+"char": "r",
+"p": 0.043731778425655975
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "kyou ha ",
+"char": "s",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "kyou ha ",
+"char": "t",
+"p": 0.08323615160349854
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "kyou ha ",
+"char": "u",
+"p": 0.018950437317784258
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "kyou ha ",
+"char": "y",
+"p": 0.01967930029154519
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "kyou ha ",
+"char": "z",
+"p": 0.0005830903790087463
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "kyou ha ",
+"char": " ",
+"p": 0.19941690962099126
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "kyou ha ",
+"char": ",",
+"p": 0.004081632653061225
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "kyou ha ",
+"char": ".",
+"p": 0.023760932944606412
+},
+{
+"corpus": "english",
+"order": 1,
+"context": "kyou ha ",
+"char": ";",
+"p": 0.00043731778425655976
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "",
+"char": "a",
+"p": 0.0597667638483965
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "",
+"char": "e",
+"p": 0.10903790087463557
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "",
+"char": "h",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "",
+"char": "n",
+"p": 0.04795918367346939
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "",
+"char": "o",
+"p": 0.05641399416909621
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "",
+"char": "q",
+"p": 0.0010204081632653062
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "",
+"char": "r",
+"p": 0.043731778425655975
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "",
+"char": "s",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "",
+"char": "t",
+"p": 0.08323615160349854
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "",
+"char": "u",
+"p": 0.018950437317784258
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "",
+"char": "y",
+"p": 0.01967930029154519
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "",
+"char": "z",
+"p": 0.0005830903790087463
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "",
+"char": " ",
+"p": 0.19941690962099126
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "",
+"char": ",",
+"p": 0.004081632653061225
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "",
+"char": ".",
+"p": 0.023760932944606412
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "",
+"char": ";",
+"p": 0.00043731778425655976
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "t",
+"char": "a",
+"p": 0.04258748843272073
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "t",
+"char": "e",
+"p": 0.09000786077473408
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "t",
+"char": "h",
+"p": 0.38020079801789075
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "t",
+"char": "n",
+"p": 0.0013094657658285157
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "t",
+"char": "o",
+"p": 0.09198399984079444
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "t",
+"char": "q",
+"p": 2.7860973741032252e-05
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "t",
+"char": "r",
+"p": 0.02508482671469368
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "t",
+"char": "s",
+"p": 0.020132538632225198
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "t",
+"char": "t",
+"p": 0.017631021204191084
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "t",
+"char": "u",
+"p": 0.009049841291953154
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "t",
+"char": "y",
+"p": 0.02101513447895004
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "t",
+"char": "z",
+"p": 1.5920556423446998e-05
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "t",
+"char": " ",
+"p": 0.21534244121832058
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "t",
+"char": ",",
+"p": 0.001817928536602354
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "t",
+"char": ".",
+"p": 0.034778455507019974
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "t",
+"char": ";",
+"p": 1.1940417317585249e-05
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "th",
+"char": "a",
+"p": 0.02860264540512513
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "th",
+"char": "e",
+"p": 0.8362370474192059
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "th",
+"char": "h",
+"p": 4.762276089475092e-05
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "th",
+"char": "n",
+"p": 4.581253898939488e-05
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "th",
+"char": "o",
+"p": 0.01130587382829273
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "th",
+"char": "q",
+"p": 9.747348721147849e-07
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "th",
+"char": "r",
+"p": 4.1774351662062206e-05
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "th",
+"char": "s",
+"p": 4.762276089475092e-05
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "th",
+"char": "t",
+"p": 0.0010347506906692807
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "th",
+"char": "u",
+"p": 0.004471754462007114
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "th",
+"char": "y",
+"p": 0.00010563847412724518
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "th",
+"char": "z",
+"p": 5.569913554941627e-07
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "th",
+"char": " ",
+"p": 0.04542173360014907
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "th",
+"char": ",",
+"p": 9.073895536777634e-05
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "th",
+"char": ".",
+"p": 0.004563189656569258
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "th",
+"char": ";",
+"p": 4.17743516620622e-07
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the",
+"char": "a",
+"p": 0.019413365500792642
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the",
+"char": "e",
+"p": 0.0015861195647363384
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the",
+"char": "h",
+"p": 5.328352155000518e-05
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the",
+"char": "n",
+"p": 0.03205361836122368
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the",
+"char": "o",
+"p": 6.029451122763744e-05
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the",
+"char": "q",
+"p": 1.0905983942983516e-06
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the",
+"char": "r",
+"p": 0.07201169264295143
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the",
+"char": "s",
+"p": 0.0017455286967029476
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the",
+"char": "t",
+"p": 0.0013804119342689207
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the",
+"char": "u",
+"p": 6.478673794700922e-05
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the",
+"char": "y",
+"p": 0.022192784721118977
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the",
+"char": "z",
+"p": 6.231990824562009e-07
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the",
+"char": " ",
+"p": 0.817573120281042
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the",
+"char": ",",
+"p": 0.00022702623241310687
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the",
+"char": ".",
+"p": 0.0014949766989271192
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the",
+"char": ";",
+"p": 8.953293484620752e-05
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the q",
+"char": "a",
+"p": 0.0012197298744570715
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the q",
+"char": "e",
+"p": 0.0022252632831558277
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the q",
+"char": "h",
+"p": 0.0010174332123519963
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the q",
+"char": "n",
+"p": 0.0009787588504789671
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the q",
+"char": "o",
+"p": 0.0011513060034509433
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the q",
+"char": "q",
+"p": 2.0824656393169516e-05
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the q",
+"char": "r",
+"p": 0.0008924852739929792
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the q",
+"char": "s",
+"p": 0.0010174332123519963
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the q",
+"char": "t",
+"p": 0.00169869697149997
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the q",
+"char": "u",
+"p": 0.9799785803534241
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the q",
+"char": "y",
+"p": 0.00040161837329684067
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the q",
+"char": "z",
+"p": 1.1899803653239721e-05
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the q",
+"char": " ",
+"p": 0.004069732849407985
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the q",
+"char": ",",
+"p": 8.329862557267806e-05
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the q",
+"char": ".",
+"p": 0.0004849169988695186
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "the q",
+"char": ";",
+"p": 8.92485273992979e-06
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "hello wor",
+"char": "a",
+"p": 0.013492008131377551
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "hello wor",
+"char": "e",
+"p": 0.2008675462372449
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "hello wor",
+"char": "h",
+"p": 0.0006645607461734694
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "hello wor",
+"char": "n",
+"p": 0.11699672154017857
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "hello wor",
+"char": "o",
+"p": 0.014716846699617347
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "hello wor",
+"char": "q",
+"p": 1.3602120535714286e-05
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "hello wor",
+"char": "r",
+"p": 0.049997010522959184
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "hello wor",
+"char": "s",
+"p": 0.02390674824617347
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "hello wor",
+"char": "t",
+"p": 0.05496696627869898
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "hello wor",
+"char": "u",
+"p": 0.00215690768494898
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "hello wor",
+"char": "y",
+"p": 0.05792834223533163
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "hello wor",
+"char": "z",
+"p": 7.772640306122449e-06
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "hello wor",
+"char": " ",
+"p": 0.23078324298469388
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "hello wor",
+"char": ",",
+"p": 5.4408482142857145e-05
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "hello wor",
+"char": ".",
+"p": 0.05734798509247449
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "hello wor",
+"char": ";",
+"p": 5.829480229591836e-06
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "i am typ",
+"char": "a",
+"p": 0.025732031943212066
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "i am typ",
+"char": "e",
+"p": 0.40657941437444545
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "i am typ",
+"char": "h",
+"p": 0.01673469387755102
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "i am typ",
+"char": "n",
+"p": 0.0014596273291925465
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "i am typ",
+"char": "o",
+"p": 0.010412599822537711
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "i am typ",
+"char": "q",
+"p": 3.1055900621118014e-05
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "i am typ",
+"char": "r",
+"p": 0.020896184560780833
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "i am typ",
+"char": "s",
+"p": 0.010212954747116238
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "i am typ",
+"char": "t",
+"p": 0.006881100266193434
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "i am typ",
+"char": "u",
+"p": 0.011446317657497781
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "i am typ",
+"char": "y",
+"p": 0.0027728482697426796
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "i am typ",
+"char": "z",
+"p": 1.774622892635315e-05
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "i am typ",
+"char": " ",
+"p": 0.04519964507542147
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "i am typ",
+"char": ",",
+"p": 0.00012422360248447205
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "i am typ",
+"char": ".",
+"p": 0.002897071872227152
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "i am typ",
+"char": ";",
+"p": 1.3309671694764861e-05
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "konnichi",
+"char": "a",
+"p": 0.0005039856078485816
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "konnichi",
+"char": "e",
+"p": 0.0053837521403119065
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "konnichi",
+"char": "h",
+"p": 0.0004203977509371095
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "konnichi",
+"char": "n",
+"p": 0.24703140184645286
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "konnichi",
+"char": "o",
+"p": 0.0024598402286084503
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "konnichi",
+"char": "q",
+"p": 8.604632329122124e-06
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "konnichi",
+"char": "r",
+"p": 0.003344960433152853
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "konnichi",
+"char": "s",
+"p": 0.4610354771160165
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "konnichi",
+"char": "t",
+"p": 0.018063003262529503
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "konnichi",
+"char": "u",
+"p": 0.0001598003146836966
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "konnichi",
+"char": "y",
+"p": 0.00016594648063306954
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "konnichi",
+"char": "z",
+"p": 4.916932759498357e-06
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "konnichi",
+"char": " ",
+"p": 0.010610162432319865
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "konnichi",
+"char": ",",
+"p": 3.4418529316488496e-05
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "konnichi",
+"char": ".",
+"p": 0.00020036500994955806
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "konnichi",
+"char": ";",
+"p": 3.6876995696237677e-06
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "arigatou ",
+"char": "a",
+"p": 0.17516195548637997
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "arigatou ",
+"char": "e",
+"p": 0.005898933411830906
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "arigatou ",
+"char": "h",
+"p": 0.08157185601674487
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "arigatou ",
+"char": "n",
+"p": 0.009592191130979805
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "arigatou ",
+"char": "o",
+"p": 0.05067956572713077
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "arigatou ",
+"char": "q",
+"p": 0.0016439937423741514
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "arigatou ",
+"char": "r",
+"p": 0.007654308844067804
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "arigatou ",
+"char": "s",
+"p": 0.10067381582820603
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "arigatou ",
+"char": "t",
+"p": 0.1122543871005538
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "arigatou ",
+"char": "u",
+"p": 0.002852962427484372
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "arigatou ",
+"char": "y",
+"p": 0.007769668451425649
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "arigatou ",
+"char": "z",
+"p": 3.818800795294196e-06
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "arigatou ",
+"char": " ",
+"p": 0.0013060298719906151
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "arigatou ",
+"char": ",",
+"p": 2.6731605567059373e-05
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "arigatou ",
+"char": ".",
+"p": 0.00015561613240823848
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "arigatou ",
+"char": ";",
+"p": 2.8641005964706465e-06
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "xyz",
+"char": "a",
+"p": 0.02988338192419825
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "xyz",
+"char": "e",
+"p": 0.05451895043731778
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "xyz",
+"char": "h",
+"p": 0.024927113702623908
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "xyz",
+"char": "n",
+"p": 0.023979591836734693
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "xyz",
+"char": "o",
+"p": 0.028206997084548106
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "xyz",
+"char": "q",
+"p": 0.0005102040816326531
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "xyz",
+"char": "r",
+"p": 0.021865889212827987
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "xyz",
+"char": "s",
+"p": 0.024927113702623908
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "xyz",
+"char": "t",
+"p": 0.04161807580174927
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "xyz",
+"char": "u",
+"p": 0.009475218658892129
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "xyz",
+"char": "y",
+"p": 0.17650631681243925
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "xyz",
+"char": "z",
+"p": 0.16695821185617102
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "xyz",
+"char": " ",
+"p": 0.09970845481049563
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "xyz",
+"char": ",",
+"p": 0.0020408163265306124
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "xyz",
+"char": ".",
+"p": 0.011880466472303208
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "xyz",
+"char": ";",
+"p": 0.00021865889212827985
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "zzzz zzzz",
+"char": "a",
+"p": 0.014941690962099125
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "zzzz zzzz",
+"char": "e",
+"p": 0.02725947521865889
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "zzzz zzzz",
+"char": "h",
+"p": 0.012463556851311954
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "zzzz zzzz",
+"char": "n",
+"p": 0.011989795918367347
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "zzzz zzzz",
+"char": "o",
+"p": 0.014103498542274053
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "zzzz zzzz",
+"char": "q",
+"p": 0.00025510204081632655
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "zzzz zzzz",
+"char": "r",
+"p": 0.010932944606413994
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "zzzz zzzz",
+"char": "s",
+"p": 0.012463556851311954
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "zzzz zzzz",
+"char": "t",
+"p": 0.020809037900874634
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "zzzz zzzz",
+"char": "u",
+"p": 0.0047376093294460644
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "zzzz zzzz",
+"char": "y",
+"p": 0.08825315840621963
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "zzzz zzzz",
+"char": "z",
+"p": 0.08347910592808551
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "zzzz zzzz",
+"char": " ",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "zzzz zzzz",
+"char": ",",
+"p": 0.0010204081632653062
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "zzzz zzzz",
+"char": ".",
+"p": 0.005940233236151604
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "zzzz zzzz",
+"char": ";",
+"p": 0.00010932944606413993
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "kyou ha ",
+"char": "a",
+"p": 0.04523088452201129
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "kyou ha ",
+"char": "e",
+"p": 0.004481007969233646
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "kyou ha ",
+"char": "h",
+"p": 0.026525308191456425
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "kyou ha ",
+"char": "n",
+"p": 0.07508312823971193
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "kyou ha ",
+"char": "o",
+"p": 0.02925273636899148
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "kyou ha ",
+"char": "q",
+"p": 0.01819797983819793
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "kyou ha ",
+"char": "r",
+"p": 0.022763596702812677
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "kyou ha ",
+"char": "s",
+"p": 0.19357810663067118
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "kyou ha ",
+"char": "t",
+"p": 0.07602683026282438
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "kyou ha ",
+"char": "u",
+"p": 0.002167196420261626
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "kyou ha ",
+"char": "y",
+"p": 0.0059020748020845075
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "kyou ha ",
+"char": "z",
+"p": 2.900876413066315e-06
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "kyou ha ",
+"char": " ",
+"p": 0.00099209973326868
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "kyou ha ",
+"char": ",",
+"p": 2.0306134891464208e-05
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "kyou ha ",
+"char": ".",
+"p": 0.00011821071383245234
+},
+{
+"corpus": "english",
+"order": 3,
+"context": "kyou ha ",
+"char": ";",
+"p": 2.1756573097997357e-06
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "",
+"char": "a",
+"p": 0.0597667638483965
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "",
+"char": "e",
+"p": 0.10903790087463557
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "",
+"char": "h",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "",
+"char": "n",
+"p": 0.04795918367346939
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "",
+"char": "o",
+"p": 0.05641399416909621
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "",
+"char": "q",
+"p": 0.0010204081632653062
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "",
+"char": "r",
+"p": 0.043731778425655975
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "",
+"char": "s",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "",
+"char": "t",
+"p": 0.08323615160349854
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "",
+"char": "u",
+"p": 0.018950437317784258
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "",
+"char": "y",
+"p": 0.01967930029154519
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "",
+"char": "z",
+"p": 0.0005830903790087463
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "",
+"char": " ",
+"p": 0.19941690962099126
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "",
+"char": ",",
+"p": 0.004081632653061225
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "",
+"char": ".",
+"p": 0.023760932944606412
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "",
+"char": ";",
+"p": 0.00043731778425655976
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "t",
+"char": "a",
+"p": 0.04258748843272073
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "t",
+"char": "e",
+"p": 0.09000786077473408
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "t",
+"char": "h",
+"p": 0.38020079801789075
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "t",
+"char": "n",
+"p": 0.0013094657658285157
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "t",
+"char": "o",
+"p": 0.09198399984079444
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "t",
+"char": "q",
+"p": 2.7860973741032252e-05
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "t",
+"char": "r",
+"p": 0.02508482671469368
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "t",
+"char": "s",
+"p": 0.020132538632225198
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "t",
+"char": "t",
+"p": 0.017631021204191084
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "t",
+"char": "u",
+"p": 0.009049841291953154
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "t",
+"char": "y",
+"p": 0.02101513447895004
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "t",
+"char": "z",
+"p": 1.5920556423446998e-05
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "t",
+"char": " ",
+"p": 0.21534244121832058
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "t",
+"char": ",",
+"p": 0.001817928536602354
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "t",
+"char": ".",
+"p": 0.034778455507019974
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "t",
+"char": ";",
+"p": 1.1940417317585249e-05
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "th",
+"char": "a",
+"p": 0.02860264540512513
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "th",
+"char": "e",
+"p": 0.8362370474192059
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "th",
+"char": "h",
+"p": 4.762276089475092e-05
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "th",
+"char": "n",
+"p": 4.581253898939488e-05
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "th",
+"char": "o",
+"p": 0.01130587382829273
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "th",
+"char": "q",
+"p": 9.747348721147849e-07
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "th",
+"char": "r",
+"p": 4.1774351662062206e-05
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "th",
+"char": "s",
+"p": 4.762276089475092e-05
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "th",
+"char": "t",
+"p": 0.0010347506906692807
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "th",
+"char": "u",
+"p": 0.004471754462007114
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "th",
+"char": "y",
+"p": 0.00010563847412724518
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "th",
+"char": "z",
+"p": 5.569913554941627e-07
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "th",
+"char": " ",
+"p": 0.04542173360014907
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "th",
+"char": ",",
+"p": 9.073895536777634e-05
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "th",
+"char": ".",
+"p": 0.004563189656569258
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "th",
+"char": ";",
+"p": 4.17743516620622e-07
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the",
+"char": "a",
+"p": 0.00040656262828885114
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the",
+"char": "e",
+"p": 3.321716365939976e-05
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the",
+"char": "h",
+"p": 1.1158852680629357e-06
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the",
+"char": "n",
+"p": 0.005906882059920914
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the",
+"char": "o",
+"p": 1.2627122770185851e-06
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the",
+"char": "q",
+"p": 2.283975694865658e-08
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the",
+"char": "r",
+"p": 0.06433532340613511
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the",
+"char": "s",
+"p": 3.655557480006173e-05
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the",
+"char": "t",
+"p": 2.8909150455893628e-05
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the",
+"char": "u",
+"p": 1.3567903234975751e-06
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the",
+"char": "y",
+"p": 0.026642780831855895
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the",
+"char": "z",
+"p": 1.3051289684946615e-08
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the",
+"char": " ",
+"p": 0.9019387040896553
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the",
+"char": ",",
+"p": 4.754476071478678e-06
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the",
+"char": ".",
+"p": 3.1308412542976315e-05
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the",
+"char": ";",
+"p": 1.8750352847373302e-06
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the q",
+"char": "a",
+"p": 0.00020328831240951192
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the q",
+"char": "e",
+"p": 0.0003708772138593046
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the q",
+"char": "h",
+"p": 0.00016957220205866605
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the q",
+"char": "n",
+"p": 0.00016312647507982786
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the q",
+"char": "o",
+"p": 0.00019188433390849053
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the q",
+"char": "q",
+"p": 3.4707760655282527e-06
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the q",
+"char": "r",
+"p": 0.00014874754566549653
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the q",
+"char": "s",
+"p": 0.00016957220205866605
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the q",
+"char": "t",
+"p": 0.0002831161619166617
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the q",
+"char": "u",
+"p": 0.9966630967255707
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the q",
+"char": "y",
+"p": 6.693639554947345e-05
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the q",
+"char": "z",
+"p": 1.983300608873287e-06
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the q",
+"char": " ",
+"p": 0.0006782888082346642
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the q",
+"char": ",",
+"p": 1.388310426211301e-05
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the q",
+"char": ".",
+"p": 8.081949981158643e-05
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "the q",
+"char": ";",
+"p": 1.4874754566549651e-06
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "hello wor",
+"char": "a",
+"p": 0.0011038915743854362
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "hello wor",
+"char": "e",
+"p": 0.016434617419410946
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "hello wor",
+"char": "h",
+"p": 5.43731519596475e-05
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "hello wor",
+"char": "n",
+"p": 0.009572459035105518
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "hello wor",
+"char": "o",
+"p": 0.0012041056390596013
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "hello wor",
+"char": "q",
+"p": 1.1129007711038961e-06
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "hello wor",
+"char": "r",
+"p": 0.2586361190427876
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "hello wor",
+"char": "s",
+"p": 0.0019560066746869198
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "hello wor",
+"char": "t",
+"p": 0.0044972972409844615
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "hello wor",
+"char": "u",
+"p": 0.00017647426513218927
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "hello wor",
+"char": "y",
+"p": 0.004739591637436224
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "hello wor",
+"char": "z",
+"p": 6.35943297773655e-07
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "hello wor",
+"char": " ",
+"p": 0.01888226533511132
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "hello wor",
+"char": ",",
+"p": 4.4516030844155845e-06
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "hello wor",
+"char": ".",
+"p": 0.004692107871202458
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "hello wor",
+"char": ";",
+"p": 4.769574733302411e-07
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "i am typ",
+"char": "a",
+"p": 0.0016082519964507542
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "i am typ",
+"char": "e",
+"p": 0.49416121339840285
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "i am typ",
+"char": "h",
+"p": 0.0010459183673469387
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "i am typ",
+"char": "n",
+"p": 9.122670807453416e-05
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "i am typ",
+"char": "o",
+"p": 0.000650787488908607
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "i am typ",
+"char": "q",
+"p": 1.940993788819876e-06
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "i am typ",
+"char": "r",
+"p": 0.001306011535048802
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "i am typ",
+"char": "s",
+"p": 0.0006383096716947649
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "i am typ",
+"char": "t",
+"p": 0.0004300687666370896
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "i am typ",
+"char": "u",
+"p": 0.0007153948535936113
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "i am typ",
+"char": "y",
+"p": 0.00017330301685891748
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "i am typ",
+"char": "z",
+"p": 1.109139307897072e-06
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "i am typ",
+"char": " ",
+"p": 0.002824977817213842
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "i am typ",
+"char": ",",
+"p": 7.763975155279503e-06
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "i am typ",
+"char": ".",
+"p": 0.000181066992014197
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "i am typ",
+"char": ";",
+"p": 8.318544809228038e-07
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "konnichi",
+"char": "a",
+"p": 0.0002519928039242908
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "konnichi",
+"char": "e",
+"p": 0.0026918760701559533
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "konnichi",
+"char": "h",
+"p": 0.00021019887546855476
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "konnichi",
+"char": "n",
+"p": 0.12351570092322643
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "konnichi",
+"char": "o",
+"p": 0.0012299201143042252
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "konnichi",
+"char": "q",
+"p": 4.302316164561062e-06
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "konnichi",
+"char": "r",
+"p": 0.0016724802165764266
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "konnichi",
+"char": "s",
+"p": 0.23051773855800825
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "konnichi",
+"char": "t",
+"p": 0.009031501631264751
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "konnichi",
+"char": "u",
+"p": 7.99001573418483e-05
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "konnichi",
+"char": "y",
+"p": 8.297324031653477e-05
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "konnichi",
+"char": "z",
+"p": 2.4584663797491786e-06
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "konnichi",
+"char": " ",
+"p": 0.0053050812161599325
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "konnichi",
+"char": ",",
+"p": 1.7209264658244248e-05
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "konnichi",
+"char": ".",
+"p": 0.00010018250497477903
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "konnichi",
+"char": ";",
+"p": 1.8438497848118838e-06
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "arigatou ",
+"char": "a",
+"p": 0.20437177621897173
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "arigatou ",
+"char": "e",
+"p": 0.0022375264665565504
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "arigatou ",
+"char": "h",
+"p": 0.09990656607531702
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "arigatou ",
+"char": "n",
+"p": 0.003638417325544064
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "arigatou ",
+"char": "o",
+"p": 0.05370604217235995
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "arigatou ",
+"char": "q",
+"p": 0.0006235838333143333
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "arigatou ",
+"char": "r",
+"p": 0.0029033585270602015
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "arigatou ",
+"char": "s",
+"p": 0.10715213703828504
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "arigatou ",
+"char": "t",
+"p": 0.07706200890021006
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "arigatou ",
+"char": "u",
+"p": 0.0010821581621492445
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "arigatou ",
+"char": "y",
+"p": 0.0029471156195062806
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "arigatou ",
+"char": "z",
+"p": 1.448510646490902e-06
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "arigatou ",
+"char": " ",
+"p": 0.0004953906410998885
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "arigatou ",
+"char": ",",
+"p": 1.0139574525436314e-05
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "arigatou ",
+"char": ".",
+"p": 5.902680884450425e-05
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "arigatou ",
+"char": ";",
+"p": 1.0863829848681761e-06
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "xyz",
+"char": "a",
+"p": 0.02988338192419825
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "xyz",
+"char": "e",
+"p": 0.05451895043731778
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "xyz",
+"char": "h",
+"p": 0.024927113702623908
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "xyz",
+"char": "n",
+"p": 0.023979591836734693
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "xyz",
+"char": "o",
+"p": 0.028206997084548106
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "xyz",
+"char": "q",
+"p": 0.0005102040816326531
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "xyz",
+"char": "r",
+"p": 0.021865889212827987
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "xyz",
+"char": "s",
+"p": 0.024927113702623908
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "xyz",
+"char": "t",
+"p": 0.04161807580174927
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "xyz",
+"char": "u",
+"p": 0.009475218658892129
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "xyz",
+"char": "y",
+"p": 0.17650631681243925
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "xyz",
+"char": "z",
+"p": 0.16695821185617102
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "xyz",
+"char": " ",
+"p": 0.09970845481049563
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "xyz",
+"char": ",",
+"p": 0.0020408163265306124
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "xyz",
+"char": ".",
+"p": 0.011880466472303208
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "xyz",
+"char": ";",
+"p": 0.00021865889212827985
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "zzzz zzzz",
+"char": "a",
+"p": 0.014941690962099125
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "zzzz zzzz",
+"char": "e",
+"p": 0.02725947521865889
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "zzzz zzzz",
+"char": "h",
+"p": 0.012463556851311954
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "zzzz zzzz",
+"char": "n",
+"p": 0.011989795918367347
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "zzzz zzzz",
+"char": "o",
+"p": 0.014103498542274053
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "zzzz zzzz",
+"char": "q",
+"p": 0.00025510204081632655
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "zzzz zzzz",
+"char": "r",
+"p": 0.010932944606413994
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "zzzz zzzz",
+"char": "s",
+"p": 0.012463556851311954
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "zzzz zzzz",
+"char": "t",
+"p": 0.020809037900874634
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "zzzz zzzz",
+"char": "u",
+"p": 0.0047376093294460644
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "zzzz zzzz",
+"char": "y",
+"p": 0.08825315840621963
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "zzzz zzzz",
+"char": "z",
+"p": 0.08347910592808551
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "zzzz zzzz",
+"char": " ",
+"p": 0.049854227405247815
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "zzzz zzzz",
+"char": ",",
+"p": 0.0010204081632653062
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "zzzz zzzz",
+"char": ".",
+"p": 0.005940233236151604
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "zzzz zzzz",
+"char": ";",
+"p": 0.00010932944606413993
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "kyou ha ",
+"char": "a",
+"p": 0.04523088452201129
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "kyou ha ",
+"char": "e",
+"p": 0.004481007969233646
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "kyou ha ",
+"char": "h",
+"p": 0.026525308191456425
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "kyou ha ",
+"char": "n",
+"p": 0.07508312823971193
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "kyou ha ",
+"char": "o",
+"p": 0.02925273636899148
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "kyou ha ",
+"char": "q",
+"p": 0.01819797983819793
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "kyou ha ",
+"char": "r",
+"p": 0.022763596702812677
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "kyou ha ",
+"char": "s",
+"p": 0.19357810663067118
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "kyou ha ",
+"char": "t",
+"p": 0.07602683026282438
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "kyou ha ",
+"char": "u",
+"p": 0.002167196420261626
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "kyou ha ",
+"char": "y",
+"p": 0.0059020748020845075
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "kyou ha ",
+"char": "z",
+"p": 2.900876413066315e-06
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "kyou ha ",
+"char": " ",
+"p": 0.00099209973326868
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "kyou ha ",
+"char": ",",
+"p": 2.0306134891464208e-05
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "kyou ha ",
+"char": ".",
+"p": 0.00011821071383245234
+},
+{
+"corpus": "english",
+"order": 5,
+"context": "kyou ha ",
+"char": ";",
+"p": 2.1756573097997357e-06
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "",
+"char": "a",
+"p": 0.11750599520383694
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "",
+"char": "e",
+"p": 0.04948768258120776
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "",
+"char": "h",
+"p": 0.045563549160671464
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "",
+"char": "n",
+"p": 0.04621757139742751
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "",
+"char": "o",
+"p": 0.07434052757793765
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "",
+"char": "q",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "",
+"char": "r",
+"p": 0.021800741225201658
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "",
+"char": "s",
+"p": 0.06235011990407674
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "",
+"char": "t",
+"p": 0.04403749727490735
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "",
+"char": "u",
+"p": 0.07150643121866143
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "",
+"char": "y",
+"p": 0.012208415086112928
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "",
+"char": "z",
+"p": 0.004578155657292348
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "",
+"char": " ",
+"p": 0.1656856333115326
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "",
+"char": ",",
+"p": 0.007194244604316547
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "",
+"char": ".",
+"p": 0.02594288205798997
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "",
+"char": ";",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "t",
+"char": "a",
+"p": 0.11750599520383694
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "t",
+"char": "e",
+"p": 0.04948768258120776
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "t",
+"char": "h",
+"p": 0.045563549160671464
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "t",
+"char": "n",
+"p": 0.04621757139742751
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "t",
+"char": "o",
+"p": 0.07434052757793765
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "t",
+"char": "q",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "t",
+"char": "r",
+"p": 0.021800741225201658
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "t",
+"char": "s",
+"p": 0.06235011990407674
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "t",
+"char": "t",
+"p": 0.04403749727490735
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "t",
+"char": "u",
+"p": 0.07150643121866143
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "t",
+"char": "y",
+"p": 0.012208415086112928
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "t",
+"char": "z",
+"p": 0.004578155657292348
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "t",
+"char": " ",
+"p": 0.1656856333115326
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "t",
+"char": ",",
+"p": 0.007194244604316547
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "t",
+"char": ".",
+"p": 0.02594288205798997
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "t",
+"char": ";",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "th",
+"char": "a",
+"p": 0.11750599520383694
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "th",
+"char": "e",
+"p": 0.04948768258120776
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "th",
+"char": "h",
+"p": 0.045563549160671464
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "th",
+"char": "n",
+"p": 0.04621757139742751
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "th",
+"char": "o",
+"p": 0.07434052757793765
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "th",
+"char": "q",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "th",
+"char": "r",
+"p": 0.021800741225201658
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "th",
+"char": "s",
+"p": 0.06235011990407674
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "th",
+"char": "t",
+"p": 0.04403749727490735
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "th",
+"char": "u",
+"p": 0.07150643121866143
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "th",
+"char": "y",
+"p": 0.012208415086112928
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "th",
+"char": "z",
+"p": 0.004578155657292348
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "th",
+"char": " ",
+"p": 0.1656856333115326
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "th",
+"char": ",",
+"p": 0.007194244604316547
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "th",
+"char": ".",
+"p": 0.02594288205798997
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "th",
+"char": ";",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the",
+"char": "a",
+"p": 0.11750599520383694
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the",
+"char": "e",
+"p": 0.04948768258120776
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the",
+"char": "h",
+"p": 0.045563549160671464
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the",
+"char": "n",
+"p": 0.04621757139742751
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the",
+"char": "o",
+"p": 0.07434052757793765
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the",
+"char": "q",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the",
+"char": "r",
+"p": 0.021800741225201658
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the",
+"char": "s",
+"p": 0.06235011990407674
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the",
+"char": "t",
+"p": 0.04403749727490735
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the",
+"char": "u",
+"p": 0.07150643121866143
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the",
+"char": "y",
+"p": 0.012208415086112928
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the",
+"char": "z",
+"p": 0.004578155657292348
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the",
+"char": " ",
+"p": 0.1656856333115326
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the",
+"char": ",",
+"p": 0.007194244604316547
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the",
+"char": ".",
+"p": 0.02594288205798997
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the",
+"char": ";",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the q",
+"char": "a",
+"p": 0.11750599520383694
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the q",
+"char": "e",
+"p": 0.04948768258120776
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the q",
+"char": "h",
+"p": 0.045563549160671464
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the q",
+"char": "n",
+"p": 0.04621757139742751
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the q",
+"char": "o",
+"p": 0.07434052757793765
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the q",
+"char": "q",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the q",
+"char": "r",
+"p": 0.021800741225201658
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the q",
+"char": "s",
+"p": 0.06235011990407674
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the q",
+"char": "t",
+"p": 0.04403749727490735
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the q",
+"char": "u",
+"p": 0.07150643121866143
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the q",
+"char": "y",
+"p": 0.012208415086112928
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the q",
+"char": "z",
+"p": 0.004578155657292348
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the q",
+"char": " ",
+"p": 0.1656856333115326
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the q",
+"char": ",",
+"p": 0.007194244604316547
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the q",
+"char": ".",
+"p": 0.02594288205798997
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "the q",
+"char": ";",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "hello wor",
+"char": "a",
+"p": 0.11750599520383694
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "hello wor",
+"char": "e",
+"p": 0.04948768258120776
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "hello wor",
+"char": "h",
+"p": 0.045563549160671464
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "hello wor",
+"char": "n",
+"p": 0.04621757139742751
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "hello wor",
+"char": "o",
+"p": 0.07434052757793765
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "hello wor",
+"char": "q",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "hello wor",
+"char": "r",
+"p": 0.021800741225201658
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "hello wor",
+"char": "s",
+"p": 0.06235011990407674
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "hello wor",
+"char": "t",
+"p": 0.04403749727490735
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "hello wor",
+"char": "u",
+"p": 0.07150643121866143
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "hello wor",
+"char": "y",
+"p": 0.012208415086112928
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "hello wor",
+"char": "z",
+"p": 0.004578155657292348
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "hello wor",
+"char": " ",
+"p": 0.1656856333115326
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "hello wor",
+"char": ",",
+"p": 0.007194244604316547
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "hello wor",
+"char": ".",
+"p": 0.02594288205798997
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "hello wor",
+"char": ";",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "i am typ",
+"char": "a",
+"p": 0.11750599520383694
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "i am typ",
+"char": "e",
+"p": 0.04948768258120776
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "i am typ",
+"char": "h",
+"p": 0.045563549160671464
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "i am typ",
+"char": "n",
+"p": 0.04621757139742751
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "i am typ",
+"char": "o",
+"p": 0.07434052757793765
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "i am typ",
+"char": "q",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "i am typ",
+"char": "r",
+"p": 0.021800741225201658
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "i am typ",
+"char": "s",
+"p": 0.06235011990407674
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "i am typ",
+"char": "t",
+"p": 0.04403749727490735
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "i am typ",
+"char": "u",
+"p": 0.07150643121866143
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "i am typ",
+"char": "y",
+"p": 0.012208415086112928
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "i am typ",
+"char": "z",
+"p": 0.004578155657292348
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "i am typ",
+"char": " ",
+"p": 0.1656856333115326
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "i am typ",
+"char": ",",
+"p": 0.007194244604316547
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "i am typ",
+"char": ".",
+"p": 0.02594288205798997
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "i am typ",
+"char": ";",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "konnichi",
+"char": "a",
+"p": 0.11750599520383694
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "konnichi",
+"char": "e",
+"p": 0.04948768258120776
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "konnichi",
+"char": "h",
+"p": 0.045563549160671464
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "konnichi",
+"char": "n",
+"p": 0.04621757139742751
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "konnichi",
+"char": "o",
+"p": 0.07434052757793765
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "konnichi",
+"char": "q",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "konnichi",
+"char": "r",
+"p": 0.021800741225201658
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "konnichi",
+"char": "s",
+"p": 0.06235011990407674
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "konnichi",
+"char": "t",
+"p": 0.04403749727490735
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "konnichi",
+"char": "u",
+"p": 0.07150643121866143
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "konnichi",
+"char": "y",
+"p": 0.012208415086112928
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "konnichi",
+"char": "z",
+"p": 0.004578155657292348
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "konnichi",
+"char": " ",
+"p": 0.1656856333115326
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "konnichi",
+"char": ",",
+"p": 0.007194244604316547
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "konnichi",
+"char": ".",
+"p": 0.02594288205798997
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "konnichi",
+"char": ";",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "arigatou ",
+"char": "a",
+"p": 0.11750599520383694
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "arigatou ",
+"char": "e",
+"p": 0.04948768258120776
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "arigatou ",
+"char": "h",
+"p": 0.045563549160671464
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "arigatou ",
+"char": "n",
+"p": 0.04621757139742751
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "arigatou ",
+"char": "o",
+"p": 0.07434052757793765
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "arigatou ",
+"char": "q",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "arigatou ",
+"char": "r",
+"p": 0.021800741225201658
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "arigatou ",
+"char": "s",
+"p": 0.06235011990407674
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "arigatou ",
+"char": "t",
+"p": 0.04403749727490735
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "arigatou ",
+"char": "u",
+"p": 0.07150643121866143
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "arigatou ",
+"char": "y",
+"p": 0.012208415086112928
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "arigatou ",
+"char": "z",
+"p": 0.004578155657292348
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "arigatou ",
+"char": " ",
+"p": 0.1656856333115326
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "arigatou ",
+"char": ",",
+"p": 0.007194244604316547
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "arigatou ",
+"char": ".",
+"p": 0.02594288205798997
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "arigatou ",
+"char": ";",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "xyz",
+"char": "a",
+"p": 0.11750599520383694
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "xyz",
+"char": "e",
+"p": 0.04948768258120776
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "xyz",
+"char": "h",
+"p": 0.045563549160671464
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "xyz",
+"char": "n",
+"p": 0.04621757139742751
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "xyz",
+"char": "o",
+"p": 0.07434052757793765
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "xyz",
+"char": "q",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "xyz",
+"char": "r",
+"p": 0.021800741225201658
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "xyz",
+"char": "s",
+"p": 0.06235011990407674
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "xyz",
+"char": "t",
+"p": 0.04403749727490735
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "xyz",
+"char": "u",
+"p": 0.07150643121866143
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "xyz",
+"char": "y",
+"p": 0.012208415086112928
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "xyz",
+"char": "z",
+"p": 0.004578155657292348
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "xyz",
+"char": " ",
+"p": 0.1656856333115326
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "xyz",
+"char": ",",
+"p": 0.007194244604316547
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "xyz",
+"char": ".",
+"p": 0.02594288205798997
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "xyz",
+"char": ";",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "zzzz zzzz",
+"char": "a",
+"p": 0.11750599520383694
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "zzzz zzzz",
+"char": "e",
+"p": 0.04948768258120776
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "zzzz zzzz",
+"char": "h",
+"p": 0.045563549160671464
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "zzzz zzzz",
+"char": "n",
+"p": 0.04621757139742751
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "zzzz zzzz",
+"char": "o",
+"p": 0.07434052757793765
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "zzzz zzzz",
+"char": "q",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "zzzz zzzz",
+"char": "r",
+"p": 0.021800741225201658
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "zzzz zzzz",
+"char": "s",
+"p": 0.06235011990407674
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "zzzz zzzz",
+"char": "t",
+"p": 0.04403749727490735
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "zzzz zzzz",
+"char": "u",
+"p": 0.07150643121866143
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "zzzz zzzz",
+"char": "y",
+"p": 0.012208415086112928
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "zzzz zzzz",
+"char": "z",
+"p": 0.004578155657292348
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "zzzz zzzz",
+"char": " ",
+"p": 0.1656856333115326
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "zzzz zzzz",
+"char": ",",
+"p": 0.007194244604316547
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "zzzz zzzz",
+"char": ".",
+"p": 0.02594288205798997
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "zzzz zzzz",
+"char": ";",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "kyou ha ",
+"char": "a",
+"p": 0.11750599520383694
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "kyou ha ",
+"char": "e",
+"p": 0.04948768258120776
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "kyou ha ",
+"char": "h",
+"p": 0.045563549160671464
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "kyou ha ",
+"char": "n",
+"p": 0.04621757139742751
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "kyou ha ",
+"char": "o",
+"p": 0.07434052757793765
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "kyou ha ",
+"char": "q",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "kyou ha ",
+"char": "r",
+"p": 0.021800741225201658
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "kyou ha ",
+"char": "s",
+"p": 0.06235011990407674
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "kyou ha ",
+"char": "t",
+"p": 0.04403749727490735
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "kyou ha ",
+"char": "u",
+"p": 0.07150643121866143
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "kyou ha ",
+"char": "y",
+"p": 0.012208415086112928
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "kyou ha ",
+"char": "z",
+"p": 0.004578155657292348
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "kyou ha ",
+"char": " ",
+"p": 0.1656856333115326
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "kyou ha ",
+"char": ",",
+"p": 0.007194244604316547
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "kyou ha ",
+"char": ".",
+"p": 0.02594288205798997
+},
+{
+"corpus": "romaji",
+"order": 1,
+"context": "kyou ha ",
+"char": ";",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "",
+"char": "a",
+"p": 0.11750599520383694
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "",
+"char": "e",
+"p": 0.04948768258120776
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "",
+"char": "h",
+"p": 0.045563549160671464
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "",
+"char": "n",
+"p": 0.04621757139742751
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "",
+"char": "o",
+"p": 0.07434052757793765
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "",
+"char": "q",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "",
+"char": "r",
+"p": 0.021800741225201658
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "",
+"char": "s",
+"p": 0.06235011990407674
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "",
+"char": "t",
+"p": 0.04403749727490735
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "",
+"char": "u",
+"p": 0.07150643121866143
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "",
+"char": "y",
+"p": 0.012208415086112928
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "",
+"char": "z",
+"p": 0.004578155657292348
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "",
+"char": " ",
+"p": 0.1656856333115326
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "",
+"char": ",",
+"p": 0.007194244604316547
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "",
+"char": ".",
+"p": 0.02594288205798997
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "",
+"char": ";",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "t",
+"char": "a",
+"p": 0.2892598542525203
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "t",
+"char": "e",
+"p": 0.30702640006265064
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "t",
+"char": "h",
+"p": 0.0011059113873949384
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "t",
+"char": "n",
+"p": 0.001121785713529794
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "t",
+"char": "o",
+"p": 0.16199855649461015
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "t",
+"char": "q",
+"p": 5.291442044951859e-06
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "t",
+"char": "r",
+"p": 0.0005291442044951859
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "t",
+"char": "s",
+"p": 0.12772694465786594
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "t",
+"char": "t",
+"p": 0.09815624993385698
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "t",
+"char": "u",
+"p": 0.0017355929907442093
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "t",
+"char": "y",
+"p": 0.0002963207545173041
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "t",
+"char": "z",
+"p": 0.00011112028294398902
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "t",
+"char": " ",
+"p": 0.004021495954163413
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "t",
+"char": ",",
+"p": 0.00017461758748341132
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "t",
+"char": ".",
+"p": 0.000629681603349271
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "t",
+"char": ";",
+"p": 5.291442044951859e-06
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "th",
+"char": "a",
+"p": 0.3397431587440328
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "th",
+"char": "e",
+"p": 0.01540619670788433
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "th",
+"char": "h",
+"p": 0.001277482686747798
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "th",
+"char": "n",
+"p": 0.0012958197588063788
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "th",
+"char": "o",
+"p": 0.095542257782559
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "th",
+"char": "q",
+"p": 6.112357352860277e-06
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "th",
+"char": "r",
+"p": 0.0006112357352860277
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "th",
+"char": "s",
+"p": 0.0017481342029180395
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "th",
+"char": "t",
+"p": 0.0012346961852777762
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "th",
+"char": "u",
+"p": 0.030042236389308263
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "th",
+"char": "y",
+"p": 0.005015189208021857
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "th",
+"char": "z",
+"p": 0.00012835950441006584
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "th",
+"char": " ",
+"p": 0.004645391588173811
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "th",
+"char": ",",
+"p": 0.00020170779264438917
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "th",
+"char": ".",
+"p": 0.000727370524990373
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "th",
+"char": ";",
+"p": 6.112357352860277e-06
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the",
+"char": "a",
+"p": 0.002925460461506314
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the",
+"char": "e",
+"p": 0.007871062636876543
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the",
+"char": "h",
+"p": 0.0011343622197677542
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the",
+"char": "n",
+"p": 0.042644420864666244
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the",
+"char": "o",
+"p": 0.001850801516463178
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the",
+"char": "q",
+"p": 5.427570429510785e-06
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the",
+"char": "r",
+"p": 0.21880001845373945
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the",
+"char": "s",
+"p": 0.06628257559927161
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the",
+"char": "t",
+"p": 0.022673132712238357
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the",
+"char": "u",
+"p": 0.0017802431008795375
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the",
+"char": "y",
+"p": 0.4036234460187414
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the",
+"char": "z",
+"p": 0.0001139789790197265
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the",
+"char": " ",
+"p": 0.12694653028991368
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the",
+"char": ",",
+"p": 0.023415624346995435
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the",
+"char": ".",
+"p": 0.002305631918456182
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the",
+"char": ";",
+"p": 5.427570429510785e-06
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the q",
+"char": "a",
+"p": 0.11750599520383694
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the q",
+"char": "e",
+"p": 0.04948768258120776
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the q",
+"char": "h",
+"p": 0.045563549160671464
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the q",
+"char": "n",
+"p": 0.04621757139742751
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the q",
+"char": "o",
+"p": 0.07434052757793765
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the q",
+"char": "q",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the q",
+"char": "r",
+"p": 0.021800741225201658
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the q",
+"char": "s",
+"p": 0.06235011990407674
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the q",
+"char": "t",
+"p": 0.04403749727490735
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the q",
+"char": "u",
+"p": 0.07150643121866143
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the q",
+"char": "y",
+"p": 0.012208415086112928
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the q",
+"char": "z",
+"p": 0.004578155657292348
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the q",
+"char": " ",
+"p": 0.1656856333115326
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the q",
+"char": ",",
+"p": 0.007194244604316547
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the q",
+"char": ".",
+"p": 0.02594288205798997
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "the q",
+"char": ";",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "hello wor",
+"char": "a",
+"p": 0.08209536267090224
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "hello wor",
+"char": "e",
+"p": 0.16466467911857055
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "hello wor",
+"char": "h",
+"p": 0.000946775047494472
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "hello wor",
+"char": "n",
+"p": 0.0009603651199465457
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "hello wor",
+"char": "o",
+"p": 0.20067893736958486
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "hello wor",
+"char": "q",
+"p": 4.530024150691253e-06
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "hello wor",
+"char": "r",
+"p": 0.0004530024150691253
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "hello wor",
+"char": "s",
+"p": 0.0012955869070976984
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "hello wor",
+"char": "t",
+"p": 0.0009150648784396333
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "hello wor",
+"char": "u",
+"p": 0.24910489554047432
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "hello wor",
+"char": "y",
+"p": 0.02103290213165949
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "hello wor",
+"char": "z",
+"p": 9.513050716451632e-05
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "hello wor",
+"char": " ",
+"p": 0.0034428183545253525
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "hello wor",
+"char": ",",
+"p": 0.00014949079697281137
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "hello wor",
+"char": ".",
+"p": 0.0005390728739322591
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "hello wor",
+"char": ";",
+"p": 4.530024150691253e-06
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "i am typ",
+"char": "a",
+"p": 0.08973873532752745
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "i am typ",
+"char": "e",
+"p": 0.06825926818353929
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "i am typ",
+"char": "h",
+"p": 0.014388489208633094
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "i am typ",
+"char": "n",
+"p": 0.014595022546556057
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "i am typ",
+"char": "o",
+"p": 0.28663385081408554
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "i am typ",
+"char": "q",
+"p": 6.884444597432101e-05
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "i am typ",
+"char": "r",
+"p": 0.006884444597432102
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "i am typ",
+"char": "s",
+"p": 0.01968951154865581
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "i am typ",
+"char": "t",
+"p": 0.013906578086812846
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "i am typ",
+"char": "u",
+"p": 0.23310729406905095
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "i am typ",
+"char": "y",
+"p": 0.003855288974561977
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "i am typ",
+"char": "z",
+"p": 0.0014457333654607414
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "i am typ",
+"char": " ",
+"p": 0.052321778940483975
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "i am typ",
+"char": ",",
+"p": 0.002271866717152594
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "i am typ",
+"char": ".",
+"p": 0.008192489070944201
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "i am typ",
+"char": ";",
+"p": 6.884444597432101e-05
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "konnichi",
+"char": "a",
+"p": 0.0181605535243936
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "konnichi",
+"char": "e",
+"p": 0.009163727140493268
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "konnichi",
+"char": "h",
+"p": 0.009687659708298935
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "konnichi",
+"char": "n",
+"p": 0.021303434152826768
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "konnichi",
+"char": "o",
+"p": 0.0004265440106930848
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "konnichi",
+"char": "q",
+"p": 1.250862201445997e-06
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "konnichi",
+"char": "r",
+"p": 0.053130550701018915
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "konnichi",
+"char": "s",
+"p": 0.01306266462240044
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "konnichi",
+"char": "t",
+"p": 0.2983401058586812
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "konnichi",
+"char": "u",
+"p": 0.00041028280207428686
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "konnichi",
+"char": "y",
+"p": 0.00034327232699682284
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "konnichi",
+"char": "z",
+"p": 0.026665612368525448
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "konnichi",
+"char": " ",
+"p": 0.21283590117473833
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "konnichi",
+"char": ",",
+"p": 0.000860950583795259
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "konnichi",
+"char": ".",
+"p": 0.003700765170278084
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "konnichi",
+"char": ";",
+"p": 1.250862201445997e-06
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "arigatou ",
+"char": "a",
+"p": 0.004754970257690033
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "arigatou ",
+"char": "e",
+"p": 0.001180344029966771
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "arigatou ",
+"char": "h",
+"p": 0.1326040605914268
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "arigatou ",
+"char": "n",
+"p": 0.17763430281415893
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "arigatou ",
+"char": "o",
+"p": 0.0371367196424224
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "arigatou ",
+"char": "q",
+"p": 6.998778713114561e-07
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "arigatou ",
+"char": "r",
+"p": 0.009367465377291663
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "arigatou ",
+"char": "s",
+"p": 0.08198044441245003
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "arigatou ",
+"char": "t",
+"p": 0.08859249061038849
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "arigatou ",
+"char": "u",
+"p": 0.002418427984316737
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "arigatou ",
+"char": "y",
+"p": 0.018634148341114473
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "arigatou ",
+"char": "z",
+"p": 0.0008902446523081723
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "arigatou ",
+"char": " ",
+"p": 0.0005319071821967067
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "arigatou ",
+"char": ",",
+"p": 2.3095969753278058e-05
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "arigatou ",
+"char": ".",
+"p": 8.328546668606329e-05
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "arigatou ",
+"char": ";",
+"p": 6.998778713114561e-07
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "xyz",
+"char": "a",
+"p": 0.14458433253397282
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "xyz",
+"char": "e",
+"p": 0.04991461376353463
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "xyz",
+"char": "h",
+"p": 0.007593924860111911
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "xyz",
+"char": "n",
+"p": 0.007702928566237919
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "xyz",
+"char": "o",
+"p": 0.13739008792965626
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "xyz",
+"char": "q",
+"p": 3.6334568708669426e-05
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "xyz",
+"char": "r",
+"p": 0.003633456870866943
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "xyz",
+"char": "s",
+"p": 0.010391686650679457
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "xyz",
+"char": "t",
+"p": 0.007339582879151225
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "xyz",
+"char": "u",
+"p": 0.5535844052031103
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "xyz",
+"char": "y",
+"p": 0.002034735847685488
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "xyz",
+"char": "z",
+"p": 0.000763025942882058
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "xyz",
+"char": " ",
+"p": 0.027614272218588767
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "xyz",
+"char": ",",
+"p": 0.0011990407673860913
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "xyz",
+"char": ".",
+"p": 0.004323813676331662
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "xyz",
+"char": ";",
+"p": 3.6334568708669426e-05
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "zzzz zzzz",
+"char": "a",
+"p": 0.14458433253397282
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "zzzz zzzz",
+"char": "e",
+"p": 0.04991461376353463
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "zzzz zzzz",
+"char": "h",
+"p": 0.007593924860111911
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "zzzz zzzz",
+"char": "n",
+"p": 0.007702928566237919
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "zzzz zzzz",
+"char": "o",
+"p": 0.13739008792965626
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "zzzz zzzz",
+"char": "q",
+"p": 3.6334568708669426e-05
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "zzzz zzzz",
+"char": "r",
+"p": 0.003633456870866943
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "zzzz zzzz",
+"char": "s",
+"p": 0.010391686650679457
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "zzzz zzzz",
+"char": "t",
+"p": 0.007339582879151225
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "zzzz zzzz",
+"char": "u",
+"p": 0.5535844052031103
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "zzzz zzzz",
+"char": "y",
+"p": 0.002034735847685488
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "zzzz zzzz",
+"char": "z",
+"p": 0.000763025942882058
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "zzzz zzzz",
+"char": " ",
+"p": 0.027614272218588767
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "zzzz zzzz",
+"char": ",",
+"p": 0.0011990407673860913
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "zzzz zzzz",
+"char": ".",
+"p": 0.004323813676331662
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "zzzz zzzz",
+"char": ";",
+"p": 3.6334568708669426e-05
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "kyou ha ",
+"char": "a",
+"p": 0.06541252988439611
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "kyou ha ",
+"char": "e",
+"p": 0.021309758102840193
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "kyou ha ",
+"char": "h",
+"p": 0.09248641840475658
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "kyou ha ",
+"char": "n",
+"p": 0.1706856216504127
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "kyou ha ",
+"char": "o",
+"p": 0.05199817731143664
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "kyou ha ",
+"char": "q",
+"p": 8.551487897812163e-07
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "kyou ha ",
+"char": "r",
+"p": 0.008134419616624582
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "kyou ha ",
+"char": "s",
+"p": 0.07698935095428497
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "kyou ha ",
+"char": "t",
+"p": 0.08837956634183229
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "kyou ha ",
+"char": "u",
+"p": 0.002954966643088993
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "kyou ha ",
+"char": "y",
+"p": 0.009523181251229276
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "kyou ha ",
+"char": "z",
+"p": 0.007710265816893098
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "kyou ha ",
+"char": " ",
+"p": 0.0006499130802337244
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "kyou ha ",
+"char": ",",
+"p": 2.8219910062780142e-05
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "kyou ha ",
+"char": ".",
+"p": 0.00010176270598396475
+},
+{
+"corpus": "romaji",
+"order": 3,
+"context": "kyou ha ",
+"char": ";",
+"p": 8.551487897812163e-07
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "",
+"char": "a",
+"p": 0.11750599520383694
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "",
+"char": "e",
+"p": 0.04948768258120776
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "",
+"char": "h",
+"p": 0.045563549160671464
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "",
+"char": "n",
+"p": 0.04621757139742751
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "",
+"char": "o",
+"p": 0.07434052757793765
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "",
+"char": "q",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "",
+"char": "r",
+"p": 0.021800741225201658
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "",
+"char": "s",
+"p": 0.06235011990407674
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "",
+"char": "t",
+"p": 0.04403749727490735
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "",
+"char": "u",
+"p": 0.07150643121866143
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "",
+"char": "y",
+"p": 0.012208415086112928
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "",
+"char": "z",
+"p": 0.004578155657292348
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "",
+"char": " ",
+"p": 0.1656856333115326
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "",
+"char": ",",
+"p": 0.007194244604316547
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "",
+"char": ".",
+"p": 0.02594288205798997
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "",
+"char": ";",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "t",
+"char": "a",
+"p": 0.2892598542525203
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "t",
+"char": "e",
+"p": 0.30702640006265064
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "t",
+"char": "h",
+"p": 0.0011059113873949384
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "t",
+"char": "n",
+"p": 0.001121785713529794
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "t",
+"char": "o",
+"p": 0.16199855649461015
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "t",
+"char": "q",
+"p": 5.291442044951859e-06
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "t",
+"char": "r",
+"p": 0.0005291442044951859
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "t",
+"char": "s",
+"p": 0.12772694465786594
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "t",
+"char": "t",
+"p": 0.09815624993385698
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "t",
+"char": "u",
+"p": 0.0017355929907442093
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "t",
+"char": "y",
+"p": 0.0002963207545173041
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "t",
+"char": "z",
+"p": 0.00011112028294398902
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "t",
+"char": " ",
+"p": 0.004021495954163413
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "t",
+"char": ",",
+"p": 0.00017461758748341132
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "t",
+"char": ".",
+"p": 0.000629681603349271
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "t",
+"char": ";",
+"p": 5.291442044951859e-06
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "th",
+"char": "a",
+"p": 0.3397431587440328
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "th",
+"char": "e",
+"p": 0.01540619670788433
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "th",
+"char": "h",
+"p": 0.001277482686747798
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "th",
+"char": "n",
+"p": 0.0012958197588063788
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "th",
+"char": "o",
+"p": 0.095542257782559
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "th",
+"char": "q",
+"p": 6.112357352860277e-06
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "th",
+"char": "r",
+"p": 0.0006112357352860277
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "th",
+"char": "s",
+"p": 0.0017481342029180395
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "th",
+"char": "t",
+"p": 0.0012346961852777762
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "th",
+"char": "u",
+"p": 0.030042236389308263
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "th",
+"char": "y",
+"p": 0.005015189208021857
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "th",
+"char": "z",
+"p": 0.00012835950441006584
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "th",
+"char": " ",
+"p": 0.004645391588173811
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "th",
+"char": ",",
+"p": 0.00020170779264438917
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "th",
+"char": ".",
+"p": 0.000727370524990373
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "th",
+"char": ";",
+"p": 6.112357352860277e-06
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the",
+"char": "a",
+"p": 0.002925460461506314
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the",
+"char": "e",
+"p": 0.007871062636876543
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the",
+"char": "h",
+"p": 0.0011343622197677542
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the",
+"char": "n",
+"p": 0.042644420864666244
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the",
+"char": "o",
+"p": 0.001850801516463178
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the",
+"char": "q",
+"p": 5.427570429510785e-06
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the",
+"char": "r",
+"p": 0.21880001845373945
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the",
+"char": "s",
+"p": 0.06628257559927161
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the",
+"char": "t",
+"p": 0.022673132712238357
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the",
+"char": "u",
+"p": 0.0017802431008795375
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the",
+"char": "y",
+"p": 0.4036234460187414
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the",
+"char": "z",
+"p": 0.0001139789790197265
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the",
+"char": " ",
+"p": 0.12694653028991368
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the",
+"char": ",",
+"p": 0.023415624346995435
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the",
+"char": ".",
+"p": 0.002305631918456182
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the",
+"char": ";",
+"p": 5.427570429510785e-06
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the q",
+"char": "a",
+"p": 0.11750599520383694
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the q",
+"char": "e",
+"p": 0.04948768258120776
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the q",
+"char": "h",
+"p": 0.045563549160671464
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the q",
+"char": "n",
+"p": 0.04621757139742751
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the q",
+"char": "o",
+"p": 0.07434052757793765
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the q",
+"char": "q",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the q",
+"char": "r",
+"p": 0.021800741225201658
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the q",
+"char": "s",
+"p": 0.06235011990407674
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the q",
+"char": "t",
+"p": 0.04403749727490735
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the q",
+"char": "u",
+"p": 0.07150643121866143
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the q",
+"char": "y",
+"p": 0.012208415086112928
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the q",
+"char": "z",
+"p": 0.004578155657292348
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the q",
+"char": " ",
+"p": 0.1656856333115326
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the q",
+"char": ",",
+"p": 0.007194244604316547
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the q",
+"char": ".",
+"p": 0.02594288205798997
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "the q",
+"char": ";",
+"p": 0.00021800741225201656
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "hello wor",
+"char": "a",
+"p": 0.08209536267090224
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "hello wor",
+"char": "e",
+"p": 0.16466467911857055
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "hello wor",
+"char": "h",
+"p": 0.000946775047494472
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "hello wor",
+"char": "n",
+"p": 0.0009603651199465457
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "hello wor",
+"char": "o",
+"p": 0.20067893736958486
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "hello wor",
+"char": "q",
+"p": 4.530024150691253e-06
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "hello wor",
+"char": "r",
+"p": 0.0004530024150691253
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "hello wor",
+"char": "s",
+"p": 0.0012955869070976984
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "hello wor",
+"char": "t",
+"p": 0.0009150648784396333
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "hello wor",
+"char": "u",
+"p": 0.24910489554047432
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "hello wor",
+"char": "y",
+"p": 0.02103290213165949
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "hello wor",
+"char": "z",
+"p": 9.513050716451632e-05
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "hello wor",
+"char": " ",
+"p": 0.0034428183545253525
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "hello wor",
+"char": ",",
+"p": 0.00014949079697281137
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "hello wor",
+"char": ".",
+"p": 0.0005390728739322591
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "hello wor",
+"char": ";",
+"p": 4.530024150691253e-06
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "i am typ",
+"char": "a",
+"p": 0.08973873532752745
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "i am typ",
+"char": "e",
+"p": 0.06825926818353929
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "i am typ",
+"char": "h",
+"p": 0.014388489208633094
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "i am typ",
+"char": "n",
+"p": 0.014595022546556057
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "i am typ",
+"char": "o",
+"p": 0.28663385081408554
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "i am typ",
+"char": "q",
+"p": 6.884444597432101e-05
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "i am typ",
+"char": "r",
+"p": 0.006884444597432102
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "i am typ",
+"char": "s",
+"p": 0.01968951154865581
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "i am typ",
+"char": "t",
+"p": 0.013906578086812846
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "i am typ",
+"char": "u",
+"p": 0.23310729406905095
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "i am typ",
+"char": "y",
+"p": 0.003855288974561977
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "i am typ",
+"char": "z",
+"p": 0.0014457333654607414
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "i am typ",
+"char": " ",
+"p": 0.052321778940483975
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "i am typ",
+"char": ",",
+"p": 0.002271866717152594
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "i am typ",
+"char": ".",
+"p": 0.008192489070944201
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "i am typ",
+"char": ";",
+"p": 6.884444597432101e-05
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "konnichi",
+"char": "a",
+"p": 0.01023558634943879
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "konnichi",
+"char": "e",
+"p": 0.0007255737032062118
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "konnichi",
+"char": "h",
+"p": 0.10047380296810578
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "konnichi",
+"char": "n",
+"p": 0.0016867821763235271
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "konnichi",
+"char": "o",
+"p": 3.377327943904191e-05
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "konnichi",
+"char": "q",
+"p": 9.90418751878062e-08
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "konnichi",
+"char": "r",
+"p": 0.013004471756385664
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "konnichi",
+"char": "s",
+"p": 0.009831941187110886
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "konnichi",
+"char": "t",
+"p": 0.02362223712077535
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "konnichi",
+"char": "u",
+"p": 3.2485735061600426e-05
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "konnichi",
+"char": "y",
+"p": 2.717992031939653e-05
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "konnichi",
+"char": "z",
+"p": 0.002111353471994683
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "konnichi",
+"char": " ",
+"p": 0.6678785024390556
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "konnichi",
+"char": ",",
+"p": 6.816910780783574e-05
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "konnichi",
+"char": ".",
+"p": 0.00029302246216278085
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "konnichi",
+"char": ";",
+"p": 9.90418751878062e-08
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "arigatou ",
+"char": "a",
+"p": 0.0005630885831475039
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "arigatou ",
+"char": "e",
+"p": 0.000139777582496065
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "arigatou ",
+"char": "h",
+"p": 0.10780837559635317
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "arigatou ",
+"char": "n",
+"p": 0.09998300954378198
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "arigatou ",
+"char": "o",
+"p": 0.030713558905023704
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "arigatou ",
+"char": "q",
+"p": 8.288027423425138e-08
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "arigatou ",
+"char": "r",
+"p": 0.0011093051104687495
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "arigatou ",
+"char": "s",
+"p": 0.0623397894698954
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "arigatou ",
+"char": "t",
+"p": 0.01049121599333548
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "arigatou ",
+"char": "u",
+"p": 0.0002863927876164557
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "arigatou ",
+"char": "y",
+"p": 0.0022066754614477667
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "arigatou ",
+"char": "z",
+"p": 0.00010542370882596777
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "arigatou ",
+"char": " ",
+"p": 6.298900841803105e-05
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "arigatou ",
+"char": ",",
+"p": 2.735049049730296e-06
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "arigatou ",
+"char": ".",
+"p": 9.862752633875915e-06
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "arigatou ",
+"char": ";",
+"p": 8.288027423425138e-08
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "xyz",
+"char": "a",
+"p": 0.14458433253397282
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "xyz",
+"char": "e",
+"p": 0.04991461376353463
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "xyz",
+"char": "h",
+"p": 0.007593924860111911
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "xyz",
+"char": "n",
+"p": 0.007702928566237919
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "xyz",
+"char": "o",
+"p": 0.13739008792965626
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "xyz",
+"char": "q",
+"p": 3.6334568708669426e-05
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "xyz",
+"char": "r",
+"p": 0.003633456870866943
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "xyz",
+"char": "s",
+"p": 0.010391686650679457
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "xyz",
+"char": "t",
+"p": 0.007339582879151225
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "xyz",
+"char": "u",
+"p": 0.5535844052031103
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "xyz",
+"char": "y",
+"p": 0.002034735847685488
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "xyz",
+"char": "z",
+"p": 0.000763025942882058
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "xyz",
+"char": " ",
+"p": 0.027614272218588767
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "xyz",
+"char": ",",
+"p": 0.0011990407673860913
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "xyz",
+"char": ".",
+"p": 0.004323813676331662
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "xyz",
+"char": ";",
+"p": 3.6334568708669426e-05
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "zzzz zzzz",
+"char": "a",
+"p": 0.14458433253397282
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "zzzz zzzz",
+"char": "e",
+"p": 0.04991461376353463
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "zzzz zzzz",
+"char": "h",
+"p": 0.007593924860111911
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "zzzz zzzz",
+"char": "n",
+"p": 0.007702928566237919
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "zzzz zzzz",
+"char": "o",
+"p": 0.13739008792965626
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "zzzz zzzz",
+"char": "q",
+"p": 3.6334568708669426e-05
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "zzzz zzzz",
+"char": "r",
+"p": 0.003633456870866943
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "zzzz zzzz",
+"char": "s",
+"p": 0.010391686650679457
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "zzzz zzzz",
+"char": "t",
+"p": 0.007339582879151225
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "zzzz zzzz",
+"char": "u",
+"p": 0.5535844052031103
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "zzzz zzzz",
+"char": "y",
+"p": 0.002034735847685488
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "zzzz zzzz",
+"char": "z",
+"p": 0.000763025942882058
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "zzzz zzzz",
+"char": " ",
+"p": 0.027614272218588767
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "zzzz zzzz",
+"char": ",",
+"p": 0.0011990407673860913
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "zzzz zzzz",
+"char": ".",
+"p": 0.004323813676331662
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "zzzz zzzz",
+"char": ";",
+"p": 3.6334568708669426e-05
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "kyou ha ",
+"char": "a",
+"p": 0.10490126454618272
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "kyou ha ",
+"char": "e",
+"p": 0.041712685569832465
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "kyou ha ",
+"char": "h",
+"p": 0.08961649427274279
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "kyou ha ",
+"char": "n",
+"p": 0.09360791193840648
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "kyou ha ",
+"char": "o",
+"p": 0.06359157363360458
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "kyou ha ",
+"char": "q",
+"p": 4.364821947841625e-08
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "kyou ha ",
+"char": "r",
+"p": 0.020727694334598545
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "kyou ha ",
+"char": "s",
+"p": 0.08517966478829163
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "kyou ha ",
+"char": "t",
+"p": 0.16701104036536435
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "kyou ha ",
+"char": "u",
+"p": 0.00015082642240766734
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "kyou ha ",
+"char": "y",
+"p": 0.00048607904303149427
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "kyou ha ",
+"char": "z",
+"p": 0.00039354481773725195
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "kyou ha ",
+"char": " ",
+"p": 3.317264680359635e-05
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "kyou ha ",
+"char": ",",
+"p": 1.4403912427877364e-06
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "kyou ha ",
+"char": ".",
+"p": 5.194138117931534e-06
+},
+{
+"corpus": "romaji",
+"order": 5,
+"context": "kyou ha ",
+"char": ";",
+"p": 4.364821947841625e-08
+}
+]

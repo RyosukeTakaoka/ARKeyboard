@@ -16,6 +16,8 @@ struct TapResult: Equatable {
     var audioOffset: Double? = nil
     /// 対応づけた振動のオンセットの時刻 − カメラのタップ時刻(秒)
     var motionOffset: Double? = nil
+    /// デコーダーの結果(キーごとの確率)。デコーダーを使わないときは nil
+    var decode: DecodeResult? = nil
 }
 
 /// 融合の結果を待っている候補に付けておく情報
@@ -67,6 +69,14 @@ final class KeyboardEngine {
     let tapDetector = TapDetector()
     /// カメラの候補と音・振動を突き合わせる
     let fusion = SensorFusion<TapCandidate>()
+    /// キーを確率で選ぶデコーダー(空間タッチモデル × 言語モデル)
+    let decoder = TapDecoder()
+    /// 直前までに入力された文字列(言語モデルの文脈)。ViewModel が毎回セットする
+    var context: String = ""
+    /// 言語モデル
+    private var languageModels: [DecoderLanguage: CharNGramModel] = [:]
+    /// 最後にキーが入力された時刻(入力の速さを測るため)
+    private var lastKeyTime: Double?
 
     /// 手ごとの「平滑化した」手の座標系(手ぶれでキー配置が震えないようにするため)
     private var smoothedFrames: [Chirality: HandFrame] = [:]
@@ -76,6 +86,39 @@ final class KeyboardEngine {
 
     init(settings: KeyboardSettings = KeyboardSettings()) {
         self.settings = settings
+    }
+
+    /// 言語モデルを作る(学習用のテキストから)。order が変わったときも呼ぶ。
+    func setLanguageCorpora(english: String?, romaji: String?) {
+        let order = settings.decoder.lmOrder
+        languageModels = [:]
+        if let english { languageModels[.english] = CharNGramModel(text: english, order: order) }
+        if let romaji { languageModels[.romaji] = CharNGramModel(text: romaji, order: order) }
+        syncDecoderSettings()
+    }
+
+    /// デコーダーの設定と、使う言語モデルを反映する
+    private func syncDecoderSettings() {
+        decoder.config = settings.decoder
+        let english = languageModels[.english], romaji = languageModels[.romaji]
+        switch settings.decoder.language {
+        case .english:
+            decoder.languageModel = english.map { model in { c, h in model.probability(of: c, after: h) } }
+        case .romaji:
+            decoder.languageModel = romaji.map { model in { c, h in model.probability(of: c, after: h) } }
+        case .mixed:
+            let parts = [english, romaji].compactMap { $0 }.map { (model: $0, weight: 1.0) }
+            let mixed = MixedLanguageModel(models: parts)
+            decoder.languageModel = parts.isEmpty ? nil : { c, h in mixed.probability(of: c, after: h) }
+        }
+    }
+
+    /// 当たり判定の地図(当たり判定ビュー用)
+    func hitMap(for chirality: Chirality) -> HitMap? {
+        guard let handKeys = keys[chirality] else { return nil }
+        syncDecoderSettings()
+        return decoder.hitMap(keys: handKeys, context: context,
+                              useLanguageModel: settings.features.languageModel)
     }
 
     func startCalibration() {
@@ -237,8 +280,9 @@ final class KeyboardEngine {
         guard let calibration, let frame = layoutFrame(for: event.finger.chirality) else { return nil }
         let hand = calibration.hand(event.finger.chirality)
         // 位置の不確かさ: キーの大きさの 3 割程度のばらつきがあると仮定(個人適応で更新される)
-        let covariance = Covariance2.diagonal(sigmaX: 0.3 * hand.keyPitch * settings.keyScale,
-                                              sigmaY: 0.3 * hand.rowPitch * settings.keyScale)
+        let sigma = settings.decoder.measurementSigma
+        let covariance = Covariance2.diagonal(sigmaX: sigma * hand.keyPitch * settings.keyScale,
+                                              sigmaY: sigma * hand.rowPitch * settings.keyScale)
         // カメラの確からしさ: しきい値ぎりぎりなら 0.5、しきい値の2倍以上なら 0.95
         let ratio = event.peakSpeed / max(tapDetector.effectiveDownSpeed, 1e-6)
         let visionConfidence = min(max(0.5 + (ratio - 1) * 0.45, 0.05), 0.95)
@@ -253,7 +297,10 @@ final class KeyboardEngine {
 
     /// 融合で確定した候補を、入力結果に変換する
     private func resolvePending(now: Double) -> [TapResult] {
-        fusion.resolve(now: now).map { decision in
+        syncDecoderSettings()
+        // 同じ回にまとめて確定したタップは、前のタップの文字も文脈に含める
+        var runningContext = context
+        return fusion.resolve(now: now).map { decision in
             var result = TapResult(event: decision.payload.event,
                                    touch: decision.payload.touch,
                                    key: nil,
@@ -273,20 +320,43 @@ final class KeyboardEngine {
                 touch.confidence = 1 - (1 - touch.confidence) * (1 - c)
             }
             result.touch = touch
-            result.key = chooseKey(for: touch)
-            if result.key == nil, result.note == nil { result.note = "キーの範囲外" }
+            let chosen = chooseKey(for: touch, context: runningContext)
+            result.key = chosen.key
+            result.decode = chosen.decode
+            if let key = chosen.key {
+                runningContext += key.output
+                lastKeyTime = touch.time
+            } else if result.note == nil {
+                result.note = "キーの範囲外"
+            }
             return result
         }
     }
 
     /// タップイベントから入力するキーを決める
-    private func chooseKey(for touch: TouchEvent) -> Key? {
-        guard let handKeys = keys[touch.finger.chirality] else { return nil }
-        return KeyLayout.nearestKey(to: touch.surfaceLocation,
-                                    finger: touch.finger.finger,
-                                    in: handKeys,
+    /// - デコーダーがオフ: いちばん近いキー
+    /// - デコーダーがオン: 位置の分布 × 指の制約 × 言語モデル の事後確率が最大のキー
+    private func chooseKey(for touch: TouchEvent, context: String) -> (key: Key?, decode: DecodeResult?) {
+        guard let handKeys = keys[touch.finger.chirality] else { return (nil, nil) }
+        // どちらの方式でも、キーから遠すぎるタップは「範囲外」にする
+        let nearest = KeyLayout.nearestKey(to: touch.surfaceLocation,
+                                           finger: touch.finger.finger,
+                                           in: handKeys,
+                                           restrictToFinger: settings.restrictKeysToFinger,
+                                           maxDistance: settings.maxKeyDistance)?.key
+        guard let nearest else { return (nil, nil) }
+        guard settings.features.decoder else { return (nearest, nil) }
+
+        let interval = lastKeyTime.map { touch.time - $0 }
+        let result = decoder.decode(location: touch.surfaceLocation,
+                                    measurementCovariance: touch.locationCovariance,
+                                    finger: touch.finger,
+                                    keys: handKeys,
+                                    context: context,
+                                    interval: interval,
                                     restrictToFinger: settings.restrictKeysToFinger,
-                                    maxDistance: settings.maxKeyDistance)?.key
+                                    useLanguageModel: settings.features.languageModel)
+        return (result.best ?? nearest, result)
     }
 
     // MARK: - LiDAR(深度)

@@ -11,6 +11,7 @@ struct SettingsView: View {
                 modeSection
                 tapSection
                 sensorSection
+                decoderSection
                 layoutSection
                 feedbackSection
                 // LiDAR が無い機種では、この設定自体を出さない
@@ -132,6 +133,55 @@ struct SettingsView: View {
             Text("センサーと二重条件(レベルA)")
         } footer: {
             Text("カメラの「指が下りて急に止まった」と、マイクの「叩いた音の立ち上がり」が同じ頃に起きたときだけ入力します(Acustico の二重条件の考え方)。マイクが使えないときはカメラだけで判定します。")
+        }
+    }
+
+    // MARK: - デコーダー(空間タッチモデル × 言語モデル)
+
+    private var decoderSection: some View {
+        Section {
+            Toggle("デコーダーを使う", isOn: $viewModel.settings.features.decoder)
+            if viewModel.settings.features.decoder {
+                Toggle("文字 n-gram 言語モデルを使う", isOn: $viewModel.settings.features.languageModel)
+                Picker("言語", selection: $viewModel.settings.decoder.language) {
+                    ForEach(DecoderLanguage.allCases) { language in
+                        Text(language.japaneseName).tag(language)
+                    }
+                }
+                Stepper("n-gram の n: \(viewModel.settings.decoder.lmOrder)",
+                        value: $viewModel.settings.decoder.lmOrder, in: 1...8)
+                ParameterSlider(title: "言語モデルの重み w", value: $viewModel.settings.decoder.lmWeight, range: 0...3,
+                                format: { String(format: "%.2f", $0) },
+                                help: "大きいほど文脈を重視する。0 で位置だけ。")
+                ParameterSlider(title: "アンカーの大きさ", value: $viewModel.settings.decoder.anchorFraction, range: 0...0.9,
+                                format: { "\(Int($0 * 100))%" },
+                                help: "キーの中央のこの割合の範囲は、文脈に関係なく必ずそのキーになる。0 で無効。")
+                ParameterSlider(title: "キーごとのばらつき", value: $viewModel.settings.decoder.keySigma, range: 0.1...0.8,
+                                format: { String(format: "%.2f キー", $0) },
+                                help: "狙ったキーのまわりに、どれくらい散らばって押すかの見積もり(初期値)。")
+                ParameterSlider(title: "カメラの測定のばらつき", value: $viewModel.settings.decoder.measurementSigma, range: 0...0.8,
+                                format: { String(format: "%.2f キー", $0) },
+                                help: "カメラで測った指先の位置の誤差の見積もり。")
+                ParameterSlider(title: "担当外の指の罰点", value: $viewModel.settings.decoder.offFingerPenalty, range: 0...10,
+                                format: { String(format: "%.1f", $0) },
+                                help: "「指の担当キーだけから選ぶ」をオフにしたとき、担当外のキーをどれだけ選びにくくするか。")
+                Toggle("入力の速さに合わせる", isOn: $viewModel.settings.decoder.speedAdaptation)
+                if viewModel.settings.decoder.speedAdaptation {
+                    ParameterSlider(title: "速いときのばらつきの増え方", value: $viewModel.settings.decoder.fastSigmaGain, range: 0...2,
+                                    format: { String(format: "+%.0f%%", $0 * 100) })
+                    ParameterSlider(title: "速いときの言語モデルの増え方", value: $viewModel.settings.decoder.fastLMGain, range: 0...2,
+                                    format: { String(format: "+%.0f%%", $0 * 100) })
+                }
+                Picker("重ねる表示", selection: $viewModel.settings.overlayMode) {
+                    ForEach(OverlayMode.allCases) { mode in
+                        Text(mode.japaneseName).tag(mode)
+                    }
+                }
+            }
+        } header: {
+            Text("デコーダー(空間タッチモデル)")
+        } footer: {
+            Text("キーを「確率の場」として扱い、位置の確率 × 文脈の確率 で最も確からしいキーを選びます(Goodman ら 2002、Gunawardana ら 2010)。「当たり判定」表示にすると、文脈で各キーの領域が広がる様子が見えます。")
         }
     }
 

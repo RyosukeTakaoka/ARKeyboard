@@ -29,6 +29,14 @@ struct DebugOverlayView: View {
                 .font(.caption)
             }
 
+            // キー配置の上に重ねる表示の切り替え(キー / 当たり判定 / ヒートマップ)
+            Picker("重ねる表示", selection: $viewModel.settings.overlayMode) {
+                ForEach(OverlayMode.allCases) { mode in
+                    Text(mode.japaneseName).tag(mode)
+                }
+            }
+            .pickerStyle(.segmented)
+
             SignalGraphView(samples: viewModel.signalHistory,
                             duration: KeyboardViewModel.signalHistoryDuration)
                 .frame(height: 90)
