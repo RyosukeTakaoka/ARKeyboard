@@ -95,6 +95,9 @@ final class KeyboardEngine {
     private var languageModels: [DecoderLanguage: CharNGramModel] = [:]
     /// 単語辞書
     private var lexicons: [DecoderLanguage: Lexicon] = [:]
+    /// 個人辞書から作った言語モデル(英字・ローマ字用)と単語
+    private var personalModel: CharNGramModel?
+    private var personalWords: Set<String> = []
     /// 単語単位のデコード
     let wordDecoder = WordBeamDecoder()
     /// 今打っている単語の、タップごとの候補
@@ -167,6 +170,16 @@ final class KeyboardEngine {
         }
     }
 
+    /// 個人辞書を入れ替える(読み込み・学習・リセットのたびに呼ぶ)
+    func setPersonalDictionary(_ dictionary: PersonalDictionary) {
+        let order = settings.decoder.lmOrder
+        personalModel = dictionary.text.isEmpty ? nil : CharNGramModel(text: dictionary.text, order: order)
+        personalWords = Lexicon(text: dictionary.text).words
+        flickEngine.personalKanaModel = dictionary.kanaText.isEmpty ? nil
+            : CharNGramModel(text: dictionary.kanaText, order: order, vocabulary: FlickLayout.kanaVocabulary)
+        syncDecoderSettings()
+    }
+
     func setAdaptation(_ value: PersonalAdaptation) {
         adaptation = value
         appliedAdaptationVersion = -1
@@ -206,6 +219,14 @@ final class KeyboardEngine {
             let mixed = MixedLanguageModel(models: parts)
             decoder.languageModel = parts.isEmpty ? nil : { c, h in mixed.probability(of: c, after: h) }
         }
+        // 個人辞書を混ぜる
+        let usePersonal = settings.features.personalDictionary
+        if usePersonal, let personal = personalModel, let base = decoder.languageModel {
+            let model = PersonalLanguageModel(base: base, personal: personal, weight: settings.personalDictionary.weight)
+            decoder.languageModel = { c, h in model.probability(of: c, after: h) }
+        }
+        flickEngine.usePersonalDictionary = usePersonal
+        flickEngine.personalWeight = settings.personalDictionary.weight
         // 単語単位のデコード
         wordDecoder.config = settings.wordDecoder
         wordDecoder.languageModel = settings.features.languageModel ? decoder.languageModel : nil
@@ -217,6 +238,11 @@ final class KeyboardEngine {
             var merged = lexicons[.english] ?? Lexicon(text: "")
             for word in lexicons[.romaji]?.words ?? [] { merged.add(word) }
             wordDecoder.lexicon = merged
+        }
+        if usePersonal && !personalWords.isEmpty {
+            var lexicon = wordDecoder.lexicon ?? Lexicon(text: "")
+            for word in personalWords { lexicon.add(word) }
+            wordDecoder.lexicon = lexicon
         }
     }
 

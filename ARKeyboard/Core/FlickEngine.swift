@@ -21,6 +21,10 @@ final class FlickEngine {
     let beam = KanaBeamDecoder()
     /// 仮名の言語モデル
     var kanaModel: CharNGramModel?
+    /// 個人辞書から作った仮名の言語モデルと、混ぜる重みの上限
+    var personalKanaModel: CharNGramModel?
+    var usePersonalDictionary = false
+    var personalWeight = 0.3
     /// 方向のずれ(回転)を個人適応するか
     var adaptRotation = false
     /// 方式B が使えるか(音のオンセットが使える)。使えなければ方式A で動く(フォールバック)
@@ -50,7 +54,12 @@ final class FlickEngine {
 
     var languageModel: ((Character, String) -> Double)? {
         guard let model = kanaModel else { return nil }
-        return { c, h in model.probability(of: c, after: h) }
+        let base: (Character, String) -> Double = { c, h in model.probability(of: c, after: h) }
+        if usePersonalDictionary, let personal = personalKanaModel {
+            let mixed = PersonalLanguageModel(base: base, personal: personal, weight: personalWeight)
+            return { c, h in mixed.probability(of: c, after: h) }
+        }
+        return base
     }
 
     func rebuildKeys(calibration: CalibrationResult?) {

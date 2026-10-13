@@ -69,7 +69,13 @@ final class KeyboardViewModel {
     var activeTracker: HandTrackerKind = .vision
 
     /// 入力された文字列
-    var typedText = ""
+    var typedText = "" {
+        didSet { learnPersonalWord(old: oldValue) }
+    }
+    /// 個人辞書(確定した単語・言い回し。端末内に保存)
+    private(set) var personalDictionary = PersonalDictionary()
+    /// 個人辞書の単語数(設定画面の表示用)
+    var personalWordCount = 0
     /// 記録モード中か
     var isRecording = false
     /// 記録の目標の並びと、今の位置(画面表示用)
@@ -159,6 +165,14 @@ final class KeyboardViewModel {
         if let model = LevelBModelLoader.load() {
             engine.tapClassifier = model.classifier
             levelBModelStatus = "読み込み済み: \(model.description)"
+        }
+
+        // 個人辞書(端末内に保存)を読み込む
+        if let data = try? Data(contentsOf: Self.personalDictionaryURL),
+           let saved = try? JSONDecoder().decode(PersonalDictionary.self, from: data) {
+            personalDictionary = saved
+            personalWordCount = saved.wordCount
+            engine.setPersonalDictionary(saved)
         }
 
         // 個人適応の学習データ(端末内に保存)を読み込む
@@ -392,6 +406,39 @@ final class KeyboardViewModel {
     private static func loadCalibration() -> CalibrationResult? {
         guard let data = UserDefaults.standard.data(forKey: calibrationKey) else { return nil }
         return try? JSONDecoder().decode(CalibrationResult.self, from: data)
+    }
+
+    // MARK: 個人辞書
+
+    static var personalDictionaryURL: URL {
+        let dir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        return dir.appendingPathComponent("personal_dictionary.json")
+    }
+
+    /// 区切り(空白・改行・句読点)が打たれたら、直前の単語を個人辞書に覚える
+    private func learnPersonalWord(old: String) {
+        guard settings.features.personalDictionary, practice == nil else { return }
+        var dictionary = personalDictionary
+        guard dictionary.learn(old: old, new: typedText) else { return }
+        personalDictionary = dictionary
+        personalWordCount = dictionary.wordCount
+        engine.setPersonalDictionary(dictionary)
+        savePersonalDictionary()
+    }
+
+    private func savePersonalDictionary() {
+        guard let data = try? JSONEncoder().encode(personalDictionary) else { return }
+        try? FileManager.default.createDirectory(at: Self.personalDictionaryURL.deletingLastPathComponent(),
+                                                 withIntermediateDirectories: true)
+        try? data.write(to: Self.personalDictionaryURL, options: .atomic)
+    }
+
+    /// 個人辞書を消す
+    func resetPersonalDictionary() {
+        personalDictionary = PersonalDictionary()
+        personalWordCount = 0
+        engine.setPersonalDictionary(personalDictionary)
+        try? FileManager.default.removeItem(at: Self.personalDictionaryURL)
     }
 
     // MARK: 個人適応(押しがちなずれ)とヒートマップ

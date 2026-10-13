@@ -72,6 +72,8 @@ struct FeatureFlags: Codable, Equatable {
     var levelBModel: Bool = false
     /// 机モードで、四隅の登録(ホモグラフィー)を使って真上から見た座標に直す
     var deskHomography: Bool = true
+    /// 個人辞書: 確定した単語・言い回しを端末内に覚えて、言語モデルと単語の辞書に足す
+    var personalDictionary: Bool = true
 }
 
 /// アプリの設定(UserDefaults に保存する)
@@ -118,6 +120,8 @@ struct KeyboardSettings: Codable, Equatable {
     var decoder = DecoderConfig()
     /// 個人適応の設定
     var adaptation = AdaptationConfig()
+    /// 個人辞書
+    var personalDictionary = PersonalDictionaryConfig()
     /// 単語単位のデコードの設定
     var wordDecoder = WordBeamDecoder.Config()
     /// 入力の方式(QWERTY / フリック)

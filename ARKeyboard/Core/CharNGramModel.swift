@@ -79,6 +79,13 @@ struct CharNGramModel {
         return interpolated(c, history: history)
     }
 
+    /// 直前の文脈(最長 order−1 文字)の後に、学習データで何か文字が来た回数(個人辞書の混ぜ具合に使う)
+    func contextCount(_ context: String) -> Int {
+        let normalizedContext = Array(Self.normalize(context, allowed: allowed))
+        let history = String(normalizedContext.suffix(min(order - 1, normalizedContext.count)))
+        return totals[history] ?? 0
+    }
+
     /// log P(c | context)
     func logProbability(of c: Character, after context: String) -> Double {
         log(max(probability(of: c, after: context), 1e-300))

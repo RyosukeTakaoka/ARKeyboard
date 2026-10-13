@@ -22,6 +22,7 @@ struct SettingsView: View {
                 levelBSection
                 decoderSection
                 adaptationSection
+                personalDictionarySection
                 layoutSection
                 feedbackSection
                 // LiDAR が無い機種では、この設定自体を出さない
@@ -351,6 +352,23 @@ struct SettingsView: View {
     }
 
     // MARK: - 個人適応とヒートマップ
+
+    private var personalDictionarySection: some View {
+        Section {
+            Toggle("個人辞書を使う", isOn: $viewModel.settings.features.personalDictionary)
+            LabeledContent("覚えた単語の数", value: "\(viewModel.personalWordCount)")
+            ParameterSlider(title: "混ぜる重みの上限", value: $viewModel.settings.personalDictionary.weight, range: 0...0.8,
+                            format: { String(format: "%.2f", $0) },
+                            help: "よく打つ文脈ほど、この値に近い重みで個人の言語モデルを混ぜる")
+            Button("個人辞書を消す", role: .destructive) {
+                viewModel.resetPersonalDictionary()
+            }
+        } header: {
+            Text("個人辞書")
+        } footer: {
+            Text("空白・改行・句読点で確定した単語と言い回しを、端末の中だけに覚えます(外部に送信しません。練習モード中は覚えません)。英字とかな、それぞれ最大 5000 文字。")
+        }
+    }
 
     private var adaptationSection: some View {
         Section {
