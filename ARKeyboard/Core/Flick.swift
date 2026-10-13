@@ -4,13 +4,16 @@ import Foundation
 enum InputMode: String, Codable, CaseIterable, Identifiable {
     case qwerty
     case flick
+    /// 手書き(人差し指と親指でつまんで書く → Vision の文字認識。Tier3)
+    case handwriting
 
     var id: String { rawValue }
 
     var japaneseName: String {
         switch self {
         case .qwerty: return "QWERTY(英字)"
-        case .flick: return "フリック(日本語かな)"
+        case .flick: return "フリック(かな)"
+        case .handwriting: return "手書き"
         }
     }
 }

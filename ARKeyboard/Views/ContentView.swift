@@ -95,6 +95,13 @@ struct ContentView: View {
                                             hands: viewModel.hands,
                                             config: viewModel.settings.flick,
                                             projection: projection)
+                    } else if viewModel.settings.inputMode == .handwriting {
+                        HandwritingOverlayView(strokes: viewModel.handwritingStrokes,
+                                               penDown: viewModel.handwritingPenDown,
+                                               hands: viewModel.hands,
+                                               config: viewModel.settings.handwriting,
+                                               functionConfig: viewModel.settings.flick,
+                                               converter: converter)
                     } else {
                     KeyboardOverlayView(keys: viewModel.keys,
                                         frames: viewModel.layoutFrames,
@@ -119,6 +126,16 @@ struct ContentView: View {
                                 onBackspace: { viewModel.backspace() },
                                 onNewline: { viewModel.newline() },
                                 onClear: { viewModel.clearText() })
+
+                if viewModel.settings.inputMode == .handwriting
+                    && (!viewModel.handwritingCandidates.isEmpty || viewModel.isRecognizingHandwriting) {
+                    if viewModel.isRecognizingHandwriting {
+                        Text("認識中…").font(.caption).foregroundStyle(.secondary)
+                    } else {
+                        FlickCandidateBar(candidates: viewModel.handwritingCandidates,
+                                          onSelect: { viewModel.selectHandwritingCandidate($0) })
+                    }
+                }
 
                 if viewModel.settings.inputMode == .flick && !viewModel.flickCandidates.isEmpty {
                     FlickCandidateBar(candidates: viewModel.flickCandidates,

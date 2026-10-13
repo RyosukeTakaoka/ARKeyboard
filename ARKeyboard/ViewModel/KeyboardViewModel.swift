@@ -53,6 +53,15 @@ final class KeyboardViewModel {
     var activeFlicks: [FingerID: (start: Vec2, displacement: Vec2)] = [:]
     /// 今の仮名の並びの候補(上位3つ)
     var flickCandidates: [String] = []
+    /// 手書きモード: 書きかけの画(画像の座標)、ペンが下りているか、認識の候補、認識中か
+    var handwritingStrokes: [[Vec2]] = []
+    var handwritingPenDown = false
+    var handwritingCandidates: [String] = []
+    var isRecognizingHandwriting = false
+    /// 手書きで最後に入力した文字列(候補を選び直したとき、置き換えるため)
+    private var lastHandwritingInsert: String?
+    private var handwritingCandidateIndex = 0
+    private let handwritingRecognizer = HandwritingRecognizer()
     /// 最後のフリックの解読結果(デバッグ表示用)
     var lastFlickDecode: FlickDecodeResult?
     /// 指先の下のフリックキーの、方向ごとの事前確率(扇形の表示用)
@@ -699,6 +708,7 @@ final class KeyboardViewModel {
         }
         handleTapResults(output.taps)
         handleFlicks(output.flicks)
+        handleHandwriting(output)
         if settings.inputMode == .flick || !activeFlicks.isEmpty {
             activeFlicks = output.activeFlicks
         }
@@ -777,7 +787,48 @@ final class KeyboardViewModel {
     }
 
     /// 機能パッド(フリックモードのもう一方の手)の動作
+    // MARK: 手書き
+
+    private func handleHandwriting(_ output: EngineOutput) {
+        guard settings.inputMode == .handwriting || !handwritingStrokes.isEmpty else { return }
+        if handwritingStrokes != output.handwritingStrokes { handwritingStrokes = output.handwritingStrokes }
+        if handwritingPenDown != output.handwritingPenDown { handwritingPenDown = output.handwritingPenDown }
+        guard let strokes = output.handwritingFinished else { return }
+        isRecognizingHandwriting = true
+        handwritingRecognizer.recognize(strokes, language: settings.handwriting.language) { [weak self] candidates in
+            guard let self else { return }
+            self.isRecognizingHandwriting = false
+            self.handwritingCandidates = candidates
+            self.handwritingCandidateIndex = 0
+            self.lastHandwritingInsert = nil
+            if self.settings.handwriting.autoInsert, let first = candidates.first {
+                self.insert(first)
+                self.lastHandwritingInsert = first
+                self.playFeedback()
+            }
+        }
+    }
+
+    /// 手書きの候補を選ぶ(自動で入れた1位があれば、それと置き換える)
+    func selectHandwritingCandidate(_ index: Int) {
+        guard index < handwritingCandidates.count else { return }
+        let text = handwritingCandidates[index]
+        if let last = lastHandwritingInsert, typedText.hasSuffix(last) {
+            typedText = String(typedText.dropLast(last.count))
+        }
+        insert(text)
+        lastHandwritingInsert = text
+        handwritingCandidateIndex = index
+    }
+
     private func handleFunction(_ action: FunctionAction, tap: TapResult) {
+        if settings.inputMode == .handwriting && action == .nextCandidate {
+            if !handwritingCandidates.isEmpty {
+                selectHandwritingCandidate((handwritingCandidateIndex + 1) % handwritingCandidates.count)
+            }
+            playFeedback()
+            return
+        }
         switch action {
         case .space: insert(" ")
         case .backspace: backspace()
@@ -789,7 +840,11 @@ final class KeyboardViewModel {
             if action == .nextCandidate { flickCandidates = engine.flickEngine.runNBest }
         case .none: return
         }
-        if action == .space || action == .newline { flickCandidates = [] }
+        if action == .space || action == .newline {
+            flickCandidates = []
+            handwritingCandidates = []
+            lastHandwritingInsert = nil
+        }
         playFeedback()
     }
 

@@ -128,6 +128,8 @@ struct KeyboardSettings: Codable, Equatable {
     var inputMode: InputMode = .qwerty
     /// フリック入力の設定
     var flick = FlickConfig()
+    /// 手書きモード
+    var handwriting = HandwritingConfig()
     /// レベルB: この確率より低い候補はタップにしない
     var levelBThreshold: Double = 0.5
     /// レベルB: 位置の補正を使う

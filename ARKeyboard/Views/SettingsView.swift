@@ -17,6 +17,9 @@ struct SettingsView: View {
                 if viewModel.settings.inputMode == .flick {
                     flickSection
                 }
+                if viewModel.settings.inputMode == .handwriting {
+                    handwritingSection
+                }
                 tapSection
                 sensorSection
                 levelBSection
@@ -81,7 +84,7 @@ struct SettingsView: View {
         } header: {
             Text("入力方式")
         } footer: {
-            Text("フリック(比較実験用): 片手に 12 キーの仮名パッド、もう一方の手に機能パッド(空白・削除など)を置きます。")
+            Text("フリック(比較実験用): 片手に 12 キーの仮名パッド、もう一方の手に機能パッド(空白・削除など)を置きます。\n手書き: 人差し指と親指でつまんだまま書き、指を離して 1 秒たつと文字を認識します。もう一方の手は機能パッドです。")
         }
     }
 
@@ -143,6 +146,32 @@ struct SettingsView: View {
             Text("フリック")
         } footer: {
             Text("数値はすべて仮説です(実機の記録で調整してください)。黄色の扇形は、文脈から見た各方向の出やすさ = 実効的な判定範囲の広さです。")
+        }
+    }
+
+    private var handwritingSection: some View {
+        Section {
+            Picker("書く手", selection: $viewModel.settings.handwriting.hand) {
+                Text("右手").tag(Chirality.right)
+                Text("左手").tag(Chirality.left)
+            }
+            Picker("言語", selection: $viewModel.settings.handwriting.language) {
+                Text("日本語").tag("ja-JP")
+                Text("英語").tag("en-US")
+            }
+            Toggle("1位の候補を自動で入力", isOn: $viewModel.settings.handwriting.autoInsert)
+            Toggle("左右反転(鏡文字になるとき)", isOn: $viewModel.settings.handwriting.mirror)
+            ParameterSlider(title: "ペンを下ろす距離", value: $viewModel.settings.handwriting.pinchDown, range: 0.1...0.5,
+                            format: { String(format: "%.2f 手", $0) },
+                            help: "親指の先と人差し指の先がこれより近づいたら、書き始める")
+            ParameterSlider(title: "ペンを上げる距離", value: $viewModel.settings.handwriting.pinchUp, range: 0.15...0.7,
+                            format: { String(format: "%.2f 手", $0) })
+            ParameterSlider(title: "書き終わりの待ち時間", value: $viewModel.settings.handwriting.finishDelay, range: 0.3...3,
+                            format: { String(format: "%.1f 秒", $0) })
+        } header: {
+            Text("手書き")
+        } footer: {
+            Text("文字の向きは手の向き(手首→指先が上)で決めます。画像の上下左右は使いません。文字認識は Vision で端末の中だけで行います。")
         }
     }
 

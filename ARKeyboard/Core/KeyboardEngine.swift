@@ -55,6 +55,11 @@ struct EngineOutput {
     var flicks: [FlickResult] = []
     /// 今まさに動いているフリック(始点と移動。画面表示用)
     var activeFlicks: [FingerID: (start: Vec2, displacement: Vec2)] = [:]
+    /// 手書きモード: 書きかけの画(画像の座標。画面表示用)と、ペンが下りているか
+    var handwritingStrokes: [[Vec2]] = []
+    var handwritingPenDown = false
+    /// 手書きモード: このフレームで書き終わった画のまとまり(文字認識に渡す)
+    var handwritingFinished: [HandwritingStroke]?
     /// デバッググラフ用の、1本の指の速度
     var signalSample: FingerSignalSample?
     /// このフレームでキャリブレーションが完了したら、その結果
@@ -106,9 +111,24 @@ final class KeyboardEngine {
     private var wordStartContext = ""
     /// フリック入力
     let flickEngine = FlickEngine()
+    /// 手書き入力
+    let handwriting = HandwritingRecorder()
 
-    /// フリックモードか(キャリブレーション済みのときだけ)
+    /// フリックモードか
     var isFlickMode: Bool { settings.inputMode == .flick }
+    /// 手書きモードか
+    var isHandwritingMode: Bool { settings.inputMode == .handwriting }
+    /// もう一方の手が機能パッド(空白・削除など)になるモードか
+    var usesFunctionPad: Bool { isFlickMode || isHandwritingMode }
+
+    /// 入力の主役の手か(フリックパッドの手・書く手)。それ以外の手は機能パッド
+    func isPrimaryHand(_ chirality: Chirality) -> Bool {
+        switch settings.inputMode {
+        case .qwerty: return true
+        case .flick: return settings.flick.isFlickHand(chirality)
+        case .handwriting: return chirality == settings.handwriting.hand
+        }
+    }
     /// 最後にキーが入力された時刻(入力の速さを測るため)
     private var lastKeyTime: Double?
     /// レベルB の学習モデル(読み込んだときだけ)
@@ -343,6 +363,16 @@ final class KeyboardEngine {
             return output
         }
 
+        // 手書きモード: 書く手のつまみをペンにして、軌跡を集める
+        if isHandwritingMode {
+            let writer = settings.handwriting.hand
+            handwriting.config = settings.handwriting
+            output.handwritingFinished = handwriting.process(hand: hands[writer], frame: smoothedFrames[writer],
+                                                             time: frame.timestamp, minConfidence: settings.minConfidence)
+            output.handwritingStrokes = handwriting.displayStrokes
+            output.handwritingPenDown = handwriting.isPenDown
+        }
+
         // 指先の下にあるキーを探す(画面で光らせる)
         for chirality in Chirality.allCases {
             guard let hand = hands[chirality], let layout = layoutFrame(for: chirality) else { continue }
@@ -361,7 +391,7 @@ final class KeyboardEngine {
                 }
                 continue
             }
-            if isFlickMode { continue }  // 機能パッドの手は、キーを光らせない
+            if usesFunctionPad { continue }  // 機能パッドの手・書く手は、キーを光らせない
             for finger in Finger.allCases {
                 guard let tip = hand.position(Joint.tip(of: finger), minConfidence: settings.minConfidence),
                       let key = key(atImagePoint: tip, finger: FingerID(chirality: chirality, finger: finger)) else {
@@ -390,7 +420,8 @@ final class KeyboardEngine {
         output.activeFlicks = flickEngine.segmenter.active
         syncFusionSettings()
         // フリックモードでは、フリックパッドの手の動きはタップにしない(フリックとして扱う)
-        let tapEvents = detection.taps.filter { !(isFlickMode && settings.flick.isFlickHand($0.finger.chirality)) }
+        // フリックパッドの手・書く手のタップは使わない(それぞれ専用の処理をする)
+        let tapEvents = detection.taps.filter { !(usesFunctionPad && isPrimaryHand($0.finger.chirality)) }
         for event in tapEvents {
             if let rejected = addCandidate(event, hands: rawHands, frame: frame) {
                 output.taps.append(rejected)
@@ -523,13 +554,13 @@ final class KeyboardEngine {
                 result.note = "クールダウン中"
                 return result
             }
-            // フリックモード: 機能パッドの手のタップは、指ごとの動作(削除・改行など)
-            if isFlickMode {
+            // フリック・手書きモード: 機能パッドの手のタップは、指ごとの動作(削除・改行など)
+            if usesFunctionPad {
                 lastAcceptedTime[decision.payload.event.finger] = decision.time
                 flickEngine.recentFunctionTaps.append(decision.payload.event.timestamp)
                 let action = settings.flick.action(for: decision.payload.event.finger.finger)
                 result.functionAction = action
-                if let rewrite = flickEngine.applyFunction(action) {
+                if isFlickMode, let rewrite = flickEngine.applyFunction(action) {
                     result.wordRewrite = rewrite.rewrite
                     result.wordReplaceCount = rewrite.replaceCount
                 }
