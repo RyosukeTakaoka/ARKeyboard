@@ -22,3 +22,23 @@ final class DebugModelsTests: XCTestCase {
         XCTAssertTrue(entry.summary.contains("2.35") || entry.summary.contains("2.34"))
     }
 }
+
+final class TrackerStatsTests: XCTestCase {
+    func testStats() {
+        var acc = TrackerStatsAccumulator()
+        let (left, right) = standardHands()
+        var rng = SplitMix64(seed: 3)
+        for i in 0..<60 {
+            var frame = makeFrame(time: Double(i) / 30, hands: i % 4 == 0 ? [left] : [left, right])
+            frame = Replayer.addNoise(to: frame, sigma: 0.01, rng: &rng)
+            frame.processingTime = 0.02
+            let engine = KeyboardEngine()
+            acc.add(frame, hands: engine.assignHands(frame.hands))
+        }
+        XCTAssertEqual(acc.stats.fps, 30, accuracy: 1)
+        XCTAssertEqual(acc.stats.processingMs, 20, accuracy: 1e-6)
+        XCTAssertEqual(acc.stats.twoHandRate, 0.75, accuracy: 0.01)
+        XCTAssertGreaterThan(acc.stats.jitter, 0)
+        XCTAssertLessThan(acc.stats.jitter, 0.05)
+    }
+}

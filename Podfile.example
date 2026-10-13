@@ -1,0 +1,13 @@
+# MediaPipe(Google の手の追跡)を試すときだけ使います。Vision だけで使うなら不要です。
+#
+# 使い方:
+#   1. このファイルを Podfile という名前でコピーする
+#   2. ターミナルで、このフォルダに移動して `pod install`
+#   3. 以後は ARKeyboard.xcworkspace を開く
+#   4. hand_landmarker.task を ARKeyboard/Resources/Model/ に置く(README 参照)
+platform :ios, '17.0'
+
+target 'ARKeyboard' do
+  use_frameworks!
+  pod 'MediaPipeTasksVision'
+end

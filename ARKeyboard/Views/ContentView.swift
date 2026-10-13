@@ -37,6 +37,10 @@ struct ContentView: View {
             // マイク・加速度センサーのオン/オフや設定を反映する
             viewModel.applySensorSettings()
         }
+        // 手の追跡器の切り替え
+        .onChange(of: viewModel.settings.handTracker) { _, _ in
+            viewModel.applyTracker()
+        }
         // LiDAR のオン/オフでカメラを切り替える
         .onChange(of: viewModel.settings.useLiDAR) { _, _ in
             viewModel.applyCameraSource()

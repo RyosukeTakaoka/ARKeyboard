@@ -53,6 +53,10 @@ final class KeyboardViewModel {
     var adaptationSampleCount = 0
     /// レベルB の学習モデルの状態(表示用)
     var levelBModelStatus = "モデル未導入"
+    /// 手の追跡器ごとの統計(比較表示用)
+    var trackerStats: [HandTrackerKind: TrackerStats] = [:]
+    /// 今使っている手の追跡器
+    var activeTracker: HandTrackerKind = .vision
 
     /// 入力された文字列
     var typedText = ""
@@ -123,6 +127,8 @@ final class KeyboardViewModel {
 
     /// 記録中のセッション
     @ObservationIgnored private var recordingSession: RecordingSession?
+    /// 手の追跡器ごとの統計の計算
+    @ObservationIgnored private var statsAccumulators: [HandTrackerKind: TrackerStatsAccumulator] = [:]
 
     /// 当たり判定の地図を最後に計算したときの条件(同じなら計算し直さない)
     @ObservationIgnored private var hitMapSignature = ""
@@ -228,6 +234,7 @@ final class KeyboardViewModel {
 
     /// 画面が表示されたときに呼ぶ
     func start() {
+        applyTracker()
         isUsingDepthCamera = settings.useLiDAR && depthCamera != nil
         activeSource.start { [weak self] status in
             self?.cameraStatus = status
@@ -286,6 +293,17 @@ final class KeyboardViewModel {
             motionSensor.stop()
             motionStatus = "オフ"
         }
+    }
+
+    /// 手の追跡器の設定が変わったら、差し替える(使えない追跡器なら Vision のまま)
+    func applyTracker() {
+        let kind = HandTrackerFactory.isAvailable(settings.handTracker) ? settings.handTracker : .vision
+        guard kind != activeTracker else { return }
+        let tracker = HandTrackerFactory.make(kind)
+        camera.setTracker(tracker)
+        depthCamera?.setTracker(HandTrackerFactory.make(kind))
+        activeTracker = tracker.kind
+        statsAccumulators[kind]?.reset()
     }
 
     /// LiDAR の設定が変わったら、カメラを切り替える
@@ -602,6 +620,11 @@ final class KeyboardViewModel {
         fps = fpsCounter.tick(at: frame.timestamp)
         detectedHandCount = frame.hands.count
         let output = engine.process(frame, now: now)
+        // 追跡器の比較用の統計(1秒に数回だけ画面に反映する)
+        var accumulator = statsAccumulators[frame.trackerKind] ?? TrackerStatsAccumulator()
+        accumulator.add(frame, hands: output.hands)
+        statsAccumulators[frame.trackerKind] = accumulator
+        if accumulator.stats.frames % 15 == 0 { trackerStats[frame.trackerKind] = accumulator.stats }
         hands = output.hands
         layoutFrames = output.layoutFrames
         if planeToImage != output.planeToImage { planeToImage = output.planeToImage }

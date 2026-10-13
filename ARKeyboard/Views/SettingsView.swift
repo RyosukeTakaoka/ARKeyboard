@@ -9,6 +9,7 @@ struct SettingsView: View {
         NavigationStack {
             Form {
                 modeSection
+                trackerSection
                 if viewModel.settings.mode == .desk {
                     deskSection
                 }
@@ -59,6 +60,33 @@ struct SettingsView: View {
             Text("モード")
         } footer: {
             Text("膝モード: キー大きめ・判定ゆるめ・キーが手に追従。\n机モード: 判定厳しめ・キーは面に固定。\nモードを切り替えると、下のしきい値はそのモードの初期値に戻ります。")
+        }
+    }
+
+    // MARK: - 手の追跡器
+
+    private var trackerSection: some View {
+        Section {
+            Picker("手の追跡", selection: $viewModel.settings.handTracker) {
+                ForEach(HandTrackerKind.allCases) { kind in
+                    Text(kind.japaneseName + (HandTrackerFactory.isAvailable(kind) ? "" : "(未導入)")).tag(kind)
+                }
+            }
+            LabeledContent("使用中", value: viewModel.activeTracker.japaneseName)
+            ForEach(HandTrackerKind.allCases) { kind in
+                if let stats = viewModel.trackerStats[kind] {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(kind.japaneseName).font(.caption.bold())
+                        Text(String(format: "FPS %.0f / 処理 %.1f ms / 両手の検出 %.0f%% / ぶれ %.4f 手",
+                                    stats.fps, stats.processingMs, stats.twoHandRate * 100, stats.jitter))
+                            .font(.caption.monospacedDigit())
+                    }
+                }
+            }
+        } header: {
+            Text("手の追跡")
+        } footer: {
+            Text("Vision は標準で使えます(2D)。MediaPipe(3D)は導入が必要です(README 参照)。切り替えて同じように手を止めたときの「ぶれ」と、FPS・両手の検出率を比べてください。")
         }
     }
 
