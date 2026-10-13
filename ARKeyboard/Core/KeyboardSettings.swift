@@ -68,6 +68,11 @@ struct KeyboardSettings: Codable, Equatable {
     /// タップ時の効果音
     var soundEnabled: Bool = true
 
+    /// LiDAR の深度で「指が面に近づいたか」を確かめる(LiDAR 搭載機のみ)
+    var useLiDAR: Bool = false
+    /// 面に触れていたときの高さから、これ以上持ち上がっていたらタップにしない(メートル)
+    var lidarTolerance: Double = 0.015
+
     /// デバッグ表示
     var showDebug: Bool = false
     /// デバッグ表示で速度グラフを出す指

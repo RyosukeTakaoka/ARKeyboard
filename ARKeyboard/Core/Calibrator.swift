@@ -21,6 +21,10 @@ struct CalibrationResult: Codable, Equatable {
     var left: HandCalibration
     var right: HandCalibration
     var createdAt: Date
+    /// LiDAR モードでキャリブレーションしたときだけ記録される、
+    /// 「指が面に触れているときの 指先の深さ − 手のひらの深さ」(メートル)。
+    /// Optional なので、これが無い古い保存データもそのまま読み込めます。
+    var restRelativeDepths: [FingerID: Double]? = nil
 
     func hand(_ chirality: Chirality) -> HandCalibration {
         chirality == .left ? left : right

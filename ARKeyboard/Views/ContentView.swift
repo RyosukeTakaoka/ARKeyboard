@@ -35,6 +35,10 @@ struct ContentView: View {
         .onChange(of: viewModel.settings) { _, _ in
             viewModel.saveSettings()
         }
+        // LiDAR のオン/オフでカメラを切り替える
+        .onChange(of: viewModel.settings.useLiDAR) { _, _ in
+            viewModel.applyCameraSource()
+        }
         .sheet(isPresented: $isShowingSettings) {
             SettingsView(viewModel: viewModel)
                 // 半分の高さでも開けるようにして、カメラ映像を見ながら調整できるようにする
@@ -46,8 +50,13 @@ struct ContentView: View {
     /// カメラが動いているときの画面
     private var runningView: some View {
         ZStack {
-            CameraPreviewView(session: viewModel.camera.session)
-                .ignoresSafeArea()
+            if viewModel.isUsingDepthCamera, let depthCamera = viewModel.depthCamera {
+                ARPreviewView(session: depthCamera.session)
+                    .ignoresSafeArea()
+            } else {
+                CameraPreviewView(session: viewModel.camera.session)
+                    .ignoresSafeArea()
+            }
 
             // カメラ映像の上に重ねる表示。プレビューと「同じ大きさ・同じ位置」に置くことが大切です
             // (そうしないと、画像座標→画面座標の変換がずれます)。

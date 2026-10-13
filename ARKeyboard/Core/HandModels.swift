@@ -158,4 +158,6 @@ struct VisionFrame {
     var imageSize: Vec2
     /// 検出された手(0〜2個)
     var hands: [HandObservation]
+    /// LiDAR の深度マップ(LiDAR モードのときだけ。それ以外は nil)
+    var depthMap: DepthMap? = nil
 }

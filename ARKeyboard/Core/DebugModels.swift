@@ -34,6 +34,8 @@ struct TapLogEntry: Identifiable, Equatable {
     var travel: Double
     /// 入力されなかった理由など
     var note: String?
+    /// LiDAR で測った、面からの高さ(メートル)
+    var heightAboveSurface: Double?
 
     init(id: Int, result: TapResult) {
         self.id = id
@@ -43,11 +45,13 @@ struct TapLogEntry: Identifiable, Equatable {
         peakSpeed = result.event.peakSpeed
         travel = result.event.travel
         note = result.note
+        heightAboveSurface = result.heightAboveSurface
     }
 
     /// 1行の説明(例: "右手の人差し指 → J  速さ2.31 移動0.112")
     var summary: String {
         let key = keyLabel.map { "→ \($0)" } ?? "→ (\(note ?? "なし"))"
-        return "\(finger.japaneseName) \(key)  速さ\(String(format: "%.2f", peakSpeed)) 移動\(String(format: "%.3f", travel))"
+        let height = heightAboveSurface.map { String(format: " 高さ%.1fcm", $0 * 100) } ?? ""
+        return "\(finger.japaneseName) \(key)  速さ\(String(format: "%.2f", peakSpeed)) 移動\(String(format: "%.3f", travel))\(height)"
     }
 }

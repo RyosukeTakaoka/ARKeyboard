@@ -12,6 +12,10 @@ struct SettingsView: View {
                 tapSection
                 layoutSection
                 feedbackSection
+                // LiDAR が無い機種では、この設定自体を出さない
+                if DepthCameraManager.isSupported {
+                    lidarSection
+                }
                 calibrationSection
                 debugSection
             }
@@ -120,6 +124,26 @@ struct SettingsView: View {
             Text("キー配置")
         } footer: {
             Text("手に追従: 膝が動いてもずれにくい。面に固定: 実物のキーボードに近いが、カメラや面が動いたら再キャリブレーションが必要。\n左右が逆に表示される(左手が右手の色)ときは「入れ替える」をオンに。")
+        }
+    }
+
+    // MARK: - LiDAR
+
+    private var lidarSection: some View {
+        Section {
+            Toggle("LiDAR で接触を確認する", isOn: $viewModel.settings.useLiDAR)
+            ParameterSlider(title: "面からの高さの許容量", value: $viewModel.settings.lidarTolerance, range: 0.005...0.05,
+                            format: { String(format: "%.1f cm", $0 * 100) },
+                            help: "タップの瞬間、指先が「面に触れていたときの高さ」よりこれ以上浮いていたら入力しない。")
+            if viewModel.settings.useLiDAR && viewModel.calibration?.restRelativeDepths == nil {
+                Text("LiDAR をオンにした状態で、もう一度キャリブレーションしてください(面に触れたときの深さを記録します)。")
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+            }
+        } header: {
+            Text("LiDAR(深度)")
+        } footer: {
+            Text("オンにするとカメラが ARKit に切り替わります。空中で指を止めただけの誤入力を減らせます。")
         }
     }
 

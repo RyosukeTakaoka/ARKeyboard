@@ -7,6 +7,8 @@ struct TapResult: Equatable {
     var key: Key?
     /// キーが決まらなかった理由など(デバッグログ用)
     var note: String?
+    /// LiDAR: 面に触れていたときの高さから、どれだけ持ち上がっていたか(メートル)。測れなければ nil
+    var heightAboveSurface: Double? = nil
 }
 
 /// 1フレーム処理した結果(ViewModel が画面に反映する)
@@ -51,6 +53,9 @@ final class KeyboardEngine {
     /// 手ごとの「平滑化した」手の座標系(手ぶれでキー配置が震えないようにするため)
     private var smoothedFrames: [Chirality: HandFrame] = [:]
 
+    /// キャリブレーション中に集めた「指先の深さ − 手のひらの深さ」(LiDAR モードのみ)
+    private var calibrationDepthSamples: [FingerID: [Double]] = [:]
+
     init(settings: KeyboardSettings = KeyboardSettings()) {
         self.settings = settings
     }
@@ -58,6 +63,7 @@ final class KeyboardEngine {
     func startCalibration() {
         calibrator.start()
         tapDetector.reset()
+        calibrationDepthSamples = [:]
     }
 
     func setCalibration(_ result: CalibrationResult?) {
@@ -119,7 +125,9 @@ final class KeyboardEngine {
 
         // キャリブレーション中は、それだけを行う
         if calibrator.isActive {
-            if let result = calibrator.process(hands: hands, timestamp: frame.timestamp) {
+            recordCalibrationDepths(hands: hands, frame: frame)
+            if var result = calibrator.process(hands: hands, timestamp: frame.timestamp) {
+                result.restRelativeDepths = restDepthsFromCalibration()
                 setCalibration(result)
                 output.calibrationFinished = result
             }
@@ -154,20 +162,66 @@ final class KeyboardEngine {
                                             observedFinger: settings.debugFinger)
         output.signalSample = detection.sample
         for event in detection.taps {
-            output.taps.append(resolve(event))
+            output.taps.append(resolve(event, hands: hands, frame: frame))
         }
         return output
     }
 
     /// タップした瞬間の指先の位置から、押されたキーを決める
-    private func resolve(_ event: TapEvent) -> TapResult {
+    private func resolve(_ event: TapEvent, hands: [Chirality: HandObservation], frame: VisionFrame) -> TapResult {
         guard calibration != nil else {
             return TapResult(event: event, key: nil, note: "未キャリブレーション")
         }
-        guard let key = key(atImagePoint: event.tipPosition, finger: event.finger) else {
-            return TapResult(event: event, key: nil, note: "キーの範囲外")
+        // LiDAR の補助: 指が「面に触れていた高さ」まで下りていなければ、空中で止めただけとみなす
+        let height = heightAboveSurface(finger: event.finger, hands: hands, frame: frame)
+        if settings.useLiDAR, let height, height > settings.lidarTolerance {
+            return TapResult(event: event, key: nil,
+                             note: String(format: "LiDAR: 面から%.1fcm上", height * 100),
+                             heightAboveSurface: height)
         }
-        return TapResult(event: event, key: key, note: nil)
+        guard let key = key(atImagePoint: event.tipPosition, finger: event.finger) else {
+            return TapResult(event: event, key: nil, note: "キーの範囲外", heightAboveSurface: height)
+        }
+        return TapResult(event: event, key: key, note: nil, heightAboveSurface: height)
+    }
+
+    // MARK: - LiDAR(深度)
+
+    /// キャリブレーション中(指が面に触れている間)の「指先の深さ − 手のひらの深さ」を集める
+    private func recordCalibrationDepths(hands: [Chirality: HandObservation], frame: VisionFrame) {
+        guard let depthMap = frame.depthMap else { return }
+        for (chirality, hand) in hands {
+            for finger in Finger.allCases {
+                guard let value = DepthAssist.relativeTipDepth(hand: hand, finger: finger, imageSize: frame.imageSize,
+                                                               depthMap: depthMap, minConfidence: settings.minConfidence)
+                else { continue }
+                let id = FingerID(chirality: chirality, finger: finger)
+                var samples = calibrationDepthSamples[id, default: []]
+                samples.append(value)
+                // 静止の最後の方(約1秒分)だけ使う
+                if samples.count > 60 { samples.removeFirst(samples.count - 60) }
+                calibrationDepthSamples[id] = samples
+            }
+        }
+    }
+
+    private func restDepthsFromCalibration() -> [FingerID: Double]? {
+        var result: [FingerID: Double] = [:]
+        for (id, samples) in calibrationDepthSamples {
+            if let median = DepthMap.median(samples) { result[id] = median }
+        }
+        return result.isEmpty ? nil : result
+    }
+
+    /// 指先が「面に触れていたときの高さ」からどれだけ持ち上がっているか(メートル)
+    private func heightAboveSurface(finger: FingerID, hands: [Chirality: HandObservation], frame: VisionFrame) -> Double? {
+        guard let depthMap = frame.depthMap,
+              let rest = calibration?.restRelativeDepths?[finger],
+              let hand = hands[finger.chirality],
+              let current = DepthAssist.relativeTipDepth(hand: hand, finger: finger.finger, imageSize: frame.imageSize,
+                                                         depthMap: depthMap, minConfidence: settings.minConfidence)
+        else { return nil }
+        return DepthAssist.heightAboveRest(current: current, rest: rest)
     }
 
     /// Vision の検出結果(最大2つ)を「左手」「右手」に割り当てます。

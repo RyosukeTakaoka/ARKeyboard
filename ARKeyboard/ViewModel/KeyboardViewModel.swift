@@ -60,8 +60,12 @@ final class KeyboardViewModel {
 
     // MARK: 内部で使うもの(View から監視する必要がないので @ObservationIgnored)
 
-    /// カメラ
+    /// カメラ(通常)
     @ObservationIgnored let camera = CameraManager()
+    /// カメラ(LiDAR 搭載機のみ。ARKit で深度も取る)。非対応機では nil
+    @ObservationIgnored let depthCamera: DepthCameraManager? = DepthCameraManager.isSupported ? DepthCameraManager() : nil
+    /// 今 LiDAR 用のカメラを使っているか
+    var isUsingDepthCamera = false
     /// 計算を担当するエンジン
     @ObservationIgnored private let engine: KeyboardEngine
     /// 触覚フィードバック(軽い「コツッ」)
@@ -100,11 +104,21 @@ final class KeyboardViewModel {
         camera.onFrame = { [weak self] frame in
             self?.handle(frame)
         }
+        depthCamera?.onFrame = { [weak self] frame in
+            self?.handle(frame)
+        }
+    }
+
+    /// 今使うべきカメラ(設定で LiDAR がオンで、対応機なら ARKit 版)
+    private var activeSource: FrameSource {
+        if isUsingDepthCamera, let depthCamera { return depthCamera }
+        return camera
     }
 
     /// 画面が表示されたときに呼ぶ
     func start() {
-        camera.start { [weak self] status in
+        isUsingDepthCamera = settings.useLiDAR && depthCamera != nil
+        activeSource.start { [weak self] status in
             self?.cameraStatus = status
         }
         // 触覚フィードバックの準備(最初の1回が遅れないように、あらかじめエンジンを起こしておく)
@@ -115,8 +129,17 @@ final class KeyboardViewModel {
 
     /// 画面が消えたとき・バックグラウンドに入ったときに呼ぶ
     func stop() {
-        camera.stop()
+        activeSource.stop()
         UIApplication.shared.isIdleTimerDisabled = false
+    }
+
+    /// LiDAR の設定が変わったら、カメラを切り替える
+    /// (AVCaptureSession と ARSession は同時に同じカメラを使えないので、片方を止めてから始める)
+    func applyCameraSource() {
+        let wantsDepth = settings.useLiDAR && depthCamera != nil
+        guard wantsDepth != isUsingDepthCamera else { return }
+        activeSource.stop()
+        start()
     }
 
     // MARK: 設定
