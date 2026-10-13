@@ -6,6 +6,8 @@ struct EngineOutput {
     var hands: [Chirality: HandObservation] = [:]
     /// キー配置の基準にしている手の座標系(画面にキーを描くのに使う)
     var layoutFrames: [Chirality: HandFrame] = [:]
+    /// 指先の下にあるキーの ID(光らせる)
+    var hoveredKeyIDs: Set<String> = []
     /// このフレームでキャリブレーションが完了したら、その結果
     var calibrationFinished: CalibrationResult?
 }
@@ -13,16 +15,23 @@ struct EngineOutput {
 /// キーボードの「頭脳」。カメラにも画面にも依存しない純粋なロジックだけを持ちます。
 ///
 /// VisionFrame(手の認識結果)を1つ受け取るたびに、
-///   左右の割り当て → 手の座標系 → キャリブレーション
+///   左右の割り当て → 手の座標系 → キャリブレーション → 指先とキーの対応
 /// の順に処理して、EngineOutput を返します。
 /// UI に依存しないので、単体テストで動作を確かめられます。
 final class KeyboardEngine {
-    var settings: KeyboardSettings
+    var settings: KeyboardSettings {
+        didSet {
+            // キーの大きさが変わったらキーを作り直す
+            if settings.keyScale != oldValue.keyScale { rebuildKeys() }
+        }
+    }
 
     /// キャリブレーション
     let calibrator = Calibrator()
     /// 現在のキャリブレーション結果(未実施なら nil)
     private(set) var calibration: CalibrationResult?
+    /// 手ごとのキー(手の座標で表したもの)
+    private(set) var keys: [Chirality: [Key]] = [:]
 
     /// 手ごとの「平滑化した」手の座標系(手ぶれでキー配置が震えないようにするため)
     private var smoothedFrames: [Chirality: HandFrame] = [:]
@@ -37,6 +46,38 @@ final class KeyboardEngine {
 
     func setCalibration(_ result: CalibrationResult?) {
         calibration = result
+        rebuildKeys()
+    }
+
+    private func rebuildKeys() {
+        keys = [:]
+        guard let calibration else { return }
+        for chirality in Chirality.allCases {
+            keys[chirality] = KeyLayout.makeKeys(for: calibration.hand(chirality), keyScale: settings.keyScale)
+        }
+    }
+
+    /// キー配置の基準にする手の座標系
+    /// - 面に固定: キャリブレーションした瞬間の座標系(ずっと同じ)
+    /// - 手に追従: 今の手の座標系(平滑化したもの)
+    func layoutFrame(for chirality: Chirality) -> HandFrame? {
+        guard let calibration else { return nil }
+        switch settings.anchor {
+        case .fixed: return calibration.hand(chirality).frame
+        case .followHand: return smoothedFrames[chirality]
+        }
+    }
+
+    /// 画像上の指先の位置から、押しているキーを探す
+    func key(atImagePoint point: Vec2, finger: FingerID) -> Key? {
+        guard let frame = layoutFrame(for: finger.chirality), let handKeys = keys[finger.chirality] else {
+            return nil
+        }
+        return KeyLayout.nearestKey(to: frame.toLocal(point),
+                                    finger: finger.finger,
+                                    in: handKeys,
+                                    restrictToFinger: settings.restrictKeysToFinger,
+                                    maxDistance: settings.maxKeyDistance)?.key
     }
 
     /// 1フレーム分の処理
@@ -63,13 +104,23 @@ final class KeyboardEngine {
         // キャリブレーション中は、それだけを行う
         if calibrator.isActive {
             if let result = calibrator.process(hands: hands, timestamp: frame.timestamp) {
-                calibration = result
+                setCalibration(result)
                 output.calibrationFinished = result
             }
+            return output
         }
 
-        if calibration != nil {
-            output.layoutFrames = smoothedFrames
+        // 指先の下にあるキーを探す(画面で光らせる)
+        for chirality in Chirality.allCases {
+            guard let hand = hands[chirality], let frame = layoutFrame(for: chirality) else { continue }
+            output.layoutFrames[chirality] = frame
+            for finger in Finger.allCases {
+                guard let tip = hand.position(Joint.tip(of: finger), minConfidence: settings.minConfidence),
+                      let key = key(atImagePoint: tip, finger: FingerID(chirality: chirality, finger: finger)) else {
+                    continue
+                }
+                output.hoveredKeyIDs.insert(key.id)
+            }
         }
         return output
     }

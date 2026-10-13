@@ -40,9 +40,15 @@ struct ContentView: View {
             GeometryReader { geometry in
                 let converter = CoordinateConverter(imageSize: viewModel.imageSize,
                                                     viewSize: Vec2(geometry.size))
-                HandSkeletonView(hands: viewModel.hands,
-                                 frames: viewModel.layoutFrames,
-                                 converter: converter)
+                ZStack {
+                    KeyboardOverlayView(keys: viewModel.keys,
+                                        frames: viewModel.layoutFrames,
+                                        hoveredKeyIDs: viewModel.hoveredKeyIDs,
+                                        converter: converter)
+                    HandSkeletonView(hands: viewModel.hands,
+                                     frames: viewModel.layoutFrames,
+                                     converter: converter)
+                }
             }
             .ignoresSafeArea()
 

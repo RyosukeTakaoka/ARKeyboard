@@ -29,6 +29,10 @@ final class KeyboardViewModel {
     var calibrationMessage = ""
     /// キャリブレーション結果
     var calibration: CalibrationResult?
+    /// 手ごとのキー(手の座標)
+    var keys: [Chirality: [Key]] = [:]
+    /// 指先の下にあるキー
+    var hoveredKeyIDs: Set<String> = []
 
     // MARK: 内部で使うもの(View から監視する必要がないので @ObservationIgnored)
 
@@ -88,9 +92,11 @@ final class KeyboardViewModel {
         let output = engine.process(frame)
         hands = output.hands
         layoutFrames = output.layoutFrames
+        hoveredKeyIDs = output.hoveredKeyIDs
         syncCalibrationState()
         if let result = output.calibrationFinished {
             calibration = result
+            keys = engine.keys
         }
     }
 
