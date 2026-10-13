@@ -34,6 +34,9 @@ final class KeyboardViewModel {
     var isRegisteringDesk = false
     /// 登録中の四隅(画像の座標)
     var deskCornerDraft: [Vec2] = []
+    /// 指先で押さえる登録の、止まり具合(0〜1)
+    var deskCaptureProgress: Double = 0
+    private let deskPointCapture = FingertipPointCapture()
     /// キャリブレーションの進み具合と案内
     var calibrationPhase: Calibrator.Phase = .idle
     var calibrationMessage = ""
@@ -488,12 +491,29 @@ final class KeyboardViewModel {
 
     // MARK: 机の四隅の登録(机モード)
 
-    /// 四隅を登録する順番の説明
-    static let deskCornerNames = ["奥の左", "奥の右", "手前の右", "手前の左"]
+    /// 登録する点の名前(順番どおり)
+    var deskPointNames: [String] { settings.deskNinePoints ? DeskPlane.gridNames : DeskPlane.cornerNames }
 
     func startDeskRegistration() {
         deskCornerDraft = []
+        deskPointCapture.reset()
+        deskCaptureProgress = 0
         isRegisteringDesk = true
+    }
+
+    /// 指先で押さえる登録: 人差し指の先が止まったら、その位置を 1 点として記録する
+    private func captureDeskPointIfNeeded(_ frame: VisionFrame) {
+        guard isRegisteringDesk, settings.deskRegisterWithFingertip else { return }
+        // 右手を優先(片手だけ映っていればその手)。机の座標に直す前の、画像の座標を使う
+        let hand = frame.hands.first { $0.chirality == .right } ?? frame.hands.first
+        let tip = hand?.position(.indexTip, minConfidence: settings.minConfidence)
+        let captured = deskPointCapture.process(fingertip: tip, time: frame.timestamp)
+        deskCaptureProgress = deskPointCapture.progress
+        if let captured {
+            deskCornerDraft.append(captured)
+            notificationHaptics.notificationOccurred(.success)
+            finishDeskRegistrationIfComplete()
+        }
     }
 
     func cancelDeskRegistration() {
@@ -508,8 +528,15 @@ final class KeyboardViewModel {
     func addDeskCorner(viewPoint: Vec2, viewSize: Vec2) {
         let converter = CoordinateConverter(imageSize: imageSize, viewSize: viewSize)
         deskCornerDraft.append(converter.imagePoint(fromView: viewPoint))
-        guard deskCornerDraft.count == 4 else { return }
-        let plane = DeskPlane(imageCorners: deskCornerDraft, widthCm: settings.deskWidthCm, depthCm: settings.deskDepthCm)
+        finishDeskRegistrationIfComplete()
+    }
+
+    /// 必要な数の点がそろったら、ホモグラフィーを計算して保存する
+    private func finishDeskRegistrationIfComplete() {
+        guard deskCornerDraft.count == deskPointNames.count else { return }
+        let plane = settings.deskNinePoints
+            ? DeskPlane(gridPoints: deskCornerDraft, widthCm: settings.deskWidthCm, depthCm: settings.deskDepthCm)
+            : DeskPlane(imageCorners: deskCornerDraft, widthCm: settings.deskWidthCm, depthCm: settings.deskDepthCm)
         isRegisteringDesk = false
         deskCornerDraft = []
         guard plane.imageToPlane != nil else {
@@ -689,6 +716,7 @@ final class KeyboardViewModel {
         recordingSession?.addFrame(frame)
         fps = fpsCounter.tick(at: frame.timestamp)
         detectedHandCount = frame.hands.count
+        captureDeskPointIfNeeded(frame)
         let output = engine.process(frame, now: now)
         // 追跡器の比較用の統計(1秒に数回だけ画面に反映する)
         var accumulator = statsAccumulators[frame.trackerKind] ?? TrackerStatsAccumulator()

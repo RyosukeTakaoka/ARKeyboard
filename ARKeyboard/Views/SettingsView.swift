@@ -211,7 +211,9 @@ struct SettingsView: View {
                             format: { "\(Int($0)) cm" })
             ParameterSlider(title: "登録する範囲の奥行き", value: $viewModel.settings.deskDepthCm, range: 10...80,
                             format: { "\(Int($0)) cm" })
-            Button(viewModel.deskPlane == nil ? "机の四隅を登録する" : "机の四隅を登録し直す") {
+            Toggle("指先で押さえて登録(画面タップより正確)", isOn: $viewModel.settings.deskRegisterWithFingertip)
+            Toggle("9 点(3×3)で登録する", isOn: $viewModel.settings.deskNinePoints)
+            Button(viewModel.deskPlane == nil ? "机を登録する" : "机を登録し直す") {
                 dismiss()
                 viewModel.startDeskRegistration()
             }
@@ -223,7 +225,7 @@ struct SettingsView: View {
         } header: {
             Text("机モード: 四隅の登録")
         } footer: {
-            Text("カメラが机を斜めから見ていると、奥は小さく手前は大きく映ります。机の四隅(またはテープで貼った長方形の四隅)を登録すると、真上から見た座標に直して計算します。登録し直すとキャリブレーションもやり直しになります。膝モードでは使いません(膝は平らでないため)。")
+            Text("カメラが机を斜めから見ていると、奥は小さく手前は大きく映ります。机の四隅(またはテープで貼った長方形の四隅)を登録すると、真上から見た座標に直して計算します。指先で登録すると、指を止めている間の位置を平均するので、画面タップより誤差が小さくなります(見積もり: docs/results-homography.md)。9 点で登録すると、さらに誤差が減ります。登録し直すとキャリブレーションもやり直しになります。膝モードでは使いません(膝は平らでないため)。")
         }
     }
 

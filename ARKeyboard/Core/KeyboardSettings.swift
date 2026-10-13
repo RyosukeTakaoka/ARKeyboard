@@ -139,6 +139,10 @@ struct KeyboardSettings: Codable, Equatable {
     /// 机モードで登録する範囲の実際の大きさ(cm)。メジャーで測って入れると、キーの大きさが cm で分かる
     var deskWidthCm: Double = 60
     var deskDepthCm: Double = 40
+    /// 机の登録方法: 指先で押さえる(既定。画面タップより正確)か、画面をタップするか
+    var deskRegisterWithFingertip: Bool = true
+    /// 9 点(3×3)で登録する(最小二乗で誤差を減らす。docs/results-homography.md)
+    var deskNinePoints: Bool = false
     /// 音のオンセット検出の設定
     var audioOnset = OnsetDetectorConfig()
     /// 振動のオンセット検出の設定

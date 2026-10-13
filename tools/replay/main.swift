@@ -109,6 +109,19 @@ case "synth":
     }
     FileHandle.standardError.write("合成の記録を作りました: \(out)(\(config.targets.count) 文字, \(recording.frames.count) フレーム)\n".data(using: .utf8)!)
 
+case "desk-accuracy":
+    // 机の登録方法ごとのキーの位置の誤差の見積もり(仮想のカメラ)。Markdown の表を出力する
+    var lines = ["| 登録方法 | カメラの傾き | 誤差の平均 (mm) | 誤差の95% (mm) |", "|---|---|---|---|"]
+    for tilt in [35.0, 50.0, 70.0] {
+        var camera = DeskAccuracySimulation.Camera()
+        camera.tilt = tilt
+        for method in DeskAccuracySimulation.Method.allCases {
+            let r = DeskAccuracySimulation.run(method: method, camera: camera)
+            lines.append(String(format: "| %@ | %.0f 度 | %.1f | %.1f |", method.rawValue, tilt, r.mean, r.p95))
+        }
+    }
+    print(lines.joined(separator: "\n"))
+
 default:
     fail("知らないコマンドです: \(command)")
 }

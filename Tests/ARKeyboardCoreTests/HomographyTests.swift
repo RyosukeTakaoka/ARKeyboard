@@ -93,3 +93,57 @@ final class HomographyTests: XCTestCase {
         XCTAssertEqual(output.hands[.left]?.joints[.wrist]?.position, toImage(left).joints[.wrist]?.position)
     }
 }
+
+final class HomographyAccuracyTests: XCTestCase {
+    /// 9 点の最小二乗: 誤差の無い点なら元の変換をそのまま復元する(4 点のときと一致)
+    func testLeastSquaresRecoversExactHomography() throws {
+        let camera = DeskAccuracySimulation.Camera()
+        let grid = (0..<9).map { Vec2(Double($0 % 3) * 15, Double($0 / 3) * 7.5) }
+        let plane9 = DeskPlane(gridPoints: grid.map { camera.project($0, width: 30, depth: 15) }, widthCm: 30, depthCm: 15)
+        let h = try XCTUnwrap(plane9.imageToPlane)
+        for p in [Vec2(3, 4), Vec2(27, 12), Vec2(15, 7.5)] {
+            let back = try XCTUnwrap(h.apply(camera.project(p, width: 30, depth: 15)))
+            XCTAssertEqual(back.distance(to: p), 0, accuracy: 1e-6)
+        }
+        XCTAssertEqual(plane9.imageCorners.count, 4)
+    }
+
+    /// 正規化: 大きな座標(数千ピクセル)でも、正しく解ける
+    func testNormalizationHandlesLargeCoordinates() throws {
+        let src = [Vec2(10000, 20000), Vec2(14000, 20500), Vec2(13800, 24000), Vec2(10300, 23800)]
+        let dst = [Vec2(0, 0), Vec2(30, 0), Vec2(30, 15), Vec2(0, 15)]
+        let h = try XCTUnwrap(Homography(from: src, to: dst))
+        for (a, b) in zip(src, dst) {
+            XCTAssertEqual(try XCTUnwrap(h.apply(a)).distance(to: b), 0, accuracy: 1e-6)
+        }
+    }
+
+    /// 見積もり: 指先で平均して登録するほうが、画面タップより誤差が小さい。9 点はさらに小さい
+    func testFingertipRegistrationIsMoreAccurate() {
+        let tap = DeskAccuracySimulation.run(method: .tap4, trials: 200).mean
+        let finger4 = DeskAccuracySimulation.run(method: .finger4, trials: 200).mean
+        let finger9 = DeskAccuracySimulation.run(method: .finger9, trials: 200).mean
+        XCTAssertLessThan(finger4, tap)
+        XCTAssertLessThan(finger9, finger4)
+    }
+
+    /// 指先が 0.8 秒止まったら、その間の平均を 1 点として記録。離れるまで次は記録しない
+    func testFingertipCapture() throws {
+        let capture = FingertipPointCapture()
+        var rng = SplitMix64(seed: 2)
+        var captured: [Vec2] = []
+        var t = 0.0
+        func feed(_ p: Vec2, seconds: Double) {
+            let end = t + seconds
+            while t < end {
+                let noisy = p + Vec2(rng.nextGaussian(), rng.nextGaussian()) * 1.5
+                if let c = capture.process(fingertip: noisy, time: t) { captured.append(c) }
+                t += 1.0 / 30
+            }
+        }
+        feed(Vec2(100, 100), seconds: 2.0)   // 長く止まっても 1 回だけ
+        feed(Vec2(400, 120), seconds: 1.2)   // 次の角
+        XCTAssertEqual(captured.count, 2)
+        XCTAssertEqual(try XCTUnwrap(captured.first).distance(to: Vec2(100, 100)), 0, accuracy: 1.5)
+    }
+}
