@@ -31,7 +31,10 @@ VARIANTS = [
     ("方式A+仮名の言語モデル", {"features": NO_ADAPT, "flick": {"useLanguageModel": True}}),
     ("方式A+仮名の言語モデル+方向の個人適応", {"features": {"personalAdaptation": True},
                                        "flick": {"useLanguageModel": True}}),
+    ("方式B(接触フリック)+仮名の言語モデル", {"features": NO_ADAPT,
+                                       "flick": {"useLanguageModel": True, "segmentation": "contact"}}),
 ]
+CONTACT = VARIANTS[3]
 # ぶれ除去フィルター(One Euro)をオンにした組み合わせ(フィルターで速さの山が低くなるので、しきい値も下げる)
 FILTER_PATCH = {"features": NO_ADAPT, "flick": {"useLanguageModel": True, "useJitterFilter": True,
                                                 "filterMinCutoff": 1.5, "filterBeta": 3.0,
@@ -80,13 +83,14 @@ def main() -> None:
         tmpdir = tempfile.mkdtemp(prefix="synth-flick-", dir=os.path.join(ROOT, "tools", "eval"))
         texts = os.path.join(ROOT, "tools", "eval", "texts")
         kana = open(os.path.join(texts, "heldout_kana.txt"), encoding="utf-8").read()
+        # 「面に触れてフリックする」想定で、フリックの始まりにも音を入れる(方式A は音を使わないので影響しない)
         for seed in (1, 2):
             path = os.path.relpath(os.path.join(tmpdir, f"synthetic-flick-{seed}.json"), ROOT)
-            synthesize_flick(cmd, path, seed, kana)
+            synthesize_flick(cmd, path, seed, kana, extra=["--contact-audio"])
             recordings.append(path)
         # その人の癖: いつも 25 度回ってしまう(方向の個人適応の効果を見るため。同じ文章を 3 回)
         bias_rec = os.path.relpath(os.path.join(tmpdir, "synthetic-flick-3-bias25.json"), ROOT)
-        synthesize_flick(cmd, bias_rec, 3, kana * 3, rotation_bias=25)
+        synthesize_flick(cmd, bias_rec, 3, kana * 3, rotation_bias=25, extra=["--contact-audio"])
         if not qwerty:
             english = open(os.path.join(texts, "heldout_english.txt"), encoding="utf-8").read()
             qwerty = os.path.relpath(os.path.join(tmpdir, "synthetic-qwerty-4.json"), ROOT)
@@ -96,7 +100,7 @@ def main() -> None:
             for rec in recordings for name, patch in VARIANTS]
     bias_rows = []
     if bias_rec:
-        bias_rows = [(name, run(cmd, bias_rec, name, patch)) for name, patch in VARIANTS[1:]]
+        bias_rows = [(name, run(cmd, bias_rec, name, patch)) for name, patch in VARIANTS[1:3]]
 
     # 位置のぶれに対する強さ: 同じ人工的なぶれを加えて、フリック(方式A+言語モデル)と QWERTY を比べる
     noise_levels = [float(x) for x in args.noise_levels.split(",") if x]
@@ -104,11 +108,12 @@ def main() -> None:
     for noise in noise_levels:
         flick = run(cmd, recordings[0], VARIANTS[1][0], VARIANTS[1][1], noise=noise)
         filtered = run(cmd, recordings[0], "+ぶれ除去フィルター", FILTER_PATCH, noise=noise)
+        contact = run(cmd, recordings[0], CONTACT[0], CONTACT[1], noise=noise)
         q = None
         if qwerty:
             result = replay(cmd, qwerty, "qwerty", QWERTY_PATCH, noise=noise)
             q = evaluate(load_prompts(qwerty), result["taps"], result.get("finalText"))
-        noise_rows.append((noise, flick, filtered, q))
+        noise_rows.append((noise, flick, filtered, contact, q))
 
     # 仮名の言語モデルの重み
     weight_rows = []
@@ -135,6 +140,7 @@ def write_report(path, rows, bias_rows, noise_rows, weight_rows, synthetic, reco
             "> `python3 tools/eval/evaluate_flick.py recordings/*.json` を実行して置き換えてください。",
             "",
             "合成データの作り方: `ARKeyboard/Core/SyntheticFlickGenerator.swift`(30fps、始点の狙いのずれ σ=0.2 キー、",
+            "フリックの始まりに接触の音(取りこぼし 5%)、雑音の音 0.3 回/秒、"
             "方向のばらつき σ=12 度、フリックの長さ 0.3±0.05 手、キーへの移動は平均 1 手/秒、",
             "濁点・小文字は機能パッドのタップ(音の取りこぼし 5%)、関節の震え、フレーム落ち 1%)。",
             "文章は言語モデルの学習データに無いもの(`tools/eval/texts/heldout_kana.txt`)。",
@@ -149,7 +155,7 @@ def write_report(path, rows, bias_rows, noise_rows, weight_rows, synthetic, reco
         "- **CER**: 最終的な文字列(並びの解読・濁点の付与を反映)の文字誤り率。低いほど良い",
         "- **CPM**: 1分あたりの入力文字数(合成データでは、指の動きの速さを決め打ちしているので参考値)",
         "",
-        "## 組み合わせごとの比較(方式A: エアフリック)",
+        "## 組み合わせごとの比較(方式A: エアフリック、方式B: 接触フリック)",
         "",
         "| 記録 | 組み合わせ | 検出 再現率 | 検出 適合率 | 始点キー | 方向 | 仮名 | CER | CPM |",
         "|---|---|---|---|---|---|---|---|---|",
@@ -159,7 +165,9 @@ def write_report(path, rows, bias_rows, noise_rows, weight_rows, synthetic, reco
                      f"{pct(m['direction_accuracy'])} | {pct(m['kana_accuracy'])} | {pct(m['cer'])} | {m['cpm']:.0f} |")
     lines += [
         "",
-        "方式B(接触フリック: 音で始まりを決める)は Tier3 で追加します(このファイルに行が増えます)。",
+        "方式B(接触フリック)は、音のオンセットをフリックの始まりとし、止まるか 0.25 秒で終わりとする。",
+        "音が鳴っても、その直前に指が止まっていない・直後に速く動いていないものは接触とみなさない(物音対策)。",
+        "音が使えない設定(音オンセット機能オフ)のときは、自動的に方式A で動く。",
         "",
     ]
     if bias_rows:
@@ -194,16 +202,18 @@ def write_report(path, rows, bias_rows, noise_rows, weight_rows, synthetic, reco
             "QWERTY は英文(evaluate.py の「+音+デコーダー+言語モデル」)、フリックは仮名文(方式A+仮名の言語モデル)。",
             "**文章も言語も違うので、CER の絶対値ではなく「ぶれを増やしたときの悪化の仕方」を比べてください。**",
             "",
-            "「+フィルター」は、ぶれ除去フィルター(One Euro)をオンにし、動き出し 1.2・止まり 0.5 手/秒に下げたもの。",
+            "「A+フィルター」は、方式A でぶれ除去フィルター(One Euro)をオンにし、動き出し 1.2・止まり 0.5 手/秒に下げたもの。",
+            "「B」は方式B(接触フリック: 音で始まりを決める)。",
             "",
-            "| ぶれ(手の大きさ比) | QWERTY 再現率 | QWERTY キー正解率 | QWERTY CER | フリック 検出 再現率 | フリック 仮名 | フリック CER "
-            "| +フィルター 検出 再現率 | +フィルター CER |",
-            "|---|---|---|---|---|---|---|---|---|",
+            "| ぶれ(手の大きさ比) | QWERTY 再現率 | QWERTY キー正解率 | QWERTY CER | A 検出 再現率 | A 仮名 | A CER "
+            "| A+フィルター 検出 再現率 | A+フィルター CER | B 検出 再現率 | B 仮名 | B CER |",
+            "|---|---|---|---|---|---|---|---|---|---|---|---|",
         ]
-        for noise, f, g, q in noise_rows:
+        for noise, f, g, b, q in noise_rows:
             qcols = (f"{pct(q['recall'])} | {pct(q['key_accuracy'])} | {pct(q['cer'])}" if q else "- | - | -")
             lines.append(f"| {noise} | {qcols} | {pct(f['recall'])} | {pct(f['kana_accuracy'])} | {pct(f['cer'])} "
-                         f"| {pct(g['recall'])} | {pct(g['cer'])} |")
+                         f"| {pct(g['recall'])} | {pct(g['cer'])} "
+                         f"| {pct(b['recall'])} | {pct(b['kana_accuracy'])} | {pct(b['cer'])} |")
         lines.append("")
     if weight_rows:
         lines += [

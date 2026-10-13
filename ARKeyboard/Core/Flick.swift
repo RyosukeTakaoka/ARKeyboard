@@ -66,6 +66,13 @@ struct FlickConfig: Codable, Equatable {
     /// 止まりの速さをこの時間(秒)下回り続けたら、フリックの終わり。
     /// 空中タップは「下ろして戻す」途中の折り返しで一瞬遅くなるので、そこで切ると「下フリック」と間違える
     var endHold: Double = 0.03
+    /// 方式B: 接触(音)からこの時間(秒)たったら、動きが止まっていなくてもフリックを終える
+    var contactWindow: Double = 0.25
+    /// 方式B: 機能パッドのタップの音と、この時間(秒)以内に始まった「タップ」は、機能パッドの音とみなして捨てる
+    var contactFunctionGuard: Double = 0.15
+    /// 方式B: 音の直後(−0.05〜+0.12 秒)の指の速さの最大がこれより遅ければ、その音は指の接触ではない
+    /// (まわりの物音や、もう一方の手のタップの音)とみなす(手/秒)。キーへのゆっくりした移動(〜1.5)より上にする
+    var contactMinSpeed: Double = 1.8
     /// 指先の位置のぶれ除去(One Euro フィルター)を使う。
     /// 既定はオフ: 合成データでは、ぶれが大きいとき(手の大きさの 1〜2%)は少し良くなるが、ぶれが小さいときに
     /// 動き出しの速さがなまって大きく悪くなった(docs/results-flick.md)。オンにするときは
@@ -297,15 +304,60 @@ final class FlickSegmenter {
         var anchor: Vec2
         var anchorRel: Vec2
         var phase: Phase
+        /// 方式B 用: 最近の位置(時刻, キー配置の座標, 手の座標, 速さ)
+        var history: [(t: Double, position: Vec2, rel: Vec2, speed: Double)] = []
+        /// 方式B 用: この指に割り当てられた接触(音)の時刻
+        var contact: Double?
     }
 
     private var states: [FingerID: State] = [:]
+    /// 方式B「接触フリック」: 音のオンセットで始まりを決める(速さでは始めない)
+    var contactMode = false
+    /// まだどの指にも割り当てていない接触(音)の時刻
+    private var pendingContacts: [Double] = []
+
+    /// 方式B: 接触(音のオンセット)を知らせる
+    func noteContact(at time: Double) {
+        guard contactMode else { return }
+        pendingContacts.append(time)
+    }
+
+    /// 接触を、その直後にいちばん速く動いた指に割り当てる(両手ともフリックパッドのとき用)。
+    /// 直後の動きを見るため、接触の 0.12 秒後のフレームまで待ってから決める(始点は履歴から取るので遅れない)
+    private func assignContacts(now: Double) {
+        pendingContacts.removeAll { $0 < now - 0.4 }
+        var remaining: [Double] = []
+        for contact in pendingContacts {
+            guard now >= contact + 0.12 else { remaining.append(contact); continue }
+            let best = states.max { a, b in
+                Self.motion(a.value.history, around: contact) < Self.motion(b.value.history, around: contact)
+            }
+            // 本物の接触は「キーの上で一瞬止まる → 下ろす」の後に来る。キーへの移動の途中で鳴った音
+            // (まわりの物音など)は、直前に止まっていないので捨てる
+            let wasStill = best.map { Self.wasStill($0.value.history, before: contact, below: config.endSpeed) } ?? false
+            if let best, wasStill, Self.motion(best.value.history, around: contact) >= config.contactMinSpeed {
+                states[best.key]?.contact = contact
+            }
+        }
+        pendingContacts = remaining
+    }
+
+    private static func wasStill(_ history: [(t: Double, position: Vec2, rel: Vec2, speed: Double)],
+                                 before time: Double, below speed: Double) -> Bool {
+        history.contains { $0.t >= time - 0.2 && $0.t <= time - 0.03 && $0.speed < speed }
+    }
+
+    private static func motion(_ history: [(t: Double, position: Vec2, rel: Vec2, speed: Double)],
+                               around time: Double) -> Double {
+        history.filter { $0.t >= time - 0.05 && $0.t <= time + 0.12 }.map(\.speed).max() ?? -1
+    }
     /// 今まさに動いている指の、始点と今の移動(画面表示用)
     private(set) var active: [FingerID: (start: Vec2, displacement: Vec2)] = [:]
 
     func reset() {
         states.removeAll()
         active.removeAll()
+        pendingContacts.removeAll()
     }
 
     /// 1フレーム分を処理する
@@ -348,8 +400,18 @@ final class FlickSegmenter {
         state.speed = state.speed + (raw - state.speed) * alpha
         state.rel = rel
         state.lastTime = time
+        state.history.append((time, position, rel, state.speed))
+        state.history.removeAll { $0.t < time - 0.5 }
 
         var gesture: FlickGesture?
+        if contactMode {
+            states[finger] = state
+            assignContacts(now: time)
+            state = states[finger] ?? state
+            gesture = processContact(finger: finger, state: &state, position: position, rel: rel, time: time)
+            states[finger] = state
+            return gesture
+        }
         switch state.phase {
         case .still(let since, let bandSince):
             if state.speed < config.endSpeed {
@@ -397,6 +459,37 @@ final class FlickSegmenter {
         }
         states[finger] = state
         return gesture
+    }
+
+    /// 方式B: 接触(音)から始まり、止まるか contactWindow 秒たったら終わる
+    private func processContact(finger: FingerID, state: inout State, position: Vec2, rel: Vec2,
+                                time: Double) -> FlickGesture? {
+        switch state.phase {
+        case .still:
+            guard let contact = state.contact, contact <= time else { return nil }
+            state.contact = nil
+            // 接触の時刻にいちばん近い位置を始点にする(音はカメラより少し遅れて届くことがある)
+            let sample = state.history.min { abs($0.t - contact) < abs($1.t - contact) }
+            state.phase = .moving(startTime: contact, start: sample?.position ?? position, startRel: sample?.rel ?? rel,
+                                  peak: state.speed, slowSince: nil)
+            return nil
+        case .moving(let startTime, let start, let startRel, let peak, let slowSince):
+            active[finger] = (start, rel - startRel)
+            let slow = state.speed < config.endSpeed ? (slowSince ?? time) : nil
+            let stopped = slow.map { time - $0 >= config.endHold - 1e-9 } ?? false
+            if (stopped && time - startTime >= config.minDuration) || time - startTime >= config.contactWindow {
+                state.phase = .still(since: time, bandSince: nil)
+                state.contact = nil
+                active[finger] = nil
+                let displacement = rel - startRel
+                guard displacement.length <= config.maxDistance else { return nil }
+                return FlickGesture(finger: finger, startTime: startTime, endTime: time, start: start,
+                                    displacement: displacement, peakSpeed: max(peak, state.speed))
+            }
+            state.phase = .moving(startTime: startTime, start: start, startRel: startRel,
+                                  peak: max(peak, state.speed), slowSince: slow)
+            return nil
+        }
     }
 }
 

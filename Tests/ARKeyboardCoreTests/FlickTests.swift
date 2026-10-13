@@ -261,3 +261,42 @@ final class OneEuroFilterTests: XCTestCase {
         XCTAssertGreaterThan(out.x, 0.24)
     }
 }
+
+final class ContactFlickTests: XCTestCase {
+    let finger = FingerID(chirality: .right, finger: .index)
+
+    func ease(_ x: Double) -> Double { let t = min(max(x, 0), 1); return t * t * (3 - 2 * t) }
+
+    /// 方式B: 音(接触)の時刻からフリックが始まる。止まっている指に鳴った物音は無視される
+    func testContactStartsFlickAndIgnoresNoise() throws {
+        var config = FlickConfig()
+        config.segmentation = .contact
+        let segmenter = FlickSegmenter()
+        segmenter.config = config
+        segmenter.contactMode = true
+        var gestures: [FlickGesture] = []
+        var t = 0.0
+        while t <= 1.5 {
+            // 0.3 秒: 止まっている指に物音(無視されるはず)。0.8 秒: 接触してから右へ(右手: −x)フリック
+            if abs(t - 0.3) < 1e-9 { segmenter.noteContact(at: 0.3) }
+            if abs(t - 0.8 - 1.0 / 30) < 1e-6 { segmenter.noteContact(at: 0.8) }  // 音は少し遅れて届く
+            let rel = Vec2(-0.3 * ease((t - 0.8) / 0.12), 0)
+            if let g = segmenter.process(finger: finger, position: rel, rel: rel, time: t) { gestures.append(g) }
+            t += 1.0 / 30
+        }
+        XCTAssertEqual(gestures.count, 1)
+        let g = try XCTUnwrap(gestures.first)
+        XCTAssertEqual(g.startTime, 0.8, accuracy: 1e-9)
+        XCTAssertEqual(g.displacement.x, -0.3, accuracy: 0.03)
+    }
+
+    /// 方式B を選んでいても、音が使えなければ方式A(速さで切り出す)で動く
+    func testFallsBackToAirWithoutAudio() {
+        let engine = FlickEngine()
+        engine.config.segmentation = .contact
+        engine.contactAvailable = false
+        XCTAssertFalse(engine.usesContact)
+        engine.contactAvailable = true
+        XCTAssertTrue(engine.usesContact)
+    }
+}

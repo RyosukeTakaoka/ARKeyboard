@@ -23,6 +23,13 @@ final class FlickEngine {
     var kanaModel: CharNGramModel?
     /// 方向のずれ(回転)を個人適応するか
     var adaptRotation = false
+    /// 方式B が使えるか(音のオンセットが使える)。使えなければ方式A で動く(フォールバック)
+    var contactAvailable = false
+    /// 最近、機能パッドのタップが採用された時刻(方式B で、その音で始まったフリックを捨てるため)
+    var recentFunctionTaps: [Double] = []
+
+    /// 今、方式B で切り出しているか
+    var usesContact: Bool { config.segmentation == .contact && contactAvailable }
 
     private(set) var keys: [FlickKey] = []
     /// 今の仮名の並びの、フリックごとの候補
@@ -67,6 +74,7 @@ final class FlickEngine {
     func process(hand: HandObservation, chirality: Chirality, layoutFrame: HandFrame, liveFrame: HandFrame,
                  time: Double, minConfidence: Double, context: String) -> (result: FlickResult?, hoveredKeyID: String?) {
         segmenter.config = config
+        segmenter.contactMode = usesContact
         let finger = FingerID(chirality: chirality, finger: .index)
         var position: Vec2?
         var rel: Vec2?
@@ -83,6 +91,12 @@ final class FlickEngine {
                 .flatMap { $0.center.distance(to: position) < max($0.size.x, $0.size.y) ? $0.id : nil }
         }
         guard let gesture = segmenter.process(finger: finger, position: position, rel: rel, time: time) else {
+            return (nil, hovered)
+        }
+        // 方式B: 機能パッドのタップの音で始まった「動かないフリック」は、機能パッドの音だったとみなして捨てる
+        recentFunctionTaps.removeAll { $0 < time - 1 }
+        if usesContact, gesture.displacement.length < config.tapDistance,
+           recentFunctionTaps.contains(where: { abs($0 - gesture.startTime) < config.contactFunctionGuard }) {
             return (nil, hovered)
         }
         return (handle(gesture, context: context), hovered)

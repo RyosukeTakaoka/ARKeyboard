@@ -326,6 +326,7 @@ final class KeyboardEngine {
                 if let live = smoothedFrames[chirality] {
                     flickEngine.config = settings.flick
                     flickEngine.adaptRotation = settings.features.personalAdaptation
+                    flickEngine.contactAvailable = settings.features.audioOnset
                     let (result, hovered) = flickEngine.process(hand: hand, chirality: chirality, layoutFrame: layout,
                                                                 liveFrame: live, time: frame.timestamp,
                                                                 minConfidence: settings.minConfidence, context: context)
@@ -378,6 +379,10 @@ final class KeyboardEngine {
     func ingestOnsets(_ events: [OnsetEvent], source: OnsetEvent.Source, coveredUntil: Double, now: Double) -> [TapResult] {
         syncFusionSettings()
         fusion.addOnsets(events, source: source, coveredUntil: coveredUntil, now: now)
+        // 方式B(接触フリック): 音のオンセットを、フリックの始まりとしても使う
+        if isFlickMode && source == .audio {
+            for event in events { flickEngine.segmenter.noteContact(at: event.time) }
+        }
         return resolvePending(now: now)
     }
 
@@ -495,6 +500,7 @@ final class KeyboardEngine {
             // フリックモード: 機能パッドの手のタップは、指ごとの動作(削除・改行など)
             if isFlickMode {
                 lastAcceptedTime[decision.payload.event.finger] = decision.time
+                flickEngine.recentFunctionTaps.append(decision.payload.event.timestamp)
                 let action = settings.flick.action(for: decision.payload.event.finger.finger)
                 result.functionAction = action
                 if let rewrite = flickEngine.applyFunction(action) {
