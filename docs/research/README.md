@@ -35,3 +35,7 @@ keithv.com、jungong.me、hbenko.com など)への接続が拒否されました
 原文で確かめるまでは、引用時に注意してください。
 
 まとめと「再現する/既存APIで代替/見送り」の判断は [feasibility.md](feasibility.md) にあります。
+
+Tier3(Apple Watch・手書き・接触フリック・個人辞書・仮名漢字変換・ホモグラフィーの精度)の判断も
+[feasibility.md](feasibility.md) の「Tier3 の判断」にあります。評価の結果は `docs/results.md`(QWERTY)、
+`docs/results-flick.md`(フリック)、`docs/results-homography.md`(机の登録)です(いずれも合成データ・仮想カメラ)。
