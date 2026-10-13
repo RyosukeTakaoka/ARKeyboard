@@ -37,6 +37,13 @@ struct ControlBarView: View {
                     .padding(.vertical, 4)
                     .background(.thinMaterial, in: Capsule())
 
+                // デバッグ表示の切り替え(てんとう虫=「バグ」のアイコン)
+                Toggle(isOn: $viewModel.settings.showDebug) {
+                    Image(systemName: "ladybug")
+                }
+                .toggleStyle(.button)
+                .accessibilityLabel("デバッグ表示")
+
                 Button(action: onOpenSettings) {
                     Image(systemName: "gearshape")
                         .font(.title3)

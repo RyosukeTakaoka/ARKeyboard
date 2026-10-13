@@ -12,6 +12,7 @@ struct SettingsView: View {
                 tapSection
                 layoutSection
                 feedbackSection
+                debugSection
             }
             .navigationTitle("設定")
             .navigationBarTitleDisplayMode(.inline)
@@ -118,6 +119,23 @@ struct SettingsView: View {
             Text("キー配置")
         } footer: {
             Text("手に追従: 膝が動いてもずれにくい。面に固定: 実物のキーボードに近いが、カメラや面が動いたら再キャリブレーションが必要。\n左右が逆に表示される(左手が右手の色)ときは「入れ替える」をオンに。")
+        }
+    }
+
+    // MARK: - デバッグ
+
+    private var debugSection: some View {
+        Section {
+            Toggle("デバッグ表示", isOn: $viewModel.settings.showDebug)
+            Picker("速度グラフに出す指", selection: $viewModel.settings.debugFinger) {
+                ForEach(FingerID.all) { finger in
+                    Text(finger.japaneseName).tag(finger)
+                }
+            }
+        } header: {
+            Text("デバッグ")
+        } footer: {
+            Text("グラフの白線が赤い点線(しきい値)を超えると「下ろし中」(黄色の点)になり、急に下がった瞬間に緑の縦線(タップ)が出ます。")
         }
     }
 

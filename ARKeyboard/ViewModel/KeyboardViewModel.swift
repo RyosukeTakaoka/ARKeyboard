@@ -41,6 +41,17 @@ final class KeyboardViewModel {
     /// 入力された文字列
     var typedText = ""
 
+    // MARK: デバッグ表示用
+
+    /// 1秒あたりの処理コマ数
+    var fps: Double = 0
+    /// Vision が検出した手の数(左右の割り当て前)
+    var detectedHandCount = 0
+    /// 速度グラフ用の、選んだ指の直近の値
+    var signalHistory: [FingerSignalSample] = []
+    /// 直近のタップの記録(新しい順)
+    var tapLog: [TapLogEntry] = []
+
     /// 設定。画面から直接書き換えてよい(毎フレーム、エンジンに反映されます)。
     /// 保存は ContentView の onChange から saveSettings() を呼んで行います。
     var settings: KeyboardSettings
@@ -55,6 +66,15 @@ final class KeyboardViewModel {
     @ObservationIgnored private let haptics = UIImpactFeedbackGenerator(style: .light)
     /// 完了時の触覚フィードバック(「ブブッ」)
     @ObservationIgnored private let notificationHaptics = UINotificationFeedbackGenerator()
+
+    /// FPS の計算
+    @ObservationIgnored private var fpsCounter = FPSCounter()
+    /// タップログの通し番号
+    @ObservationIgnored private var tapLogCounter = 0
+    /// 速度グラフに残す時間(秒)
+    static let signalHistoryDuration = 2.0
+    /// タップログに残す件数
+    static let tapLogLimit = 12
 
     /// UserDefaults に保存するときのキー(名前)
     private static let settingsKey = "KeyboardSettings.v1"
@@ -170,6 +190,8 @@ final class KeyboardViewModel {
         }
 
         imageSize = frame.imageSize
+        fps = fpsCounter.tick(at: frame.timestamp)
+        detectedHandCount = frame.hands.count
         let output = engine.process(frame)
         hands = output.hands
         layoutFrames = output.layoutFrames
@@ -182,6 +204,32 @@ final class KeyboardViewModel {
         }
         for tap in output.taps {
             handleTap(tap)
+        }
+        recordDebugInfo(output)
+    }
+
+    /// デバッグ表示用の記録(表示していないときは、グラフの記録を省いて少しでも軽くする)
+    private func recordDebugInfo(_ output: EngineOutput) {
+        for tap in output.taps {
+            tapLogCounter += 1
+            tapLog.insert(TapLogEntry(id: tapLogCounter, result: tap), at: 0)
+        }
+        if tapLog.count > Self.tapLogLimit {
+            tapLog.removeLast(tapLog.count - Self.tapLogLimit)
+        }
+
+        guard settings.showDebug else {
+            if !signalHistory.isEmpty { signalHistory.removeAll() }
+            return
+        }
+        if let sample = output.signalSample {
+            // 指が切り替わったり時間が巻き戻ったりしたら、グラフを描き直す
+            if let last = signalHistory.last, sample.timestamp < last.timestamp {
+                signalHistory.removeAll()
+            }
+            signalHistory.append(sample)
+            let oldest = sample.timestamp - Self.signalHistoryDuration
+            signalHistory.removeAll { $0.timestamp < oldest }
         }
     }
 

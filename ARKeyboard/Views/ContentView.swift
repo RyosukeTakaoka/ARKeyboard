@@ -78,6 +78,10 @@ struct ContentView: View {
                     hintBanner("まず下の「キャリブレーション」を押して、両手をホームポジションに置いてください")
                 }
 
+                if viewModel.settings.showDebug {
+                    DebugOverlayView(viewModel: viewModel)
+                }
+
                 Spacer()
 
                 if viewModel.isCalibrating {
