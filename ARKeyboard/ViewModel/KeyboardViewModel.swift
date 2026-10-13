@@ -686,7 +686,13 @@ final class KeyboardViewModel {
     private func handleTap(_ tap: TapResult) {
         guard let key = tap.key else { return }
         pressedKeys[key.id] = Date()
-        insert(key.output)
+        if let rewrite = tap.wordRewrite {
+            // 単語単位のデコード: 今の単語を、決め直した綴りに書き換える
+            typedText = String(typedText.dropLast(min(tap.wordReplaceCount, typedText.count))) + rewrite
+            practice?.input(key.output, at: now)
+        } else {
+            insert(key.output)
+        }
 
         if settings.hapticsEnabled {
             haptics.impactOccurred()

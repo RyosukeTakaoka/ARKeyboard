@@ -195,6 +195,14 @@ struct SettingsView: View {
                 ParameterSlider(title: "担当外の指の罰点", value: $viewModel.settings.decoder.offFingerPenalty, range: 0...10,
                                 format: { String(format: "%.1f", $0) },
                                 help: "「指の担当キーだけから選ぶ」をオフにしたとき、担当外のキーをどれだけ選びにくくするか。")
+                Toggle("単語単位で決め直す(ビームサーチ)", isOn: $viewModel.settings.features.wordDecoder)
+                if viewModel.settings.features.wordDecoder {
+                    Stepper("ビームの幅: \(viewModel.settings.wordDecoder.beamWidth)",
+                            value: $viewModel.settings.wordDecoder.beamWidth, in: 1...32)
+                    ParameterSlider(title: "辞書に無い綴りの罰点", value: $viewModel.settings.wordDecoder.lexiconPenalty,
+                                    range: 0...8, format: { String(format: "%.1f", $0) },
+                                    help: "学習用テキストの単語の頭にならない綴りを、どれだけ選びにくくするか。")
+                }
                 Toggle("入力の速さに合わせる", isOn: $viewModel.settings.decoder.speedAdaptation)
                 if viewModel.settings.decoder.speedAdaptation {
                     ParameterSlider(title: "速いときのばらつきの増え方", value: $viewModel.settings.decoder.fastSigmaGain, range: 0...2,

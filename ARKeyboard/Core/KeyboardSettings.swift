@@ -118,6 +118,8 @@ struct KeyboardSettings: Codable, Equatable {
     var decoder = DecoderConfig()
     /// 個人適応の設定
     var adaptation = AdaptationConfig()
+    /// 単語単位のデコードの設定
+    var wordDecoder = WordBeamDecoder.Config()
     /// レベルB: この確率より低い候補はタップにしない
     var levelBThreshold: Double = 0.5
     /// レベルB: 位置の補正を使う

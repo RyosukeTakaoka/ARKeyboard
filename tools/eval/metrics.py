@@ -47,8 +47,11 @@ def edit_distance(a: str, b: str) -> int:
     return prev[-1]
 
 
-def evaluate(prompts: list[dict], taps: list[dict]) -> dict:
-    """1つの記録 × 1つのバリアントの指標を計算する"""
+def evaluate(prompts: list[dict], taps: list[dict], final_text: str | None = None) -> dict:
+    """1つの記録 × 1つのバリアントの指標を計算する。
+
+    final_text があれば(単語単位のデコードの書き換え・削除を反映した最終的な文字列)、CER はそれで計算する。
+    """
     accepted = sorted((t for t in taps if t.get("accepted") and t.get("output") is not None), key=lambda t: t["t"])
     windows = []
     for i, p in enumerate(prompts):
@@ -75,6 +78,8 @@ def evaluate(prompts: list[dict], taps: list[dict]) -> dict:
     fp += len([k for k in range(len(accepted)) if k not in used])
 
     hyp = "".join(t["output"] for t in accepted)
+    if final_text is not None:
+        hyp = final_text.replace("\n", " ")
     ref = "".join(p["target"] for p in prompts)
     duration = (accepted[-1]["t"] - accepted[0]["t"]) if len(accepted) >= 2 else 0
     return {

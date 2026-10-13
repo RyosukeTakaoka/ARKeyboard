@@ -29,6 +29,8 @@ struct ReplayResult: Codable {
     var frameCount: Int
     var calibrated: Bool
     var taps: [ReplayedTap]
+    /// 最終的に画面に残った文字列(単語単位のデコードの書き換えと、削除ボタンを反映したもの)
+    var finalText: String = ""
 }
 
 /// 記録ファイルを、アプリと同じエンジン(KeyboardEngine)に流し込んで、もう一度判定させる。
@@ -117,7 +119,11 @@ final class Replayer {
 
         func collect(_ results: [TapResult]) {
             for r in results {
-                if let key = r.key { typed += key.output }
+                if let rewrite = r.wordRewrite {
+                    typed = String(typed.dropLast(min(r.wordReplaceCount, typed.count))) + rewrite
+                } else if let key = r.key {
+                    typed += key.output
+                }
                 var tap = ReplayedTap(t: r.event.timestamp, finger: r.event.finger, output: r.key?.output,
                                       accepted: r.key != nil, note: r.note,
                                       candidates: r.decode.map { $0.candidates.prefix(3).map {
@@ -162,7 +168,7 @@ final class Replayer {
             collect(engine.ingestOnsets([], source: .audio, coveredUntil: last + 1, now: last + 1))
         }
         return ReplayResult(variant: options.variantName, frameCount: recording.frames.count,
-                            calibrated: engine.calibration != nil, taps: taps)
+                            calibrated: engine.calibration != nil, taps: taps, finalText: typed)
     }
 
     /// 関節点に人工的なぶれを加える(手の大きさに比例したガウス雑音)

@@ -39,6 +39,9 @@ VARIANTS = [
     ("+音+デコーダー+言語モデル+個人適応", {"features": {"audioOnset": True, "decoder": True, "languageModel": True,
                                                 "personalAdaptation": True, "levelBModel": False,
                                                 "wordDecoder": False}}),
+    ("+音+デコーダー+言語モデル+個人適応+単語デコード", {"features": {"audioOnset": True, "decoder": True,
+                                                       "languageModel": True, "personalAdaptation": True,
+                                                       "levelBModel": False, "wordDecoder": True}}),
 ]
 
 
@@ -115,7 +118,7 @@ def main() -> None:
         for name, patch in variants:
             extra = ["--model", args.model] if (args.model and "レベルB" in name) else []
             result = replay(cmd, rec, name, patch, extra=extra)
-            m = evaluate(prompts, result["taps"])
+            m = evaluate(prompts, result["taps"], result.get("finalText"))
             rows.append((os.path.basename(rec), name, m))
             print(f"{os.path.basename(rec)} / {name}: precision {pct(m['precision'])} recall {pct(m['recall'])} "
                   f"key {pct(m['key_accuracy'])} CER {pct(m['cer'])}", file=sys.stderr)
@@ -129,7 +132,7 @@ def main() -> None:
         for name, patch in [variants[0], variants[3]]:
             for noise in noise_levels:
                 result = replay(cmd, rec, name, patch, noise=noise)
-                noise_rows.append((name, noise, evaluate(prompts, result["taps"])))
+                noise_rows.append((name, noise, evaluate(prompts, result["taps"], result.get("finalText"))))
 
     # 言語モデルの重み w を変えたときの比較(最後の記録 = 合成なら学習データに無い英文)
     weight_rows = []
@@ -141,7 +144,7 @@ def main() -> None:
                                   "personalAdaptation": False, "levelBModel": False, "wordDecoder": False},
                      "decoder": {"lmWeight": w}}
             result = replay(cmd, rec, f"w={w}", patch)
-            weight_rows.append((w, evaluate(prompts, result["taps"])))
+            weight_rows.append((w, evaluate(prompts, result["taps"], result.get("finalText"))))
 
     write_report(args.out, rows, noise_rows, synthetic, recordings, weight_rows)
     print(f"wrote {args.out}", file=sys.stderr)

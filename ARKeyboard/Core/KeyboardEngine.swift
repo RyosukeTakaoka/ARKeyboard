@@ -22,6 +22,10 @@ struct TapResult: Equatable {
     var levelBFeatures: [Double]? = nil
     /// レベルB の「タップである確率」(使ったときだけ)
     var levelBProbability: Double? = nil
+    /// 単語単位のデコード: 今打っている単語を、この綴りに書き換える(使ったときだけ)
+    var wordRewrite: String? = nil
+    /// 書き換えの前に、末尾から消す文字数(=これまでに表示していた、今の単語の文字数)
+    var wordReplaceCount: Int = 0
 }
 
 /// 融合の結果を待っている候補に付けておく情報
@@ -83,6 +87,14 @@ final class KeyboardEngine {
     var context: String = ""
     /// 言語モデル
     private var languageModels: [DecoderLanguage: CharNGramModel] = [:]
+    /// 単語辞書
+    private var lexicons: [DecoderLanguage: Lexicon] = [:]
+    /// 単語単位のデコード
+    let wordDecoder = WordBeamDecoder()
+    /// 今打っている単語の、タップごとの候補
+    private var wordSteps: [[KeyCandidate]] = []
+    /// 今の単語が始まる直前までの文脈
+    private var wordStartContext = ""
     /// 最後にキーが入力された時刻(入力の速さを測るため)
     private var lastKeyTime: Double?
     /// レベルB の学習モデル(読み込んだときだけ)
@@ -125,8 +137,14 @@ final class KeyboardEngine {
     func setLanguageCorpora(english: String?, romaji: String?) {
         let order = settings.decoder.lmOrder
         languageModels = [:]
-        if let english { languageModels[.english] = CharNGramModel(text: english, order: order) }
-        if let romaji { languageModels[.romaji] = CharNGramModel(text: romaji, order: order) }
+        if let english {
+            languageModels[.english] = CharNGramModel(text: english, order: order)
+            lexicons[.english] = Lexicon(text: english)
+        }
+        if let romaji {
+            languageModels[.romaji] = CharNGramModel(text: romaji, order: order)
+            lexicons[.romaji] = Lexicon(text: romaji)
+        }
         syncDecoderSettings()
     }
 
@@ -139,6 +157,7 @@ final class KeyboardEngine {
     /// 削除ボタンが押された(個人適応で「間違いだった」と記録する)
     func noteBackspace() {
         adaptation.noteBackspace()
+        if !wordSteps.isEmpty { wordSteps.removeLast() }
     }
 
     /// デコーダーの設定と、使う言語モデルを反映する
@@ -167,6 +186,18 @@ final class KeyboardEngine {
             let parts = [english, romaji].compactMap { $0 }.map { (model: $0, weight: 1.0) }
             let mixed = MixedLanguageModel(models: parts)
             decoder.languageModel = parts.isEmpty ? nil : { c, h in mixed.probability(of: c, after: h) }
+        }
+        // 単語単位のデコード
+        wordDecoder.config = settings.wordDecoder
+        wordDecoder.languageModel = settings.features.languageModel ? decoder.languageModel : nil
+        wordDecoder.lmWeight = settings.decoder.lmWeight
+        switch settings.decoder.language {
+        case .english: wordDecoder.lexicon = lexicons[.english]
+        case .romaji: wordDecoder.lexicon = lexicons[.romaji]
+        case .mixed:
+            var merged = lexicons[.english] ?? Lexicon(text: "")
+            for word in lexicons[.romaji]?.words ?? [] { merged.add(word) }
+            wordDecoder.lexicon = merged
         }
     }
 
@@ -440,10 +471,25 @@ final class KeyboardEngine {
             result.key = chosen.key
             result.decode = chosen.decode
             if let key = chosen.key {
+                // 単語単位のデコード: 文字(a〜z)なら今の単語に加えて、単語全体の綴りを決め直す。
+                // スペースや記号なら単語の終わり
+                let isLetter = key.output.first.map { $0.isLetter } ?? false
+                if isLetter, settings.features.wordDecoder, settings.features.decoder, let decode = chosen.decode {
+                    if wordSteps.isEmpty { wordStartContext = runningContext }
+                    wordSteps.append(decode.candidates)
+                    result.wordReplaceCount = wordSteps.count - 1
+                    result.wordRewrite = wordDecoder.decode(steps: wordSteps, context: wordStartContext)
+                } else {
+                    wordSteps.removeAll()
+                }
                 // 個人適応のために記録する(確信度はデコーダーの事後確率。デコーダーを使わないときは仮に 0.9)
                 let posterior = chosen.decode?.candidates.first { $0.key.id == key.id }?.probability ?? 0.9
                 adaptation.recordTap(finger: touch.finger, key: key, location: touch.surfaceLocation, posterior: posterior)
-                runningContext += key.output
+                if let rewrite = result.wordRewrite {
+                    runningContext = String(runningContext.dropLast(result.wordReplaceCount)) + rewrite
+                } else {
+                    runningContext += key.output
+                }
                 lastKeyTime = touch.time
                 lastAcceptedTime[decision.payload.event.finger] = decision.time
             } else if result.note == nil {
