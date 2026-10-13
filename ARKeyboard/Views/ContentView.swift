@@ -1,9 +1,13 @@
 import SwiftUI
 
 /// アプリのメイン画面。カメラ映像の上に、各種の表示を重ねていきます。
+///
+/// 重ね順(下から上):
+///   カメラ映像 → キー配置 → 手の骨格 → 入力テキスト・操作バー・案内
 struct ContentView: View {
     /// ViewModel は画面と同じだけ生きていてほしいので @State で持ちます(iOS 17 の @Observable 流儀)。
     @State private var viewModel = KeyboardViewModel()
+    @State private var isShowingSettings = false
 
     /// アプリが前面にあるか、バックグラウンドにあるか
     @Environment(\.scenePhase) private var scenePhase
@@ -27,6 +31,16 @@ struct ContentView: View {
             default: break
             }
         }
+        // 設定が変わったら保存する
+        .onChange(of: viewModel.settings) { _, _ in
+            viewModel.saveSettings()
+        }
+        .sheet(isPresented: $isShowingSettings) {
+            SettingsView(viewModel: viewModel)
+                // 半分の高さでも開けるようにして、カメラ映像を見ながら調整できるようにする
+                .presentationDetents([.medium, .large])
+                .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+        }
     }
 
     /// カメラが動いているときの画面
@@ -48,36 +62,42 @@ struct ContentView: View {
                                         converter: converter)
                     HandSkeletonView(hands: viewModel.hands,
                                      frames: viewModel.layoutFrames,
-                                     converter: converter)
+                                     converter: converter,
+                                     minConfidence: viewModel.settings.minConfidence)
                 }
             }
             .ignoresSafeArea()
 
-            VStack {
+            VStack(spacing: 8) {
+                TextDisplayView(text: viewModel.typedText,
+                                onBackspace: { viewModel.backspace() },
+                                onNewline: { viewModel.newline() },
+                                onClear: { viewModel.clearText() })
+
+                if viewModel.calibration == nil && !viewModel.isCalibrating {
+                    hintBanner("まず下の「キャリブレーション」を押して、両手をホームポジションに置いてください")
+                }
+
                 Spacer()
+
                 if viewModel.isCalibrating {
                     CalibrationOverlayView(phase: viewModel.calibrationPhase,
                                            message: viewModel.calibrationMessage,
                                            onCancel: { viewModel.cancelCalibration() })
                 }
-                bottomBar
+
+                ControlBarView(viewModel: viewModel, onOpenSettings: { isShowingSettings = true })
             }
         }
     }
 
-    /// 画面下の操作ボタン
-    private var bottomBar: some View {
-        HStack {
-            Button {
-                viewModel.startCalibration()
-            } label: {
-                Label(viewModel.calibration == nil ? "キャリブレーション" : "再キャリブレーション",
-                      systemImage: "hand.raised")
-            }
-            .buttonStyle(.borderedProminent)
-            .disabled(viewModel.isCalibrating)
-        }
-        .padding()
+    private func hintBanner(_ text: String) -> some View {
+        Text(text)
+            .font(.callout)
+            .padding(10)
+            .background(.yellow.opacity(0.85), in: RoundedRectangle(cornerRadius: 10))
+            .foregroundStyle(.black)
+            .padding(.horizontal)
     }
 }
 

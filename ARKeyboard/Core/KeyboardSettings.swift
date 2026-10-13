@@ -1,5 +1,22 @@
 import Foundation
 
+/// 膝モード / 机モード
+enum KeyboardMode: String, Codable, CaseIterable, Identifiable {
+    /// 膝の上で打つ。面がやわらかく(止まり方がゆるやか)、脚も動くので、判定をゆるめにする
+    case knee
+    /// 机の上で打つ。面が硬く(ピタッと止まる)、動かないので、判定を厳しめ・キー位置を固定にする
+    case desk
+
+    var id: String { rawValue }
+
+    var japaneseName: String {
+        switch self {
+        case .knee: return "膝モード"
+        case .desk: return "机モード"
+        }
+    }
+}
+
 /// キー配置を何に固定するか
 enum LayoutAnchor: String, Codable, CaseIterable, Identifiable {
     /// 手の動きについていく(膝が動いてもずれにくい。ただし手ごと大きく動かしても同じキーのまま)
@@ -18,7 +35,13 @@ enum LayoutAnchor: String, Codable, CaseIterable, Identifiable {
 }
 
 /// アプリの設定(UserDefaults に保存する)
+///
+/// 各プロパティに書いてある値は「土台の値」です。アプリの初回起動時は
+/// `KeyboardSettings.defaults(for: .knee)` を使い、モードごとの初期値を当てはめます。
 struct KeyboardSettings: Codable, Equatable {
+    /// 膝モード / 机モード
+    var mode: KeyboardMode = .knee
+
     /// 関節点の信頼度のしきい値。これより低い点は無視する。
     var minConfidence: Double = 0.3
     /// Vision の左右判定を入れ替える(左右が逆に認識されるとき用)
@@ -39,6 +62,59 @@ struct KeyboardSettings: Codable, Equatable {
     var sensitivity: Double = 0.5
     /// タップ判定のしきい値
     var tap = TapParameters()
+
+    /// タップ時の触覚フィードバック
+    var hapticsEnabled: Bool = true
+    /// タップ時の効果音
+    var soundEnabled: Bool = true
+
+    /// デバッグ表示
+    var showDebug: Bool = false
     /// デバッグ表示で速度グラフを出す指
     var debugFinger = FingerID(chirality: .right, finger: .index)
+
+    /// 指定したモードの初期値で作った設定
+    static func defaults(for mode: KeyboardMode) -> KeyboardSettings {
+        var settings = KeyboardSettings()
+        settings.applyModeDefaults(mode)
+        return settings
+    }
+
+    /// モードを切り替え、「モードによって変わる値」をそのモードの初期値に戻す。
+    /// (触覚・効果音・デバッグ表示などの好みの設定はそのまま残す)
+    ///
+    /// ★ 初期値はここにまとめています。実機で試して、よく合う値が見つかったらここを書き換えてください。
+    mutating func applyModeDefaults(_ mode: KeyboardMode) {
+        self.mode = mode
+        switch mode {
+        case .knee:
+            keyScale = 1.15           // 膝は位置がぶれやすいので、キーを大きめに
+            anchor = .followHand      // 脚が動いてもキーが手についてくるように
+            maxKeyDistance = 1.5
+            tap = TapParameters(
+                downSpeed: 0.9,       // 布や脚はやわらかく、指の速さが出にくいので低め
+                stopRatio: 0.45,      // やわらかい面では止まり方がゆるやかなので、ゆるめに
+                minTravel: 0.05,
+                maxDownDuration: 0.3,
+                cooldown: 0.15,
+                maxPalmSpeed: 2.0,    // 脚の揺れで手全体が動きやすいので、少し許容する
+                smoothing: 0.35,
+                sameHandLockout: 0.06,
+                direction: .towardWrist)
+        case .desk:
+            keyScale = 1.0
+            anchor = .fixed           // 机とカメラが動かない前提で、実物のキーボードのように固定
+            maxKeyDistance = 1.3
+            tap = TapParameters(
+                downSpeed: 1.2,       // 硬い面では指が速く当たってピタッと止まる
+                stopRatio: 0.35,
+                minTravel: 0.06,
+                maxDownDuration: 0.25,
+                cooldown: 0.15,
+                maxPalmSpeed: 1.5,
+                smoothing: 0.3,
+                sameHandLockout: 0.06,
+                direction: .towardWrist)
+        }
+    }
 }

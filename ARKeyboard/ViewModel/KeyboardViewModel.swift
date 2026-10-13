@@ -1,5 +1,7 @@
 import Foundation
 import Observation
+import UIKit
+import AudioToolbox
 
 /// 画面(View)とロジックをつなぐクラス。
 ///
@@ -11,7 +13,7 @@ import Observation
 ///
 /// 役割分担:
 /// - 計算(左右の割り当て・座標系・キャリブレーション・タップ判定)は KeyboardEngine(Core)
-/// - このクラスは「カメラ → エンジン → 画面」の受け渡しと、触覚・音などの iPhone 固有の処理
+/// - このクラスは「カメラ → エンジン → 画面」の受け渡しと、触覚・音・保存などの iPhone 固有の処理
 @Observable
 final class KeyboardViewModel {
     // MARK: 画面に表示する状態
@@ -36,14 +38,32 @@ final class KeyboardViewModel {
     /// 押されたキーと押された時刻(押した瞬間にキーを光らせる)
     var pressedKeys: [String: Date] = [:]
 
+    /// 入力された文字列
+    var typedText = ""
+
+    /// 設定。画面から直接書き換えてよい(毎フレーム、エンジンに反映されます)。
+    /// 保存は ContentView の onChange から saveSettings() を呼んで行います。
+    var settings: KeyboardSettings
+
     // MARK: 内部で使うもの(View から監視する必要がないので @ObservationIgnored)
 
     /// カメラ
     @ObservationIgnored let camera = CameraManager()
     /// 計算を担当するエンジン
-    @ObservationIgnored private let engine = KeyboardEngine()
+    @ObservationIgnored private let engine: KeyboardEngine
+    /// 触覚フィードバック(軽い「コツッ」)
+    @ObservationIgnored private let haptics = UIImpactFeedbackGenerator(style: .light)
+    /// 完了時の触覚フィードバック(「ブブッ」)
+    @ObservationIgnored private let notificationHaptics = UINotificationFeedbackGenerator()
+
+    /// UserDefaults に保存するときのキー(名前)
+    private static let settingsKey = "KeyboardSettings.v1"
 
     init() {
+        let loaded = Self.loadSettings()
+        settings = loaded
+        engine = KeyboardEngine(settings: loaded)
+
         // カメラから1コマ届くたびに handle(_:) を呼んでもらう。
         // [weak self] にするのは、ViewModel → camera → クロージャ → ViewModel という
         // 「循環参照」(お互いを離さずメモリが解放されない状態)を防ぐためです。
@@ -57,11 +77,44 @@ final class KeyboardViewModel {
         camera.start { [weak self] status in
             self?.cameraStatus = status
         }
+        // 触覚フィードバックの準備(最初の1回が遅れないように、あらかじめエンジンを起こしておく)
+        haptics.prepare()
+        // キーボードとして使っている間は、画面が自動で消えないようにする
+        UIApplication.shared.isIdleTimerDisabled = true
     }
 
     /// 画面が消えたとき・バックグラウンドに入ったときに呼ぶ
     func stop() {
         camera.stop()
+        UIApplication.shared.isIdleTimerDisabled = false
+    }
+
+    // MARK: 設定
+
+    /// モードを切り替える(モードごとの初期値も当てはめる)
+    func setMode(_ mode: KeyboardMode) {
+        settings.applyModeDefaults(mode)
+    }
+
+    /// 今のモードの初期値に戻す
+    func resetToModeDefaults() {
+        settings.applyModeDefaults(settings.mode)
+    }
+
+    func saveSettings() {
+        // Codable なので JSON に変換して保存できる
+        if let data = try? JSONEncoder().encode(settings) {
+            UserDefaults.standard.set(data, forKey: Self.settingsKey)
+        }
+    }
+
+    private static func loadSettings() -> KeyboardSettings {
+        guard let data = UserDefaults.standard.data(forKey: settingsKey),
+              let settings = try? JSONDecoder().decode(KeyboardSettings.self, from: data) else {
+            // 初回起動(または保存形式が変わった)なら、膝モードの初期値から始める
+            return KeyboardSettings.defaults(for: .knee)
+        }
+        return settings
     }
 
     // MARK: キャリブレーション
@@ -86,10 +139,36 @@ final class KeyboardViewModel {
         syncCalibrationState()
     }
 
+    // MARK: テキスト編集(画面のボタンから呼ぶ)
+
+    func insert(_ text: String) {
+        typedText += text
+    }
+
+    func backspace() {
+        guard !typedText.isEmpty else { return }
+        typedText.removeLast()
+    }
+
+    func newline() {
+        insert("\n")
+    }
+
+    func clearText() {
+        typedText = ""
+    }
+
     // MARK: フレーム処理
 
     /// 1コマ分の認識結果を受け取る(メインスレッド)
     private func handle(_ frame: VisionFrame) {
+        // 画面で変えた設定を、毎フレームエンジンに反映する(struct のコピーなので軽い)
+        engine.settings = settings
+        // キーの大きさが変わったときなど、キーが作り直されていたら画面にも反映
+        if engine.keys != keys {
+            keys = engine.keys
+        }
+
         imageSize = frame.imageSize
         let output = engine.process(frame)
         hands = output.hands
@@ -99,6 +178,7 @@ final class KeyboardViewModel {
         if let result = output.calibrationFinished {
             calibration = result
             keys = engine.keys
+            notificationHaptics.notificationOccurred(.success)
         }
         for tap in output.taps {
             handleTap(tap)
@@ -109,6 +189,17 @@ final class KeyboardViewModel {
     private func handleTap(_ tap: TapResult) {
         guard let key = tap.key else { return }
         pressedKeys[key.id] = Date()
+        insert(key.output)
+
+        if settings.hapticsEnabled {
+            haptics.impactOccurred()
+            haptics.prepare()
+        }
+        if settings.soundEnabled {
+            // 1104 は iOS のキーボードのクリック音(システムサウンド)。
+            // 音声ファイルを用意しなくても鳴らせます(消音モードでは鳴りません)。
+            AudioServicesPlaySystemSound(1104)
+        }
     }
 
     private func syncCalibrationState() {

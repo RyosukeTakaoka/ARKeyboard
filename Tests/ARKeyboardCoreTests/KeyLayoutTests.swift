@@ -82,3 +82,32 @@ final class KeyLayoutTests: XCTestCase {
         XCTAssertFalse(shiftedOutput.hoveredKeyIDs.contains("left-F"))
     }
 }
+
+final class SettingsTests: XCTestCase {
+    func testModeDefaultsDiffer() {
+        let knee = KeyboardSettings.defaults(for: .knee)
+        let desk = KeyboardSettings.defaults(for: .desk)
+        XCTAssertGreaterThan(knee.keyScale, desk.keyScale)
+        XCTAssertLessThan(knee.tap.downSpeed, desk.tap.downSpeed)
+        XCTAssertEqual(knee.anchor, .followHand)
+        XCTAssertEqual(desk.anchor, .fixed)
+    }
+
+    func testModeSwitchKeepsPersonalPreferences() {
+        var settings = KeyboardSettings.defaults(for: .knee)
+        settings.soundEnabled = false
+        settings.showDebug = true
+        settings.applyModeDefaults(.desk)
+        XCTAssertEqual(settings.mode, .desk)
+        XCTAssertFalse(settings.soundEnabled)
+        XCTAssertTrue(settings.showDebug)
+    }
+
+    func testSettingsRoundTripThroughJSON() throws {
+        var settings = KeyboardSettings.defaults(for: .desk)
+        settings.sensitivity = 0.8
+        settings.debugFinger = FingerID(chirality: .left, finger: .ring)
+        let data = try JSONEncoder().encode(settings)
+        XCTAssertEqual(try JSONDecoder().decode(KeyboardSettings.self, from: data), settings)
+    }
+}
