@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  このファイルには「自分で書く必要がある Info.plist の項目」だけを置いています。
+  それ以外の基本的な項目(アプリ名、起動画面など)は、Xcode のビルド設定
+  (GENERATE_INFOPLIST_FILE = YES)によって自動生成され、ビルド時にこのファイルと合体されます。
+
+  NSCameraUsageDescription:
+    カメラを使うアプリは、この説明文が無いと、カメラにアクセスした瞬間にアプリが強制終了します。
+    初回起動時の「カメラへのアクセスを許可しますか?」ダイアログに、この文章が表示されます。
+-->
+<plist version="1.0">
+<dict>
+	<key>NSCameraUsageDescription</key>
+	<string>両手の指先の位置をカメラで認識し、キーボード入力に変換するためにカメラを使用します。映像は端末の中だけで処理され、保存や送信はされません。</string>
+</dict>
+</plist>

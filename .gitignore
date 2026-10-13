@@ -1,0 +1,12 @@
+# Xcode
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+
+# Swift Package Manager(ロジックのテスト用)
+.build/
+.swiftpm/
+
+# macOS
+.DS_Store
