@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// 画面下の操作バー(感度スライダー、キャリブレーション、モード表示、設定)。
+/// 画面下の操作バー(感度スライダー、キャリブレーション、練習、デバッグ、設定)。
 struct ControlBarView: View {
     /// @Bindable を付けると、@Observable なクラスのプロパティを
     /// `$viewModel.settings.sensitivity` のように Binding(双方向の結びつき)として渡せます。
@@ -14,9 +14,14 @@ struct ControlBarView: View {
                 Image(systemName: "tortoise")
                 Slider(value: $viewModel.settings.sensitivity, in: 0...1)
                 Image(systemName: "hare")
-                Text("感度 \(Int(viewModel.settings.sensitivity * 100))")
-                    .font(.caption.monospacedDigit())
-                    .frame(width: 60, alignment: .trailing)
+                VStack(alignment: .trailing, spacing: 0) {
+                    Text("感度 \(Int(viewModel.settings.sensitivity * 100))")
+                        .font(.caption.monospacedDigit())
+                    Text(viewModel.settings.mode.japaneseName)
+                        .font(.system(size: 9))
+                        .foregroundStyle(.secondary)
+                }
+                .frame(width: 60, alignment: .trailing)
             }
 
             HStack {
@@ -25,17 +30,27 @@ struct ControlBarView: View {
                 } label: {
                     Label(viewModel.calibration == nil ? "キャリブレーション" : "再キャリブレーション",
                           systemImage: "hand.raised")
+                        // 画面が狭い機種でも1行に収まるよう、必要なら文字を少し縮める
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(viewModel.isCalibrating)
 
                 Spacer()
 
-                Text(viewModel.settings.mode.japaneseName)
-                    .font(.caption)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(.thinMaterial, in: Capsule())
+                // 練習モードの開始/終了
+                Button {
+                    if viewModel.practice == nil {
+                        viewModel.startPractice()
+                    } else {
+                        viewModel.stopPractice()
+                    }
+                } label: {
+                    Image(systemName: viewModel.practice == nil ? "graduationcap" : "graduationcap.fill")
+                }
+                .buttonStyle(.bordered)
+                .accessibilityLabel("練習モード")
 
                 // デバッグ表示の切り替え(てんとう虫=「バグ」のアイコン)
                 Toggle(isOn: $viewModel.settings.showDebug) {

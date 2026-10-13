@@ -40,6 +40,8 @@ final class KeyboardViewModel {
 
     /// 入力された文字列
     var typedText = ""
+    /// 練習モード(nil なら練習していない)
+    var practice: PracticeSession?
 
     // MARK: デバッグ表示用
 
@@ -78,11 +80,19 @@ final class KeyboardViewModel {
 
     /// UserDefaults に保存するときのキー(名前)
     private static let settingsKey = "KeyboardSettings.v1"
+    private static let calibrationKey = "CalibrationResult.v1"
 
     init() {
         let loaded = Self.loadSettings()
         settings = loaded
         engine = KeyboardEngine(settings: loaded)
+
+        // 前回のキャリブレーションがあれば再利用する(毎回やり直さなくてよいように)
+        if let saved = Self.loadCalibration() {
+            engine.setCalibration(saved)
+            calibration = saved
+            keys = engine.keys
+        }
 
         // カメラから1コマ届くたびに handle(_:) を呼んでもらう。
         // [weak self] にするのは、ViewModel → camera → クロージャ → ViewModel という
@@ -159,13 +169,51 @@ final class KeyboardViewModel {
         syncCalibrationState()
     }
 
+    /// 保存したキャリブレーションを消す
+    func deleteCalibration() {
+        engine.setCalibration(nil)
+        calibration = nil
+        keys = [:]
+        UserDefaults.standard.removeObject(forKey: Self.calibrationKey)
+    }
+
+    private func saveCalibration(_ result: CalibrationResult) {
+        if let data = try? JSONEncoder().encode(result) {
+            UserDefaults.standard.set(data, forKey: Self.calibrationKey)
+        }
+    }
+
+    private static func loadCalibration() -> CalibrationResult? {
+        guard let data = UserDefaults.standard.data(forKey: calibrationKey) else { return nil }
+        return try? JSONDecoder().decode(CalibrationResult.self, from: data)
+    }
+
+    // MARK: 練習モード
+
+    /// 経過時間の計算に使う「今の時刻」(端末起動からの秒数。時計の変更に影響されない)
+    var now: Double { ProcessInfo.processInfo.systemUptime }
+
+    func startPractice() {
+        practice = PracticeSession()
+    }
+
+    func stopPractice() {
+        practice = nil
+    }
+
+    func nextPracticeSentence() {
+        practice?.next()
+    }
+
     // MARK: テキスト編集(画面のボタンから呼ぶ)
 
     func insert(_ text: String) {
         typedText += text
+        practice?.input(text, at: now)
     }
 
     func backspace() {
+        practice?.backspace()
         guard !typedText.isEmpty else { return }
         typedText.removeLast()
     }
@@ -200,6 +248,7 @@ final class KeyboardViewModel {
         if let result = output.calibrationFinished {
             calibration = result
             keys = engine.keys
+            saveCalibration(result)
             notificationHaptics.notificationOccurred(.success)
         }
         for tap in output.taps {

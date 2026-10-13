@@ -12,6 +12,7 @@ struct SettingsView: View {
                 tapSection
                 layoutSection
                 feedbackSection
+                calibrationSection
                 debugSection
             }
             .navigationTitle("設定")
@@ -119,6 +120,30 @@ struct SettingsView: View {
             Text("キー配置")
         } footer: {
             Text("手に追従: 膝が動いてもずれにくい。面に固定: 実物のキーボードに近いが、カメラや面が動いたら再キャリブレーションが必要。\n左右が逆に表示される(左手が右手の色)ときは「入れ替える」をオンに。")
+        }
+    }
+
+    // MARK: - キャリブレーション
+
+    private var calibrationSection: some View {
+        Section {
+            if let calibration = viewModel.calibration {
+                LabeledContent("保存日時", value: calibration.createdAt.formatted(date: .abbreviated, time: .shortened))
+                LabeledContent("キー間隔(左/右)",
+                               value: String(format: "%.2f / %.2f 手", calibration.left.keyPitch, calibration.right.keyPitch))
+                LabeledContent("奥行きの縮み(左/右)",
+                               value: String(format: "%.2f / %.2f", calibration.left.foreshortening, calibration.right.foreshortening))
+                Button("保存したキャリブレーションを削除", role: .destructive) {
+                    viewModel.deleteCalibration()
+                }
+            } else {
+                Text("まだキャリブレーションしていません")
+                    .foregroundStyle(.secondary)
+            }
+        } header: {
+            Text("キャリブレーション")
+        } footer: {
+            Text("キャリブレーションの結果は保存され、次回の起動時にも使われます。カメラの位置や姿勢を変えたら、やり直してください。")
         }
     }
 

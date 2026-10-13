@@ -78,6 +78,13 @@ struct ContentView: View {
                     hintBanner("まず下の「キャリブレーション」を押して、両手をホームポジションに置いてください")
                 }
 
+                if let practice = viewModel.practice {
+                    PracticeView(session: practice,
+                                 now: { viewModel.now },
+                                 onNext: { viewModel.nextPracticeSentence() },
+                                 onStop: { viewModel.stopPractice() })
+                }
+
                 if viewModel.settings.showDebug {
                     DebugOverlayView(viewModel: viewModel)
                 }
