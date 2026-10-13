@@ -76,6 +76,11 @@ struct ContentView: View {
                                           frames: viewModel.layoutFrames,
                                           projection: projection)
                     }
+                    if viewModel.settings.overlayMode == .heatmap {
+                        HeatmapOverlayView(points: viewModel.heatmapPoints,
+                                           frames: viewModel.layoutFrames,
+                                           projection: projection)
+                    }
                     KeyboardOverlayView(keys: viewModel.keys,
                                         frames: viewModel.layoutFrames,
                                         hoveredKeyIDs: viewModel.hoveredKeyIDs,

@@ -47,6 +47,10 @@ final class KeyboardViewModel {
     var pressedKeys: [String: Date] = [:]
     /// 当たり判定の地図(当たり判定ビューを表示しているときだけ計算する)
     var hitMaps: [Chirality: HitMap] = [:]
+    /// ヒートマップ(実際に押した場所)。ヒートマップ表示のときだけ更新する
+    var heatmapPoints: [Chirality: [(key: Key, points: [Vec2])]] = [:]
+    /// 個人適応で学習したタップの数
+    var adaptationSampleCount = 0
 
     /// 入力された文字列
     var typedText = ""
@@ -133,6 +137,12 @@ final class KeyboardViewModel {
         settings = loaded
         engine = KeyboardEngine(settings: loaded)
         loadLanguageModels()
+
+        // 個人適応の学習データ(端末内に保存)を読み込む
+        if let data = try? Data(contentsOf: Self.adaptationURL), let saved = PersonalAdaptation.load(from: data) {
+            engine.setAdaptation(saved)
+            adaptationSampleCount = saved.totalSamples
+        }
 
         // 前回登録した机の平面があれば使う
         if let data = UserDefaults.standard.data(forKey: Self.deskPlaneKey),
@@ -226,6 +236,7 @@ final class KeyboardViewModel {
 
     /// 画面が消えたとき・バックグラウンドに入ったときに呼ぶ
     func stop() {
+        saveAdaptation()
         activeSource.stop()
         audioSensor.stop()
         motionSensor.stop()
@@ -345,6 +356,42 @@ final class KeyboardViewModel {
     private static func loadCalibration() -> CalibrationResult? {
         guard let data = UserDefaults.standard.data(forKey: calibrationKey) else { return nil }
         return try? JSONDecoder().decode(CalibrationResult.self, from: data)
+    }
+
+    // MARK: 個人適応(押しがちなずれ)とヒートマップ
+
+    /// 保存場所(アプリの Application Support フォルダ。「ファイル」アプリからは見えない)
+    static var adaptationURL: URL {
+        let dir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        return dir.appendingPathComponent("personal_adaptation.json")
+    }
+
+    func saveAdaptation() {
+        let adaptation = engine.adaptation
+        guard let data = try? JSONEncoder().encode(adaptation) else { return }
+        try? FileManager.default.createDirectory(at: Self.adaptationURL.deletingLastPathComponent(),
+                                                 withIntermediateDirectories: true)
+        try? data.write(to: Self.adaptationURL, options: .atomic)
+    }
+
+    /// 個人適応の学習データを消す
+    func resetAdaptation() {
+        engine.setAdaptation(PersonalAdaptation())
+        adaptationSampleCount = 0
+        heatmapPoints = [:]
+        try? FileManager.default.removeItem(at: Self.adaptationURL)
+    }
+
+    private func updateHeatmapIfNeeded() {
+        guard settings.overlayMode == .heatmap else {
+            if !heatmapPoints.isEmpty { heatmapPoints = [:] }
+            return
+        }
+        var points: [Chirality: [(key: Key, points: [Vec2])]] = [:]
+        for chirality in Chirality.allCases {
+            points[chirality] = engine.adaptation.heatmapPoints(keys: keys[chirality] ?? [])
+        }
+        heatmapPoints = points
     }
 
     // MARK: 机の四隅の登録(机モード)
@@ -513,6 +560,7 @@ final class KeyboardViewModel {
 
     func backspace() {
         recordingSession?.addEdit(.backspace, at: now)
+        engine.noteBackspace()
         practice?.backspace()
         guard !typedText.isEmpty else { return }
         typedText.removeLast()
@@ -608,7 +656,13 @@ final class KeyboardViewModel {
         if tapLog.count > Self.tapLogLimit {
             tapLog.removeLast(tapLog.count - Self.tapLogLimit)
         }
-        if !results.isEmpty { syncRecordingState() }
+        if !results.isEmpty {
+            syncRecordingState()
+            adaptationSampleCount = engine.adaptation.totalSamples
+            updateHeatmapIfNeeded()
+            // 20 回ごとに保存する(アプリが落ちても学習が消えないように)
+            if tapLogCounter % 20 == 0 { saveAdaptation() }
+        }
     }
 
     /// デバッグ表示用の記録(表示していないときは、グラフの記録を省いて少しでも軽くする)

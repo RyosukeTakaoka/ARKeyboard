@@ -12,7 +12,7 @@
 //
 //   swift run -c release arkeyboard-replay synth --out 出力.json [オプション]   → 合成の記録を作る
 //     --text "the quick brown fox"   打つ文章(既定: 練習モードのお題をつなげたもの)
-//     --seed 1 --mode knee|desk --aim-noise 0.25 --interval 0.55 --false-onsets 0.3
+//     --seed 1 --mode knee|desk --aim-noise 0.25 --interval 0.6 --false-onsets 0.3 --finger-bias 0.3
 import Foundation
 @testable import ARKeyboardCore
 
@@ -76,6 +76,7 @@ case "synth":
     if let v = option("--aim-noise").flatMap(Double.init) { config.aimNoise = v }
     if let v = option("--interval").flatMap(Double.init) { config.interval = v }
     if let v = option("--false-onsets").flatMap(Double.init) { config.falseOnsetRate = v }
+    if let v = option("--finger-bias").flatMap(Double.init) { config.fingerBias = v }
     let recording = SyntheticRecordingGenerator.generate(config)
     do {
         try RecordingIO.encoder().encode(recording).write(to: URL(fileURLWithPath: out))

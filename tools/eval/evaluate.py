@@ -36,6 +36,9 @@ VARIANTS = [
                                           "personalAdaptation": False, "levelBModel": False, "wordDecoder": False}}),
     ("+音+デコーダー+言語モデル", {"features": {"audioOnset": True, "decoder": True, "languageModel": True,
                                            "personalAdaptation": False, "levelBModel": False, "wordDecoder": False}}),
+    ("+音+デコーダー+言語モデル+個人適応", {"features": {"audioOnset": True, "decoder": True, "languageModel": True,
+                                                "personalAdaptation": True, "levelBModel": False,
+                                                "wordDecoder": False}}),
 ]
 
 
@@ -54,8 +57,9 @@ def replay(cmd: list[str], recording: str, name: str, patch: dict, noise: float 
     return json.loads(out.stdout)
 
 
-def synthesize(cmd: list[str], path: str, seed: int, mode: str, text: str | None = None) -> None:
-    extra = ["--text", text] if text else []
+def synthesize(cmd: list[str], path: str, seed: int, mode: str, text: str | None = None,
+               finger_bias: float = 0.0) -> None:
+    extra = (["--text", text] if text else []) + ["--finger-bias", str(finger_bias)]
     subprocess.run(cmd + ["synth", "--out", path, "--seed", str(seed), "--mode", mode] + extra,
                    check=True, capture_output=True, text=True, cwd=ROOT)
 
@@ -86,6 +90,12 @@ def main() -> None:
             path = os.path.relpath(os.path.join(tmpdir, f"synthetic-{seed}-{mode}.json"), ROOT)
             synthesize(cmd, path, seed, mode)
             recordings.append(path)
+        # 5: 指ごとの押し癖(いつも同じ方向に 0.35 キーずれる)がある人(個人適応の効果を見るため)
+        path = os.path.relpath(os.path.join(tmpdir, "synthetic-5-knee-bias.json"), ROOT)
+        long_text = " ".join([open(os.path.join(ROOT, "tools", "eval", "texts", "heldout_english.txt"),
+                                   encoding="utf-8").read()] * 3)
+        synthesize(cmd, path, 5, "knee", long_text, finger_bias=0.35)
+        recordings.append(path)
         # 4: 言語モデルの学習データに含まれない英文(言語モデルの効果を公平に測るため)
         with open(os.path.join(ROOT, "tools", "eval", "texts", "heldout_english.txt"), encoding="utf-8") as f:
             heldout = f.read()

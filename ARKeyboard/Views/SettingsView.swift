@@ -15,6 +15,7 @@ struct SettingsView: View {
                 tapSection
                 sensorSection
                 decoderSection
+                adaptationSection
                 layoutSection
                 feedbackSection
                 // LiDAR が無い機種では、この設定自体を出さない
@@ -211,6 +212,29 @@ struct SettingsView: View {
             Text("デコーダー(空間タッチモデル)")
         } footer: {
             Text("キーを「確率の場」として扱い、位置の確率 × 文脈の確率 で最も確からしいキーを選びます(Goodman ら 2002、Gunawardana ら 2010)。「当たり判定」表示にすると、文脈で各キーの領域が広がる様子が見えます。")
+        }
+    }
+
+    // MARK: - 個人適応とヒートマップ
+
+    private var adaptationSection: some View {
+        Section {
+            Toggle("個人適応を使う", isOn: $viewModel.settings.features.personalAdaptation)
+            LabeledContent("学習したタップの数", value: "\(viewModel.adaptationSampleCount)")
+            ParameterSlider(title: "初期値の強さ", value: $viewModel.settings.adaptation.priorStrength, range: 1...100,
+                            format: { "\(Int($0)) 回分" },
+                            help: "この回数分のタップが集まるまでは、初期値(ずれ 0)の影響が大きく残る。小さいほど早く学ぶが、ぶれやすい。")
+            ParameterSlider(title: "ずれの上限", value: $viewModel.settings.adaptation.maxOffset, range: 0.1...1.0,
+                            format: { String(format: "%.2f キー", $0) })
+            ParameterSlider(title: "学習に使う確信度の下限", value: $viewModel.settings.adaptation.minPosterior, range: 0.5...0.99,
+                            format: { "\(Int($0 * 100))%" })
+            Button("学習データを消す", role: .destructive) {
+                viewModel.resetAdaptation()
+            }
+        } header: {
+            Text("個人適応とヒートマップ")
+        } footer: {
+            Text("確信度の高い入力と、削除して打ち直した箇所から、指×キーごとの「押しがちなずれ」を端末の中だけで学習します(外部に送信しません)。重ねる表示を「ヒートマップ」にすると、実際に押した場所が見えます。")
         }
     }
 

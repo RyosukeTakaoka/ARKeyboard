@@ -89,6 +89,11 @@ final class KeyboardEngine {
     var tapClassifier: TapClassifier?
     /// 指ごとの、最後に入力が採用された時刻(クールダウン用)
     private var lastAcceptedTime: [FingerID: Double] = [:]
+    /// 個人適応(押しがちなずれの学習)。学習は常に行い、モデルへの反映は設定がオンのときだけ
+    private(set) var adaptation = PersonalAdaptation()
+    /// 空間タッチモデルに反映した個人適応の番号
+    private var appliedAdaptationVersion = -1
+    private var appliedAdaptationEnabled = false
     /// 指ごとの「手のひらに対する指先の位置」(手の座標)の直近の履歴(レベルB の特徴量用)
     private var tipHistory: [FingerID: [Vec2]] = [:]
     /// 机の平面(机モードで四隅を登録したとき)
@@ -125,9 +130,33 @@ final class KeyboardEngine {
         syncDecoderSettings()
     }
 
+    /// 個人適応の学習データを入れ替える(保存データの読み込み)
+    func setAdaptation(_ value: PersonalAdaptation) {
+        adaptation = value
+        appliedAdaptationVersion = -1
+    }
+
+    /// 削除ボタンが押された(個人適応で「間違いだった」と記録する)
+    func noteBackspace() {
+        adaptation.noteBackspace()
+    }
+
     /// デコーダーの設定と、使う言語モデルを反映する
     private func syncDecoderSettings() {
         decoder.config = settings.decoder
+        adaptation.config = settings.adaptation
+        // 個人適応: 学習データが変わったとき・オンオフが変わったときだけ、空間タッチモデルに反映し直す
+        let enabled = settings.features.personalAdaptation
+        if enabled != appliedAdaptationEnabled || (enabled && adaptation.version != appliedAdaptationVersion) {
+            if enabled {
+                let allKeys = Chirality.allCases.flatMap { keys[$0] ?? [] }
+                decoder.spatial.setLearned(adaptation.learnedGaussians(keys: allKeys, priorSigma: settings.decoder.keySigma))
+            } else {
+                decoder.spatial.resetLearned()
+            }
+            appliedAdaptationEnabled = enabled
+            appliedAdaptationVersion = adaptation.version
+        }
         let english = languageModels[.english], romaji = languageModels[.romaji]
         switch settings.decoder.language {
         case .english:
@@ -411,6 +440,9 @@ final class KeyboardEngine {
             result.key = chosen.key
             result.decode = chosen.decode
             if let key = chosen.key {
+                // 個人適応のために記録する(確信度はデコーダーの事後確率。デコーダーを使わないときは仮に 0.9)
+                let posterior = chosen.decode?.candidates.first { $0.key.id == key.id }?.probability ?? 0.9
+                adaptation.recordTap(finger: touch.finger, key: key, location: touch.surfaceLocation, posterior: posterior)
                 runningContext += key.output
                 lastKeyTime = touch.time
                 lastAcceptedTime[decision.payload.event.finger] = decision.time

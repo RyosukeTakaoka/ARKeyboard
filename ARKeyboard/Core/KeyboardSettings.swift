@@ -116,6 +116,8 @@ struct KeyboardSettings: Codable, Equatable {
     var fusion = FusionConfig()
     /// デコーダー(空間タッチモデル × 言語モデル)の設定
     var decoder = DecoderConfig()
+    /// 個人適応の設定
+    var adaptation = AdaptationConfig()
     /// レベルB: この確率より低い候補はタップにしない
     var levelBThreshold: Double = 0.5
     /// レベルB: 位置の補正を使う

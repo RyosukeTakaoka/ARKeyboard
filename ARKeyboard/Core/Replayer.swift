@@ -150,7 +150,10 @@ final class Replayer {
                 }
                 collect(engine.ingestOnsets(newOnsets, source: .motion, coveredUntil: time, now: time))
             case .edit(let event):
-                if event.kind == .backspace, !typed.isEmpty { typed.removeLast() }
+                if event.kind == .backspace, !typed.isEmpty {
+                    typed.removeLast()
+                    engine.noteBackspace()
+                }
                 if event.kind == .newline { typed += "\n" }
             }
         }

@@ -38,6 +38,8 @@ struct SyntheticTypingConfig: Codable {
     var falseOnsetRate: Double = 0.3
     /// フレーム落ちの割合
     var frameDropRate: Double = 0.01
+    /// 指ごとの押し癖(いつも同じ方向にずれる大きさ。キー間隔に対する割合)。個人適応の効果を見るため
+    var fingerBias: Double = 0
     var mode: KeyboardMode = .knee
 }
 
@@ -56,6 +58,13 @@ enum SyntheticRecordingGenerator {
         var recording = Recording(createdAt: Date(timeIntervalSince1970: 0), device: "synthetic",
                                   task: task, settings: settings, calibration: nil, deskPlane: nil)
 
+        // 指ごとの押し癖(方向はランダム、大きさは fingerBias)
+        var biases: [FingerID: Vec2] = [:]
+        for finger in FingerID.all {
+            let angle = rng.nextUniform() * 2 * Double.pi
+            biases[finger] = Vec2(cos(angle), sin(angle)) * config.fingerBias
+        }
+
         // 各文字の動きの予定(どの指を、いつ、どこへ)
         struct Stroke { var finger: FingerID; var start: Double; var aim: Vec2; var contact: Double }
         let typingStart = 3.0  // 最初の 3 秒は、自動キャリブレーション用に静止
@@ -68,8 +77,9 @@ enum SyntheticRecordingGenerator {
                 : keys.first { $0.output == target && !$0.isSpace }
             guard let key else { continue }
             let cal = key.hand == .left ? calLeft : calRight
-            let aimNoise = Vec2(rng.nextGaussian() * config.aimNoise * cal.keyPitch,
-                                rng.nextGaussian() * config.aimNoise * cal.rowPitch)
+            let bias = biases[FingerID(chirality: key.hand, finger: key.finger)] ?? .zero
+            let aimNoise = Vec2((rng.nextGaussian() * config.aimNoise + bias.x) * cal.keyPitch,
+                                (rng.nextGaussian() * config.aimNoise + bias.y) * cal.rowPitch)
             let contact = start + config.reachDuration + 0.05 + config.tapDuration
             strokes.append(Stroke(finger: FingerID(chirality: key.hand, finger: key.finger), start: start,
                                   aim: key.center + aimNoise, contact: contact))
