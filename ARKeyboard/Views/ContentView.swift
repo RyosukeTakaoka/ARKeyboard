@@ -14,6 +14,14 @@ struct ContentView: View {
             case .running:
                 CameraPreviewView(session: viewModel.camera.session)
                     .ignoresSafeArea()
+                // カメラ映像の上に重ねる表示。プレビューと「同じ大きさ・同じ位置」に置くことが大切です
+                // (そうしないと、画像座標→画面座標の変換がずれます)。
+                GeometryReader { geometry in
+                    let converter = CoordinateConverter(imageSize: viewModel.imageSize,
+                                                        viewSize: Vec2(geometry.size))
+                    HandSkeletonView(hands: viewModel.hands, converter: converter)
+                }
+                .ignoresSafeArea()
             default:
                 CameraStatusView(status: viewModel.cameraStatus)
             }
