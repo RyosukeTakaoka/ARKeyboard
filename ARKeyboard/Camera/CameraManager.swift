@@ -51,8 +51,8 @@ final class CameraManager: NSObject, FrameSource {
     /// 1コマごとの処理を行うキュー。qos(優先度)を高めにして、遅れにくくします。
     private let videoQueue = DispatchQueue(label: "ARKeyboard.camera.video", qos: .userInitiated)
 
-    /// 手の検出(videoQueue からだけ使う)
-    private let detector = HandPoseDetector()
+    /// 手の追跡器(videoQueue からだけ使う。差し替えは setTracker で行う)
+    private var tracker: HandTracker = VisionHandTracker()
 
     /// セッションの開始・停止は時間がかかる(数百ミリ秒ブロックする)ので、
     /// メインスレッド(画面を描くスレッド)ではなく専用のキューで行います。
@@ -103,6 +103,15 @@ final class CameraManager: NSObject, FrameSource {
             completion(.denied)
         @unknown default:
             completion(.denied)
+        }
+    }
+
+    /// 手の追跡器を差し替えます。
+    /// 追跡器は videoQueue の中で使われているので、差し替えも videoQueue の中で行います
+    /// (別のスレッドから同時に読み書きすると、壊れたデータを読む「データ競合」が起きるため)。
+    func setTracker(_ newTracker: HandTracker) {
+        videoQueue.async { [weak self] in
+            self?.tracker = newTracker
         }
     }
 
@@ -222,8 +231,8 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
         // 撮影時刻(秒)。処理の遅れに影響されない正確な時刻なので、速度の計算に使います。
         let timestamp = CMSampleBufferGetPresentationTimeStamp(sampleBuffer).seconds
 
-        // 背面カメラ + 縦向き画面なので、向きは .right(詳しくは HandPoseDetector のコメント)
-        let frame = detector.detect(in: pixelBuffer, orientation: .right, timestamp: timestamp)
+        // 背面カメラ + 縦向き画面なので、向きは .right(詳しくは VisionHandTracker のコメント)
+        let frame = tracker.detect(in: pixelBuffer, orientation: .right, timestamp: timestamp)
 
         // 画面の更新はメインスレッドで行う決まりなので、結果だけをメインスレッドに渡します。
         DispatchQueue.main.async { [weak self] in

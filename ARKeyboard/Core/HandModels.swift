@@ -133,6 +133,8 @@ struct JointPoint: Equatable {
     var position: Vec2
     /// 信頼度(0〜1)。Vision が「この点にどれくらい自信があるか」。手が隠れていると低くなります。
     var confidence: Double
+    /// 奥行き(手首を基準にした相対的な値。MediaPipe のように 3D を返す追跡器のときだけ入る)
+    var z: Double? = nil
 }
 
 /// 1フレームで検出された1つの手
@@ -150,7 +152,7 @@ struct HandObservation: Equatable {
     }
 }
 
-/// カメラ1コマ分の「手の認識結果」。HandPoseDetector が作り、ViewModel に渡します。
+/// カメラ1コマ分の「手の認識結果」。VisionHandTracker が作り、ViewModel に渡します。
 struct VisionFrame {
     /// 撮影時刻(秒)。速度の計算に使うので、処理した時刻ではなく「撮影した時刻」を使います。
     var timestamp: Double
@@ -160,4 +162,25 @@ struct VisionFrame {
     var hands: [HandObservation]
     /// LiDAR の深度マップ(LiDAR モードのときだけ。それ以外は nil)
     var depthMap: DepthMap? = nil
+    /// どの手の追跡器で作ったか(比較表示用)
+    var trackerKind: HandTrackerKind = .vision
+    /// 手の検出にかかった時間(秒)。比較表示用
+    var processingTime: Double = 0
+}
+
+/// 手の追跡器の種類
+enum HandTrackerKind: String, Codable, CaseIterable, Identifiable {
+    /// Apple の Vision(2D、標準フレームワーク)
+    case vision
+    /// Google の MediaPipe Hand Landmarker(21点の 3D。CocoaPods で導入したときだけ使える)
+    case mediaPipe
+
+    var id: String { rawValue }
+
+    var japaneseName: String {
+        switch self {
+        case .vision: return "Vision(Apple)"
+        case .mediaPipe: return "MediaPipe(Google)"
+        }
+    }
 }

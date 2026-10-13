@@ -4,6 +4,7 @@ import SwiftUI
 /// - 選んだ1本の指の「下向きの速さ」の折れ線グラフ(しきい値の線つき)
 /// - FPS(1秒に何コマ処理できているか)
 /// - 検出した手の数
+/// - 音のオンセットの波形(マイクを使うとき)
 /// - 直近のタップのログ
 struct DebugOverlayView: View {
     @Bindable var viewModel: KeyboardViewModel
@@ -39,6 +40,27 @@ struct DebugOverlayView: View {
                 legend(color: .green, text: "タップ")
             }
             .font(.system(size: 9))
+
+            if viewModel.settings.features.audioOnset {
+                HStack {
+                    Text("マイク: \(viewModel.audioStatus)")
+                    if viewModel.settings.features.motionAssist {
+                        Text("振動: \(viewModel.motionStatus)")
+                    }
+                }
+                .font(.system(size: 10))
+                AudioGraphView(features: viewModel.audioHistory,
+                               onsets: viewModel.recentOnsets.filter { $0.source == .audio },
+                               visionTapTimes: viewModel.recentVisionTapTimes,
+                               duration: KeyboardViewModel.signalHistoryDuration)
+                    .frame(height: 50)
+                HStack(spacing: 10) {
+                    legend(color: .cyan, text: "音の変化(flux)")
+                    legend(color: .red, text: "音の立ち上がり")
+                    legend(color: .green, text: "カメラのタップ")
+                }
+                .font(.system(size: 9))
+            }
 
             // タップのログ(新しい順)
             VStack(alignment: .leading, spacing: 2) {
@@ -138,6 +160,59 @@ struct SignalGraphView: View {
                          at: CGPoint(x: 2, y: 2), anchor: .topLeading)
             context.draw(Text(String(format: "-%.1f", maxAbs)).font(.system(size: 8)).foregroundColor(.white.opacity(0.7)),
                          at: CGPoint(x: 2, y: size.height - 2), anchor: .bottomLeading)
+        }
+        .background(.white.opacity(0.06))
+        .clipShape(RoundedRectangle(cornerRadius: 6))
+    }
+}
+
+/// 音のオンセットの波形。横軸は時間(右端が最新)、縦軸はスペクトルの増え方(flux)。
+/// 赤い縦線(音の立ち上がり)と緑の縦線(カメラのタップ候補)が近くに並んでいれば、
+/// 二重条件の時間窓に入っている、ということです。
+struct AudioGraphView: View {
+    let features: [AudioFeature]
+    let onsets: [OnsetEvent]
+    let visionTapTimes: [Double]
+    let duration: Double
+
+    var body: some View {
+        Canvas { context, size in
+            guard let latest = features.last else {
+                context.draw(Text("音のデータがありません").font(.caption2).foregroundColor(.white.opacity(0.6)),
+                             at: CGPoint(x: size.width / 2, y: size.height / 2))
+                return
+            }
+            let maxValue = max(features.map { max($0.flux, $0.threshold) }.max() ?? 0, 1e-6)
+            func x(_ t: Double) -> Double { size.width * (1 - (latest.time - t) / duration) }
+            func y(_ v: Double) -> Double { size.height - (v / maxValue) * size.height }
+
+            // しきい値(点線)
+            var thresholdPath = Path()
+            for (i, f) in features.enumerated() {
+                let p = CGPoint(x: x(f.time), y: y(f.threshold))
+                if i == 0 { thresholdPath.move(to: p) } else { thresholdPath.addLine(to: p) }
+            }
+            context.stroke(thresholdPath, with: .color(.red.opacity(0.6)), style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
+
+            // flux の折れ線
+            var line = Path()
+            for (i, f) in features.enumerated() {
+                let p = CGPoint(x: x(f.time), y: y(f.flux))
+                if i == 0 { line.move(to: p) } else { line.addLine(to: p) }
+            }
+            context.stroke(line, with: .color(.cyan), lineWidth: 1.2)
+
+            // 縦線: 音の立ち上がり(赤)とカメラのタップ(緑)
+            func vertical(_ t: Double, _ color: Color, top: Bool) {
+                let px = x(t)
+                guard px >= 0 else { return }
+                var path = Path()
+                path.move(to: CGPoint(x: px, y: top ? 0 : size.height / 2))
+                path.addLine(to: CGPoint(x: px, y: top ? size.height / 2 : size.height))
+                context.stroke(path, with: .color(color), lineWidth: 2)
+            }
+            for onset in onsets { vertical(onset.time, .red, top: true) }
+            for t in visionTapTimes { vertical(t, .green, top: false) }
         }
         .background(.white.opacity(0.06))
         .clipShape(RoundedRectangle(cornerRadius: 6))

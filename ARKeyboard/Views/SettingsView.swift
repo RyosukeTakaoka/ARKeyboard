@@ -10,6 +10,7 @@ struct SettingsView: View {
             Form {
                 modeSection
                 tapSection
+                sensorSection
                 layoutSection
                 feedbackSection
                 // LiDAR が無い機種では、この設定自体を出さない
@@ -97,6 +98,40 @@ struct SettingsView: View {
             Text("タップ判定")
         } footer: {
             Text("単位の「手」は、手首から中指の付け根までの長さ(約9cm)です。調整の手順は README を見てください。")
+        }
+    }
+
+    // MARK: - センサーと二重条件(タップ推定レベルA)
+
+    private var sensorSection: some View {
+        Section {
+            Toggle("音の立ち上がりを条件にする(マイク)", isOn: $viewModel.settings.features.audioOnset)
+            if viewModel.settings.features.audioOnset {
+                LabeledContent("マイクの状態", value: viewModel.audioStatus)
+                ParameterSlider(title: "音の感度(k)", value: $viewModel.settings.audioOnset.k, range: 2...15,
+                                format: { String(format: "%.1f", $0) },
+                                help: "しきい値 = 直近の中央値 + k × ばらつき。小さいほど小さな音にも反応(雑音にも反応しやすい)。")
+            }
+            Toggle("本体の振動も証拠にする(加速度)", isOn: $viewModel.settings.features.motionAssist)
+            if viewModel.settings.features.motionAssist {
+                LabeledContent("加速度センサーの状態", value: viewModel.motionStatus)
+                ParameterSlider(title: "振動の感度(k)", value: $viewModel.settings.motionOnset.k, range: 2...15,
+                                format: { String(format: "%.1f", $0) },
+                                help: "iPhone をタップする面と同じ机に置いたときに有効です。")
+            }
+            ParameterSlider(title: "時間窓(カメラより前)", value: $viewModel.settings.fusion.windowBefore, range: 0...0.3,
+                            format: { "\(Int($0 * 1000)) ms" },
+                            help: "カメラが止まりを見つけたコマより、どれだけ前の音まで対応づけるか。")
+            ParameterSlider(title: "時間窓(カメラより後)", value: $viewModel.settings.fusion.windowAfter, range: 0...0.3,
+                            format: { "\(Int($0 * 1000)) ms" },
+                            help: "デバッグ表示のタップログの「音±○ms」を見て、ほとんどが窓に入るように合わせます。")
+            ParameterSlider(title: "音を待つ最大時間", value: $viewModel.settings.fusion.maxWait, range: 0.1...1.0,
+                            format: { "\(Int($0 * 1000)) ms" },
+                            help: "音のデータが遅れているとき、これ以上は待たずにカメラだけで決める。")
+        } header: {
+            Text("センサーと二重条件(レベルA)")
+        } footer: {
+            Text("カメラの「指が下りて急に止まった」と、マイクの「叩いた音の立ち上がり」が同じ頃に起きたときだけ入力します(Acustico の二重条件の考え方)。マイクが使えないときはカメラだけで判定します。")
         }
     }
 

@@ -36,6 +36,10 @@ struct TapLogEntry: Identifiable, Equatable {
     var note: String?
     /// LiDAR で測った、面からの高さ(メートル)
     var heightAboveSurface: Double?
+    /// 音のオンセットとのずれ(秒、音の時刻 − カメラの時刻)
+    var audioOffset: Double?
+    /// タップの確からしさ
+    var confidence: Double?
 
     init(id: Int, result: TapResult) {
         self.id = id
@@ -46,12 +50,15 @@ struct TapLogEntry: Identifiable, Equatable {
         travel = result.event.travel
         note = result.note
         heightAboveSurface = result.heightAboveSurface
+        audioOffset = result.audioOffset
+        confidence = result.touch?.confidence
     }
 
     /// 1行の説明(例: "右手の人差し指 → J  速さ2.31 移動0.112")
     var summary: String {
         let key = keyLabel.map { "→ \($0)" } ?? "→ (\(note ?? "なし"))"
         let height = heightAboveSurface.map { String(format: " 高さ%.1fcm", $0 * 100) } ?? ""
-        return "\(finger.japaneseName) \(key)  速さ\(String(format: "%.2f", peakSpeed)) 移動\(String(format: "%.3f", travel))\(height)"
+        let audio = audioOffset.map { String(format: " 音%+.0fms", $0 * 1000) } ?? ""
+        return "\(finger.japaneseName) \(key)  速さ\(String(format: "%.2f", peakSpeed)) 移動\(String(format: "%.3f", travel))\(audio)\(height)"
     }
 }

@@ -40,6 +40,8 @@ final class KeyboardViewModel {
 
     /// 入力された文字列
     var typedText = ""
+    /// 記録モード中か(記録モードは RecordingSession で実装)
+    var isRecording = false
     /// 練習モード(nil なら練習していない)
     var practice: PracticeSession?
 
@@ -53,6 +55,15 @@ final class KeyboardViewModel {
     var signalHistory: [FingerSignalSample] = []
     /// 直近のタップの記録(新しい順)
     var tapLog: [TapLogEntry] = []
+    /// 音の特徴の直近の記録(デバッグの波形表示用)
+    var audioHistory: [AudioFeature] = []
+    /// 直近の音のオンセット(デバッグ表示用)
+    var recentOnsets: [OnsetEvent] = []
+    /// 直近のカメラのタップ候補の時刻(音の波形と並べて表示する)
+    var recentVisionTapTimes: [Double] = []
+    /// マイク・加速度センサーの状態(表示用)
+    var audioStatus = "オフ"
+    var motionStatus = "オフ"
 
     /// 設定。画面から直接書き換えてよい(毎フレーム、エンジンに反映されます)。
     /// 保存は ContentView の onChange から saveSettings() を呼んで行います。
@@ -72,6 +83,10 @@ final class KeyboardViewModel {
     @ObservationIgnored private let haptics = UIImpactFeedbackGenerator(style: .light)
     /// 完了時の触覚フィードバック(「ブブッ」)
     @ObservationIgnored private let notificationHaptics = UINotificationFeedbackGenerator()
+    /// マイク(音のオンセット)
+    @ObservationIgnored private let audioSensor = AudioOnsetSensor()
+    /// 加速度センサー(本体の振動)
+    @ObservationIgnored private let motionSensor = MotionSensor()
 
     /// FPS の計算
     @ObservationIgnored private var fpsCounter = FPSCounter()
@@ -107,6 +122,12 @@ final class KeyboardViewModel {
         depthCamera?.onFrame = { [weak self] frame in
             self?.handle(frame)
         }
+        audioSensor.onUpdate = { [weak self] update in
+            self?.handleAudio(update)
+        }
+        motionSensor.onUpdate = { [weak self] update in
+            self?.handleMotion(update)
+        }
     }
 
     /// 今使うべきカメラ(設定で LiDAR がオンで、対応機なら ARKit 版)
@@ -120,6 +141,9 @@ final class KeyboardViewModel {
         isUsingDepthCamera = settings.useLiDAR && depthCamera != nil
         activeSource.start { [weak self] status in
             self?.cameraStatus = status
+            // カメラが動き出してから、マイク・加速度センサーを始める
+            // (カメラが使えない環境で、マイクの許可だけを聞かないように)
+            if status == .running { self?.applySensorSettings() }
         }
         // 触覚フィードバックの準備(最初の1回が遅れないように、あらかじめエンジンを起こしておく)
         haptics.prepare()
@@ -130,7 +154,47 @@ final class KeyboardViewModel {
     /// 画面が消えたとき・バックグラウンドに入ったときに呼ぶ
     func stop() {
         activeSource.stop()
+        audioSensor.stop()
+        motionSensor.stop()
+        audioStatus = "オフ"
+        motionStatus = "オフ"
         UIApplication.shared.isIdleTimerDisabled = false
+    }
+
+    /// 設定に合わせて、マイク・加速度センサーを動かしたり止めたりする(何度呼んでもよい)
+    func applySensorSettings() {
+        guard cameraStatus == .running else { return }
+        // マイク
+        if settings.features.audioOnset {
+            audioSensor.updateConfig(settings.audioOnset)
+            if !audioSensor.isRunning {
+                audioStatus = "開始中…"
+                audioSensor.start(config: settings.audioOnset) { [weak self] result in
+                    switch result {
+                    case .success: self?.audioStatus = "動作中"
+                    case .failure(let error): self?.audioStatus = error.localizedDescription
+                    }
+                }
+            }
+        } else if audioSensor.isRunning {
+            audioSensor.stop()
+            audioStatus = "オフ"
+        }
+        // 加速度センサー(振動の補助を使うとき、または記録モードのとき)
+        if settings.features.motionAssist || isRecording {
+            motionSensor.updateConfig(settings.motionOnset)
+            if !motionSensor.isRunning {
+                if MotionSensor.isAvailable {
+                    motionSensor.start(config: settings.motionOnset)
+                    motionStatus = "動作中"
+                } else {
+                    motionStatus = "この端末では使えません"
+                }
+            }
+        } else if motionSensor.isRunning {
+            motionSensor.stop()
+            motionStatus = "オフ"
+        }
     }
 
     /// LiDAR の設定が変わったら、カメラを切り替える
@@ -162,12 +226,33 @@ final class KeyboardViewModel {
     }
 
     private static func loadSettings() -> KeyboardSettings {
-        guard let data = UserDefaults.standard.data(forKey: settingsKey),
-              let settings = try? JSONDecoder().decode(KeyboardSettings.self, from: data) else {
-            // 初回起動(または保存形式が変わった)なら、膝モードの初期値から始める
-            return KeyboardSettings.defaults(for: .knee)
+        let defaults = KeyboardSettings.defaults(for: .knee)
+        // 初回起動なら、膝モードの初期値から始める
+        guard let data = UserDefaults.standard.data(forKey: settingsKey) else { return defaults }
+        // アプリを更新して設定の項目が増えると、古い保存データには新しい項目が無いので
+        // そのままでは読み込みに失敗する。そこで「初期値の JSON」に「保存データの JSON」を重ねてから読む。
+        // (保存データにある項目は保存データの値、無い項目は初期値になる)
+        guard let defaultData = try? JSONEncoder().encode(defaults),
+              let base = try? JSONSerialization.jsonObject(with: defaultData) as? [String: Any],
+              let saved = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let mergedData = try? JSONSerialization.data(withJSONObject: Self.merge(base, saved)),
+              let settings = try? JSONDecoder().decode(KeyboardSettings.self, from: mergedData) else {
+            return defaults
         }
         return settings
+    }
+
+    /// 辞書を重ねる(入れ子の辞書は中まで重ねる)
+    private static func merge(_ base: [String: Any], _ overlay: [String: Any]) -> [String: Any] {
+        var result = base
+        for (key, value) in overlay {
+            if let baseChild = base[key] as? [String: Any], let overlayChild = value as? [String: Any] {
+                result[key] = merge(baseChild, overlayChild)
+            } else {
+                result[key] = value
+            }
+        }
+        return result
     }
 
     // MARK: キャリブレーション
@@ -263,7 +348,7 @@ final class KeyboardViewModel {
         imageSize = frame.imageSize
         fps = fpsCounter.tick(at: frame.timestamp)
         detectedHandCount = frame.hands.count
-        let output = engine.process(frame)
+        let output = engine.process(frame, now: now)
         hands = output.hands
         layoutFrames = output.layoutFrames
         hoveredKeyIDs = output.hoveredKeyIDs
@@ -274,22 +359,54 @@ final class KeyboardViewModel {
             saveCalibration(result)
             notificationHaptics.notificationOccurred(.success)
         }
-        for tap in output.taps {
-            handleTap(tap)
-        }
+        handleTapResults(output.taps)
         recordDebugInfo(output)
     }
 
-    /// デバッグ表示用の記録(表示していないときは、グラフの記録を省いて少しでも軽くする)
-    private func recordDebugInfo(_ output: EngineOutput) {
-        for tap in output.taps {
+    /// マイクの解析結果を受け取る(メインスレッド)
+    private func handleAudio(_ update: AudioUpdate) {
+        engine.settings = settings
+        let results = engine.ingestOnsets(update.onsets, source: .audio, coveredUntil: update.coveredUntil, now: now)
+        handleTapResults(results)
+        guard settings.showDebug else {
+            if !audioHistory.isEmpty { audioHistory.removeAll() }
+            return
+        }
+        audioHistory += update.features
+        recentOnsets += update.onsets
+        let oldest = update.coveredUntil - Self.signalHistoryDuration
+        audioHistory.removeAll { $0.time < oldest }
+        recentOnsets.removeAll { $0.time < oldest }
+        recentVisionTapTimes.removeAll { $0 < oldest }
+    }
+
+    /// 加速度センサーの解析結果を受け取る(メインスレッド)
+    private func handleMotion(_ update: MotionUpdate) {
+        engine.settings = settings
+        let results = engine.ingestOnsets(update.onsets, source: .motion, coveredUntil: update.coveredUntil, now: now)
+        handleTapResults(results)
+        if settings.showDebug {
+            recentOnsets += update.onsets
+        }
+    }
+
+    /// 確定したタップをまとめて処理する
+    private func handleTapResults(_ results: [TapResult]) {
+        for tap in results {
+            handleTap(tap)
             tapLogCounter += 1
             tapLog.insert(TapLogEntry(id: tapLogCounter, result: tap), at: 0)
+            if settings.showDebug {
+                recentVisionTapTimes.append(tap.event.timestamp)
+            }
         }
         if tapLog.count > Self.tapLogLimit {
             tapLog.removeLast(tapLog.count - Self.tapLogLimit)
         }
+    }
 
+    /// デバッグ表示用の記録(表示していないときは、グラフの記録を省いて少しでも軽くする)
+    private func recordDebugInfo(_ output: EngineOutput) {
         guard settings.showDebug else {
             if !signalHistory.isEmpty { signalHistory.removeAll() }
             return
@@ -319,6 +436,10 @@ final class KeyboardViewModel {
             // 1104 は iOS のキーボードのクリック音(システムサウンド)。
             // 音声ファイルを用意しなくても鳴らせます(消音モードでは鳴りません)。
             AudioServicesPlaySystemSound(1104)
+        }
+        if settings.hapticsEnabled || settings.soundEnabled {
+            // 自分で出した音・振動を、マイクや加速度センサーが「次のタップ」と間違えないようにする
+            engine.noteFeedback(at: now)
         }
     }
 

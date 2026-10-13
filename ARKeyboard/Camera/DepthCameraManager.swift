@@ -8,7 +8,7 @@ import CoreVideo
 /// LiDAR の深度(scene depth)は ARKit からしか取得できません。
 /// また、ARKit の ARSession と AVCaptureSession は同時に同じカメラを使えないので、
 /// LiDAR モードのときはカメラ自体を ARKit に切り替えます。
-/// 手の検出は通常モードと同じく Vision(HandPoseDetector)で行います。
+/// 手の検出は通常モードと同じく Vision(VisionHandTracker)で行います。
 final class DepthCameraManager: NSObject, FrameSource {
     let session = ARSession()
     var onFrame: ((VisionFrame) -> Void)?
@@ -17,7 +17,8 @@ final class DepthCameraManager: NSObject, FrameSource {
     private let delegateQueue = DispatchQueue(label: "ARKeyboard.ar.delegate")
     /// Vision の処理をするキュー
     private let processingQueue = DispatchQueue(label: "ARKeyboard.ar.vision", qos: .userInitiated)
-    private let detector = HandPoseDetector()
+    /// 手の追跡器(processingQueue からだけ使う)
+    private var tracker: HandTracker = VisionHandTracker()
     /// 処理中なら次のフレームは捨てる(delegateQueue の中でだけ読み書きする)。
     /// ARKit は 60fps でフレームを送ってくるので、全部処理しようとすると遅れが溜まるため。
     private var isProcessing = false
@@ -68,6 +69,13 @@ final class DepthCameraManager: NSObject, FrameSource {
     func stop() {
         session.pause()
     }
+
+    /// 手の追跡器を差し替える(processingQueue の中で行う理由は CameraManager.setTracker と同じ)
+    func setTracker(_ newTracker: HandTracker) {
+        processingQueue.async { [weak self] in
+            self?.tracker = newTracker
+        }
+    }
 }
 
 extension DepthCameraManager: ARSessionDelegate {
@@ -85,8 +93,8 @@ extension DepthCameraManager: ARSessionDelegate {
 
         processingQueue.async { [weak self] in
             guard let self else { return }
-            // ARKit の画像もセンサーの向き(横長)なので、縦向き表示では .right(HandPoseDetector 参照)
-            var visionFrame = self.detector.detect(in: pixelBuffer, orientation: .right, timestamp: timestamp)
+            // ARKit の画像もセンサーの向き(横長)なので、縦向き表示では .right(VisionHandTracker 参照)
+            var visionFrame = self.tracker.detect(in: pixelBuffer, orientation: .right, timestamp: timestamp)
             visionFrame.depthMap = depthMap
             let result = visionFrame
             DispatchQueue.main.async { self.onFrame?(result) }

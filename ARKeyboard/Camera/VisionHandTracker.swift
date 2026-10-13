@@ -3,7 +3,12 @@ import Vision
 import ImageIO
 import CoreVideo
 
-/// Vision フレームワークで「手の関節点」を検出するクラス。
+/// Vision フレームワークで「手の関節点」を検出するクラス(HandTracker の実装の1つ)。
+///
+/// Vision の手の検出(VNDetectHumanHandPoseRequest)は **2D**(画像上の位置)だけを返します。
+/// (iOS 17/18 の時点で、Vision に手の 3D 版のリクエストはありません。体の 3D 版
+///  VNDetectHumanBodyPose3DRequest はありますが、手の指の関節は含みません。)
+/// そのため JointPoint.z(奥行き)は nil のままです。
 ///
 /// ## カメラの向きの扱い(とても大事)
 /// iPhone のカメラセンサーは、端末を**横向き**(ホームボタン/画面下部が右側)にしたときに
@@ -21,7 +26,9 @@ import CoreVideo
 /// このアプリは画面を縦向きに固定しているので、向きは常に `.right` で済みます。
 /// (手の座標系 HandFrame は画像の上下左右を仮定しないので、仮に向きがずれても
 ///  キー配置そのものは手の向きに合わせて作られます。)
-final class HandPoseDetector {
+final class VisionHandTracker: HandTracker {
+    let kind: HandTrackerKind = .vision
+
     /// Vision へのリクエスト。毎フレーム作り直すと無駄なので、1つを使い回します。
     /// (使い回すので、このクラスは1つのスレッド(キュー)からだけ呼ぶ前提です)
     private let request: VNDetectHumanHandPoseRequest = {
@@ -53,6 +60,7 @@ final class HandPoseDetector {
     func detect(in pixelBuffer: CVPixelBuffer,
                 orientation: CGImagePropertyOrientation,
                 timestamp: Double) -> VisionFrame {
+        let started = ProcessInfo.processInfo.systemUptime
         // 向きを補正した後の画像サイズ。90度回転する向きなら幅と高さが入れ替わります。
         let bufferWidth = Double(CVPixelBufferGetWidth(pixelBuffer))
         let bufferHeight = Double(CVPixelBufferGetHeight(pixelBuffer))
@@ -71,7 +79,10 @@ final class HandPoseDetector {
             // 1コマ失敗しても次のコマで回復するので、ログだけ出して続けます。
             print("[HandPoseDetector] Vision エラー: \(error.localizedDescription)")
         }
-        return VisionFrame(timestamp: timestamp, imageSize: imageSize, hands: hands)
+        var frame = VisionFrame(timestamp: timestamp, imageSize: imageSize, hands: hands)
+        frame.trackerKind = kind
+        frame.processingTime = ProcessInfo.processInfo.systemUptime - started
+        return frame
     }
 
     /// Vision の結果を、アプリ内の HandObservation(ピクセル座標・原点左上)に変換します。

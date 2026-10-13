@@ -2,13 +2,27 @@ import Foundation
 
 /// タップと、それで押されたキー
 struct TapResult: Equatable {
+    /// カメラが見つけたタップの候補
     var event: TapEvent
-    /// 押されたキー(キャリブレーション前や、キーから遠すぎるときは nil)
+    /// 「いつ・どの指・どこ」をまとめたタップイベント(キャリブレーション前は nil)
+    var touch: TouchEvent? = nil
+    /// 押されたキー(却下されたとき、キャリブレーション前、キーから遠すぎるときは nil)
     var key: Key?
     /// キーが決まらなかった理由など(デバッグログ用)
     var note: String?
     /// LiDAR: 面に触れていたときの高さから、どれだけ持ち上がっていたか(メートル)。測れなければ nil
     var heightAboveSurface: Double? = nil
+    /// 対応づけた音のオンセットの時刻 − カメラのタップ時刻(秒)。時間窓の調整に使う
+    var audioOffset: Double? = nil
+    /// 対応づけた振動のオンセットの時刻 − カメラのタップ時刻(秒)
+    var motionOffset: Double? = nil
+}
+
+/// 融合の結果を待っている候補に付けておく情報
+struct TapCandidate {
+    var event: TapEvent
+    var touch: TouchEvent?
+    var heightAboveSurface: Double?
 }
 
 /// 1フレーム処理した結果(ViewModel が画面に反映する)
@@ -30,8 +44,10 @@ struct EngineOutput {
 /// キーボードの「頭脳」。カメラにも画面にも依存しない純粋なロジックだけを持ちます。
 ///
 /// VisionFrame(手の認識結果)を1つ受け取るたびに、
-///   左右の割り当て → 手の座標系 → キャリブレーション → 指先とキーの対応 → タップ判定
+///   左右の割り当て → 手の座標系 → キャリブレーション → 指先とキーの対応
+///   → タップ候補(カメラ)→ 音・振動との融合(保留・確定)→ キーの決定
 /// の順に処理して、EngineOutput を返します。
+/// 音・振動のオンセットは ingestOnsets(...) で別に受け取ります。
 /// UI に依存しないので、単体テストで動作を確かめられます。
 final class KeyboardEngine {
     var settings: KeyboardSettings {
@@ -47,8 +63,10 @@ final class KeyboardEngine {
     private(set) var calibration: CalibrationResult?
     /// 手ごとのキー(手の座標で表したもの)
     private(set) var keys: [Chirality: [Key]] = [:]
-    /// タップ判定
+    /// タップ判定(カメラ)
     let tapDetector = TapDetector()
+    /// カメラの候補と音・振動を突き合わせる
+    let fusion = SensorFusion<TapCandidate>()
 
     /// 手ごとの「平滑化した」手の座標系(手ぶれでキー配置が震えないようにするため)
     private var smoothedFrames: [Chirality: HandFrame] = [:]
@@ -63,6 +81,7 @@ final class KeyboardEngine {
     func startCalibration() {
         calibrator.start()
         tapDetector.reset()
+        _ = fusion.resolve(now: .infinity)  // 保留中の候補は捨てる
         calibrationDepthSamples = [:]
     }
 
@@ -103,8 +122,13 @@ final class KeyboardEngine {
     }
 
     /// 1フレーム分の処理
-    func process(_ frame: VisionFrame) -> EngineOutput {
+    /// - Parameters:
+    ///   - frame: 手の認識結果
+    ///   - now: 今の時刻(秒、端末起動から)。省略するとフレームの撮影時刻を使う。
+    ///     音のデータを待つ時間の計算に使うので、実機では処理した瞬間の時刻を渡す。
+    func process(_ frame: VisionFrame, now: Double? = nil) -> EngineOutput {
         var output = EngineOutput()
+        let now = max(now ?? frame.timestamp, frame.timestamp)
         let hands = assignHands(frame.hands)
         output.hands = hands
 
@@ -161,28 +185,108 @@ final class KeyboardEngine {
         let detection = tapDetector.process(hands: tapInput, timestamp: frame.timestamp,
                                             observedFinger: settings.debugFinger)
         output.signalSample = detection.sample
+
+        syncFusionSettings()
         for event in detection.taps {
-            output.taps.append(resolve(event, hands: hands, frame: frame))
+            if let rejected = addCandidate(event, hands: hands, frame: frame) {
+                output.taps.append(rejected)
+            }
         }
+        output.taps += resolvePending(now: now)
         return output
     }
 
-    /// タップした瞬間の指先の位置から、押されたキーを決める
-    private func resolve(_ event: TapEvent, hands: [Chirality: HandObservation], frame: VisionFrame) -> TapResult {
-        guard calibration != nil else {
-            return TapResult(event: event, key: nil, note: "未キャリブレーション")
-        }
+    /// 音・振動のオンセットを受け取る(マイク・加速度センサーから、メインスレッドで)。
+    /// 保留していた候補が確定したら、その結果を返す。
+    func ingestOnsets(_ events: [OnsetEvent], source: OnsetEvent.Source, coveredUntil: Double, now: Double) -> [TapResult] {
+        syncFusionSettings()
+        fusion.addOnsets(events, source: source, coveredUntil: coveredUntil, now: now)
+        return resolvePending(now: now)
+    }
+
+    /// クリック音や触覚を出したことを知らせる(自分の音・振動をタップと間違えないように)
+    func noteFeedback(at time: Double) {
+        fusion.muteFeedback(at: time)
+    }
+
+    private func syncFusionSettings() {
+        fusion.config = settings.fusion
+        fusion.useAudio = settings.features.audioOnset
+        fusion.useMotion = settings.features.motionAssist
+    }
+
+    /// カメラのタップ候補から TouchEvent を作り、融合の保留に加える。
+    /// その場で却下できるとき(LiDAR で空中と分かった)は、却下の結果を返す。
+    private func addCandidate(_ event: TapEvent, hands: [Chirality: HandObservation], frame: VisionFrame) -> TapResult? {
         // LiDAR の補助: 指が「面に触れていた高さ」まで下りていなければ、空中で止めただけとみなす
         let height = heightAboveSurface(finger: event.finger, hands: hands, frame: frame)
         if settings.useLiDAR, let height, height > settings.lidarTolerance {
-            return TapResult(event: event, key: nil,
+            return TapResult(event: event, touch: nil, key: nil,
                              note: String(format: "LiDAR: 面から%.1fcm上", height * 100),
                              heightAboveSurface: height)
         }
-        guard let key = key(atImagePoint: event.tipPosition, finger: event.finger) else {
-            return TapResult(event: event, key: nil, note: "キーの範囲外", heightAboveSurface: height)
+        var touch = makeTouch(from: event)
+        if settings.useLiDAR, height != nil { touch?.evidence.insert(.depth) }
+        fusion.addCandidate(time: event.timestamp,
+                            payload: TapCandidate(event: event, touch: touch, heightAboveSurface: height))
+        return nil
+    }
+
+    /// カメラの候補から「いつ・どの指・どこ」のタップイベントを作る(キャリブレーション前は nil)
+    func makeTouch(from event: TapEvent) -> TouchEvent? {
+        guard let calibration, let frame = layoutFrame(for: event.finger.chirality) else { return nil }
+        let hand = calibration.hand(event.finger.chirality)
+        // 位置の不確かさ: キーの大きさの 3 割程度のばらつきがあると仮定(個人適応で更新される)
+        let covariance = Covariance2.diagonal(sigmaX: 0.3 * hand.keyPitch * settings.keyScale,
+                                              sigmaY: 0.3 * hand.rowPitch * settings.keyScale)
+        // カメラの確からしさ: しきい値ぎりぎりなら 0.5、しきい値の2倍以上なら 0.95
+        let ratio = event.peakSpeed / max(tapDetector.effectiveDownSpeed, 1e-6)
+        let visionConfidence = min(max(0.5 + (ratio - 1) * 0.45, 0.05), 0.95)
+        return TouchEvent(time: event.timestamp,
+                          finger: event.finger,
+                          surfaceLocation: frame.toLocal(event.tipPosition),
+                          locationCovariance: covariance,
+                          confidence: visionConfidence,
+                          imagePosition: event.tipPosition,
+                          evidence: [.vision])
+    }
+
+    /// 融合で確定した候補を、入力結果に変換する
+    private func resolvePending(now: Double) -> [TapResult] {
+        fusion.resolve(now: now).map { decision in
+            var result = TapResult(event: decision.payload.event,
+                                   touch: decision.payload.touch,
+                                   key: nil,
+                                   note: decision.note,
+                                   heightAboveSurface: decision.payload.heightAboveSurface,
+                                   audioOffset: decision.audio.map { $0.time - decision.time },
+                                   motionOffset: decision.motion.map { $0.time - decision.time })
+            guard decision.accepted else { return result }
+            guard var touch = result.touch else {
+                result.note = "未キャリブレーション"
+                return result
+            }
+            // 音・振動の裏付けがあれば、確からしさを上げる(どれか1つでも当たっていれば、の確率)
+            for onset in [decision.audio, decision.motion].compactMap({ $0 }) {
+                touch.evidence.insert(onset.source == .audio ? .audio : .motion)
+                let c = min(max(0.5 + (onset.strength - 1) * 0.25, 0.3), 0.95)
+                touch.confidence = 1 - (1 - touch.confidence) * (1 - c)
+            }
+            result.touch = touch
+            result.key = chooseKey(for: touch)
+            if result.key == nil, result.note == nil { result.note = "キーの範囲外" }
+            return result
         }
-        return TapResult(event: event, key: key, note: nil, heightAboveSurface: height)
+    }
+
+    /// タップイベントから入力するキーを決める
+    private func chooseKey(for touch: TouchEvent) -> Key? {
+        guard let handKeys = keys[touch.finger.chirality] else { return nil }
+        return KeyLayout.nearestKey(to: touch.surfaceLocation,
+                                    finger: touch.finger.finger,
+                                    in: handKeys,
+                                    restrictToFinger: settings.restrictKeysToFinger,
+                                    maxDistance: settings.maxKeyDistance)?.key
     }
 
     // MARK: - LiDAR(深度)

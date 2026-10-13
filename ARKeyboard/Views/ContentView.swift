@@ -34,6 +34,8 @@ struct ContentView: View {
         // 設定が変わったら保存する
         .onChange(of: viewModel.settings) { _, _ in
             viewModel.saveSettings()
+            // マイク・加速度センサーのオン/オフや設定を反映する
+            viewModel.applySensorSettings()
         }
         // LiDAR のオン/オフでカメラを切り替える
         .onChange(of: viewModel.settings.useLiDAR) { _, _ in

@@ -34,6 +34,26 @@ enum LayoutAnchor: String, Codable, CaseIterable, Identifiable {
     }
 }
 
+/// 機能の ON/OFF(あとで効果を比べるため、すべて設定画面で切り替えられるようにしている)
+struct FeatureFlags: Codable, Equatable {
+    /// タップ推定レベルA: カメラの急停止に加えて、マイクの音の立ち上がりを条件にする
+    var audioOnset: Bool = true
+    /// 加速度センサー(iPhone 本体の振動)も「当たった証拠」に使う(机に iPhone を置くとき向け)
+    var motionAssist: Bool = false
+    /// デコーダー: 位置の分布 × 指の制約 × 言語モデルでキーを選ぶ(オフなら最も近いキー)
+    var decoder: Bool = true
+    /// デコーダーで文字 n-gram 言語モデルを使う
+    var languageModel: Bool = true
+    /// 単語単位のビームサーチで、確定済みの文字をさかのぼって直す
+    var wordDecoder: Bool = false
+    /// 個人適応: 打ち直した箇所から、指ごとの押しがちなずれを学ぶ
+    var personalAdaptation: Bool = false
+    /// タップ推定レベルB: 学習モデル(Core ML)でタップかどうかを判定する(モデルを入れたときだけ)
+    var levelBModel: Bool = false
+    /// 机モードで、四隅の登録(ホモグラフィー)を使って真上から見た座標に直す
+    var deskHomography: Bool = true
+}
+
 /// アプリの設定(UserDefaults に保存する)
 ///
 /// 各プロパティに書いてある値は「土台の値」です。アプリの初回起動時は
@@ -67,6 +87,17 @@ struct KeyboardSettings: Codable, Equatable {
     var hapticsEnabled: Bool = true
     /// タップ時の効果音
     var soundEnabled: Bool = true
+
+    /// 機能の ON/OFF
+    var features = FeatureFlags()
+    /// 手の追跡器(Vision / MediaPipe)
+    var handTracker: HandTrackerKind = .vision
+    /// センサー融合の時間窓など
+    var fusion = FusionConfig()
+    /// 音のオンセット検出の設定
+    var audioOnset = OnsetDetectorConfig()
+    /// 振動のオンセット検出の設定
+    var motionOnset = OnsetDetectorConfig(k: 6, minSpread: 0.003, historyDuration: 0.5, refractory: 0.08)
 
     /// LiDAR の深度で「指が面に近づいたか」を確かめる(LiDAR 搭載機のみ)
     var useLiDAR: Bool = false
