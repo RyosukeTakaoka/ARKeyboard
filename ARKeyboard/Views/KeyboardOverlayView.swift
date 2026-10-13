@@ -11,7 +11,8 @@ struct KeyboardOverlayView: View {
     let hoveredKeyIDs: Set<String>
     /// 最近押されたキーと、押された時刻(押した瞬間に強く光らせる)
     var pressedKeys: [String: Date] = [:]
-    let converter: CoordinateConverter
+    /// キー配置の座標 → 画面の座標(机モードではホモグラフィーの逆変換も含む)
+    let projection: LayoutProjection
 
     /// 押した後に光り続ける時間(秒)
     private let flashDuration = 0.25
@@ -29,7 +30,7 @@ struct KeyboardOverlayView: View {
                     let corners = [
                         Vec2(-half.x, -half.y), Vec2(half.x, -half.y),
                         Vec2(half.x, half.y), Vec2(-half.x, half.y),
-                    ].map { converter.viewPoint(fromImage: frame.toImage(key.center + $0)).cgPoint }
+                    ].map { projection.viewPoint(fromLayout: frame.toImage(key.center + $0)).cgPoint }
 
                     var path = Path()
                     path.addLines(corners)
@@ -53,7 +54,7 @@ struct KeyboardOverlayView: View {
                                    lineWidth: isHovered ? 2 : 1)
 
                     // 文字
-                    let center = converter.viewPoint(fromImage: frame.toImage(key.center)).cgPoint
+                    let center = projection.viewPoint(fromLayout: frame.toImage(key.center)).cgPoint
                     let text = Text(key.label)
                         .font(.system(size: key.isSpace ? 11 : 15, weight: .bold, design: .monospaced))
                         .foregroundColor(isFlashing ? .black : .white)

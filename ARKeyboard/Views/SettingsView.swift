@@ -9,6 +9,9 @@ struct SettingsView: View {
         NavigationStack {
             Form {
                 modeSection
+                if viewModel.settings.mode == .desk {
+                    deskSection
+                }
                 tapSection
                 sensorSection
                 decoderSection
@@ -53,6 +56,31 @@ struct SettingsView: View {
             Text("モード")
         } footer: {
             Text("膝モード: キー大きめ・判定ゆるめ・キーが手に追従。\n机モード: 判定厳しめ・キーは面に固定。\nモードを切り替えると、下のしきい値はそのモードの初期値に戻ります。")
+        }
+    }
+
+    // MARK: - 机モード(四隅の登録)
+
+    private var deskSection: some View {
+        Section {
+            Toggle("四隅の登録(ホモグラフィー)を使う", isOn: $viewModel.settings.features.deskHomography)
+            ParameterSlider(title: "登録する範囲の幅", value: $viewModel.settings.deskWidthCm, range: 20...120,
+                            format: { "\(Int($0)) cm" })
+            ParameterSlider(title: "登録する範囲の奥行き", value: $viewModel.settings.deskDepthCm, range: 10...80,
+                            format: { "\(Int($0)) cm" })
+            Button(viewModel.deskPlane == nil ? "机の四隅を登録する" : "机の四隅を登録し直す") {
+                dismiss()
+                viewModel.startDeskRegistration()
+            }
+            if viewModel.deskPlane != nil {
+                Button("登録した四隅を削除", role: .destructive) {
+                    viewModel.deleteDeskPlane()
+                }
+            }
+        } header: {
+            Text("机モード: 四隅の登録")
+        } footer: {
+            Text("カメラが机を斜めから見ていると、奥は小さく手前は大きく映ります。机の四隅(またはテープで貼った長方形の四隅)を登録すると、真上から見た座標に直して計算します。登録し直すとキャリブレーションもやり直しになります。膝モードでは使いません(膝は平らでないため)。")
         }
     }
 

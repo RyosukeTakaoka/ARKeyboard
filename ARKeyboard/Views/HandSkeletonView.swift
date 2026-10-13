@@ -11,6 +11,8 @@ struct HandSkeletonView: View {
     let converter: CoordinateConverter
     /// この信頼度より低い点は描かない(=計算にも使わない点)
     var minConfidence: Double = 0.3
+    /// 机の座標 → 画像(机モードのときだけ。座標軸の表示に使う)
+    var planeToImage: Homography? = nil
 
     var body: some View {
         // Canvas は、たくさんの線や点を高速に描くのに向いた View です。
@@ -44,10 +46,11 @@ struct HandSkeletonView: View {
             }
 
             // 手の座標系の軸(前 = 緑、親指側 = 赤)。長さは手の大きさの 0.5 倍。
+            let projection = LayoutProjection(converter: converter, planeToImage: planeToImage)
             for (_, frame) in frames {
-                let origin = converter.viewPoint(fromImage: frame.origin).cgPoint
-                let forwardEnd = converter.viewPoint(fromImage: frame.toImage(Vec2(0, 0.5))).cgPoint
-                let thumbEnd = converter.viewPoint(fromImage: frame.toImage(Vec2(0.5, 0))).cgPoint
+                let origin = projection.viewPoint(fromLayout: frame.origin).cgPoint
+                let forwardEnd = projection.viewPoint(fromLayout: frame.toImage(Vec2(0, 0.5))).cgPoint
+                let thumbEnd = projection.viewPoint(fromLayout: frame.toImage(Vec2(0.5, 0))).cgPoint
                 var forwardPath = Path()
                 forwardPath.move(to: origin)
                 forwardPath.addLine(to: forwardEnd)

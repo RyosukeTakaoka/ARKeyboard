@@ -118,6 +118,9 @@ struct KeyboardSettings: Codable, Equatable {
     var decoder = DecoderConfig()
     /// キー配置の上に重ねて表示するもの
     var overlayMode: OverlayMode = .keys
+    /// 机モードで登録する範囲の実際の大きさ(cm)。メジャーで測って入れると、キーの大きさが cm で分かる
+    var deskWidthCm: Double = 60
+    var deskDepthCm: Double = 40
     /// 音のオンセット検出の設定
     var audioOnset = OnsetDetectorConfig()
     /// 振動のオンセット検出の設定

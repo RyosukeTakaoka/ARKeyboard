@@ -29,8 +29,10 @@ struct TapCandidate {
 
 /// 1フレーム処理した結果(ViewModel が画面に反映する)
 struct EngineOutput {
-    /// 左右を割り当てた手
+    /// 左右を割り当てた手(画像の座標。画面表示用)
     var hands: [Chirality: HandObservation] = [:]
+    /// 机の座標 → 画像 の変換(机モードでホモグラフィーを使っているときだけ。キー配置の表示に使う)
+    var planeToImage: Homography?
     /// キー配置の基準にしている手の座標系(画面にキーを描くのに使う)
     var layoutFrames: [Chirality: HandFrame] = [:]
     /// 指先の下にあるキーの ID(光らせる)
@@ -77,6 +79,20 @@ final class KeyboardEngine {
     private var languageModels: [DecoderLanguage: CharNGramModel] = [:]
     /// 最後にキーが入力された時刻(入力の速さを測るため)
     private var lastKeyTime: Double?
+    /// 机の平面(机モードで四隅を登録したとき)
+    var deskPlane: DeskPlane? {
+        didSet {
+            imageToPlane = deskPlane?.imageToPlane
+            planeToImage = deskPlane?.planeToImage
+        }
+    }
+    private var imageToPlane: Homography?
+    private var planeToImage: Homography?
+
+    /// 今、ホモグラフィーで机の座標に直して計算しているか
+    var isUsingDeskPlane: Bool {
+        settings.mode == .desk && settings.features.deskHomography && imageToPlane != nil && planeToImage != nil
+    }
 
     /// 手ごとの「平滑化した」手の座標系(手ぶれでキー配置が震えないようにするため)
     private var smoothedFrames: [Chirality: HandFrame] = [:]
@@ -172,8 +188,15 @@ final class KeyboardEngine {
     func process(_ frame: VisionFrame, now: Double? = nil) -> EngineOutput {
         var output = EngineOutput()
         let now = max(now ?? frame.timestamp, frame.timestamp)
-        let hands = assignHands(frame.hands)
-        output.hands = hands
+        // rawHands: 画像の座標のまま(画面表示と LiDAR の深度の読み取りに使う)
+        let rawHands = assignHands(frame.hands)
+        output.hands = rawHands
+        // hands: 計算に使う座標。机モードでは「真上から見た机の座標」に直す
+        var hands = rawHands
+        if isUsingDeskPlane, let plane = deskPlane, let homography = imageToPlane {
+            hands = rawHands.mapValues { plane.rectify($0, using: homography) }
+            output.planeToImage = planeToImage
+        }
 
         // 手の座標系を作り、前のフレームの値となめらかにつなぐ
         for chirality in Chirality.allCases {
@@ -192,7 +215,7 @@ final class KeyboardEngine {
 
         // キャリブレーション中は、それだけを行う
         if calibrator.isActive {
-            recordCalibrationDepths(hands: hands, frame: frame)
+            recordCalibrationDepths(hands: rawHands, frame: frame)
             if var result = calibrator.process(hands: hands, timestamp: frame.timestamp) {
                 result.restRelativeDepths = restDepthsFromCalibration()
                 setCalibration(result)
@@ -231,7 +254,7 @@ final class KeyboardEngine {
 
         syncFusionSettings()
         for event in detection.taps {
-            if let rejected = addCandidate(event, hands: hands, frame: frame) {
+            if let rejected = addCandidate(event, hands: rawHands, frame: frame) {
                 output.taps.append(rejected)
             }
         }

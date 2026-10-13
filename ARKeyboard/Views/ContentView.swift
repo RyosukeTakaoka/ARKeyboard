@@ -65,22 +65,30 @@ struct ContentView: View {
             GeometryReader { geometry in
                 let converter = CoordinateConverter(imageSize: viewModel.imageSize,
                                                     viewSize: Vec2(geometry.size))
+                let projection = LayoutProjection(converter: converter, planeToImage: viewModel.planeToImage)
                 ZStack {
+                    if viewModel.settings.mode == .desk, let plane = viewModel.deskPlane {
+                        DeskPlaneOutlineView(plane: plane, converter: converter)
+                    }
                     if viewModel.settings.overlayMode == .hitMap {
                         HitMapOverlayView(hitMaps: viewModel.hitMaps,
                                           keys: viewModel.keys,
                                           frames: viewModel.layoutFrames,
-                                          converter: converter)
+                                          projection: projection)
                     }
                     KeyboardOverlayView(keys: viewModel.keys,
                                         frames: viewModel.layoutFrames,
                                         hoveredKeyIDs: viewModel.hoveredKeyIDs,
                                         pressedKeys: viewModel.pressedKeys,
-                                        converter: converter)
+                                        projection: projection)
                     HandSkeletonView(hands: viewModel.hands,
                                      frames: viewModel.layoutFrames,
                                      converter: converter,
-                                     minConfidence: viewModel.settings.minConfidence)
+                                     minConfidence: viewModel.settings.minConfidence,
+                                     planeToImage: viewModel.planeToImage)
+                    if viewModel.isRegisteringDesk {
+                        DeskRegistrationView(viewModel: viewModel, converter: converter)
+                    }
                 }
             }
             .ignoresSafeArea()

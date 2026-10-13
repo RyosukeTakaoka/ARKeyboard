@@ -61,3 +61,18 @@ struct CoordinateConverter: Equatable {
         length * scale
     }
 }
+
+/// キー配置の計算に使った座標(手の座標系の toImage で得られる座標)→ 画面の座標。
+///
+/// 通常はキー配置の座標 = 画像のピクセル座標ですが、机モードでホモグラフィーを使うときは
+/// 「真上から見た机の座標(cm)」になっています。その場合は、逆の変換で画像に戻してから画面に変換します。
+struct LayoutProjection {
+    var converter: CoordinateConverter
+    /// 机の座標 → 画像 の変換(机モードのときだけ)
+    var planeToImage: Homography?
+
+    func viewPoint(fromLayout p: Vec2) -> Vec2 {
+        let image = planeToImage?.apply(p) ?? p
+        return converter.viewPoint(fromImage: image)
+    }
+}

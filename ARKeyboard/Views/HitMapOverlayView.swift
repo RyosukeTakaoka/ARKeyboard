@@ -12,7 +12,8 @@ struct HitMapOverlayView: View {
     let hitMaps: [Chirality: HitMap]
     let keys: [Chirality: [Key]]
     let frames: [Chirality: HandFrame]
-    let converter: CoordinateConverter
+    /// キー配置の座標 → 画面の座標(机モードではホモグラフィーの逆変換も含む)
+    let projection: LayoutProjection
 
     var body: some View {
         Canvas { context, _ in
@@ -29,7 +30,7 @@ struct HitMapOverlayView: View {
                     // 格子の4つの角(キー配置の座標)→ 画像 → 画面
                     let corners = [
                         Vec2(-half.x, -half.y), Vec2(half.x, -half.y), Vec2(half.x, half.y), Vec2(-half.x, half.y),
-                    ].map { converter.viewPoint(fromImage: frame.toImage(cell.center + $0)).cgPoint }
+                    ].map { projection.viewPoint(fromLayout: frame.toImage(cell.center + $0)).cgPoint }
                     var path = Path()
                     path.addLines(corners)
                     path.closeSubpath()

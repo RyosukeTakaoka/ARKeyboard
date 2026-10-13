@@ -26,6 +26,14 @@ final class KeyboardViewModel {
     var hands: [Chirality: HandObservation] = [:]
     /// キー配置の基準にしている手の座標系
     var layoutFrames: [Chirality: HandFrame] = [:]
+    /// 机の座標 → 画像(机モードでホモグラフィーを使っているとき)
+    var planeToImage: Homography?
+    /// 登録した机の平面
+    var deskPlane: DeskPlane?
+    /// 机の四隅を登録している途中か
+    var isRegisteringDesk = false
+    /// 登録中の四隅(画像の座標)
+    var deskCornerDraft: [Vec2] = []
     /// キャリブレーションの進み具合と案内
     var calibrationPhase: Calibrator.Phase = .idle
     var calibrationMessage = ""
@@ -107,12 +115,20 @@ final class KeyboardViewModel {
     /// UserDefaults に保存するときのキー(名前)
     private static let settingsKey = "KeyboardSettings.v1"
     private static let calibrationKey = "CalibrationResult.v1"
+    private static let deskPlaneKey = "DeskPlane.v1"
 
     init() {
         let loaded = Self.loadSettings()
         settings = loaded
         engine = KeyboardEngine(settings: loaded)
         loadLanguageModels()
+
+        // 前回登録した机の平面があれば使う
+        if let data = UserDefaults.standard.data(forKey: Self.deskPlaneKey),
+           let plane = try? JSONDecoder().decode(DeskPlane.self, from: data) {
+            deskPlane = plane
+            engine.deskPlane = plane
+        }
 
         // 前回のキャリブレーションがあれば再利用する(毎回やり直さなくてよいように)
         if let saved = Self.loadCalibration() {
@@ -342,6 +358,53 @@ final class KeyboardViewModel {
         return try? JSONDecoder().decode(CalibrationResult.self, from: data)
     }
 
+    // MARK: 机の四隅の登録(机モード)
+
+    /// 四隅を登録する順番の説明
+    static let deskCornerNames = ["奥の左", "奥の右", "手前の右", "手前の左"]
+
+    func startDeskRegistration() {
+        deskCornerDraft = []
+        isRegisteringDesk = true
+    }
+
+    func cancelDeskRegistration() {
+        deskCornerDraft = []
+        isRegisteringDesk = false
+    }
+
+    /// 画面をタップした位置を、机の角として追加する
+    /// - Parameters:
+    ///   - viewPoint: タップした位置(画面の座標)
+    ///   - viewSize: 画面の大きさ
+    func addDeskCorner(viewPoint: Vec2, viewSize: Vec2) {
+        let converter = CoordinateConverter(imageSize: imageSize, viewSize: viewSize)
+        deskCornerDraft.append(converter.imagePoint(fromView: viewPoint))
+        guard deskCornerDraft.count == 4 else { return }
+        let plane = DeskPlane(imageCorners: deskCornerDraft, widthCm: settings.deskWidthCm, depthCm: settings.deskDepthCm)
+        isRegisteringDesk = false
+        deskCornerDraft = []
+        guard plane.imageToPlane != nil else {
+            calibrationMessage = "四隅の位置から変換を計算できませんでした。順番どおりにタップし直してください"
+            return
+        }
+        deskPlane = plane
+        engine.deskPlane = plane
+        if let data = try? JSONEncoder().encode(plane) {
+            UserDefaults.standard.set(data, forKey: Self.deskPlaneKey)
+        }
+        // 座標の基準が変わったので、キャリブレーションはやり直しが必要
+        deleteCalibration()
+        notificationHaptics.notificationOccurred(.success)
+    }
+
+    func deleteDeskPlane() {
+        deskPlane = nil
+        engine.deskPlane = nil
+        UserDefaults.standard.removeObject(forKey: Self.deskPlaneKey)
+        deleteCalibration()
+    }
+
     // MARK: 練習モード
 
     /// 経過時間の計算に使う「今の時刻」(端末起動からの秒数。時計の変更に影響されない)
@@ -401,6 +464,7 @@ final class KeyboardViewModel {
         let output = engine.process(frame, now: now)
         hands = output.hands
         layoutFrames = output.layoutFrames
+        if planeToImage != output.planeToImage { planeToImage = output.planeToImage }
         hoveredKeyIDs = output.hoveredKeyIDs
         syncCalibrationState()
         if let result = output.calibrationFinished {
